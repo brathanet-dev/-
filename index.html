@@ -141,67 +141,116 @@
     // --- الدوال الأساسية ---
     function togglePanel() {
         const ctrl = document.getElementById('controls');
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام إدارة البيانات المتطور</title>
-    <style>
-        :root { --main-color: #2e7d32; }
+        ctrl.style.display = ctrl.style.display === 'block' ? 'none' : 'block';
+    }
 
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; transition: 0.3s; position: relative; }
-        
-        /* النقشات الخلفية المتنوعة */
-        body.dots { background-image: radial-gradient(#aaa 1px, transparent 1px); background-size: 20px 20px; }
-        body.lines { background: repeating-linear-gradient(45deg, #eee, #eee 10px, #f9f9f9 10px, #f9f9f9 20px); }
-        body.grid { background-image: linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px); background-size: 30px 30px; }
-        body.waves { background: radial-gradient(circle at 100% 50%, transparent 20%, #e5e5f7 21%, #e5e5f7 34%, transparent 35%, transparent), radial-gradient(circle at 0% 50%, transparent 20%, #e5e5f7 21%, #e5e5f7 34%, transparent 35%, transparent) 0 -50px; background-size: 75px 100px; background-color: #f4f4f9; }
-        body.carbon { background: linear-gradient(27deg, #151515 5px, transparent 5px) 0 5px, linear-gradient(207deg, #151515 5px, transparent 5px) 10px 0, linear-gradient(27deg, #222 5px, transparent 5px) 0 10px, linear-gradient(207deg, #222 5px, transparent 5px) 10px 5px, linear-gradient(90deg, #1b1b1b 10px, transparent 10px), linear-gradient(#1c1c1c 25%, #191919 25%, #191919 50%, transparent 50%, transparent 75%, #242424 75%, #242424); background-size: 20px 20px; background-color: #131313; }
-        body.honeycomb { background: radial-gradient(circle at 50% 50%, #e5e5f7 20%, transparent 20%), radial-gradient(circle at 0% 0%, #e5e5f7 20%, transparent 20%), radial-gradient(circle at 100% 0%, #e5e5f7 20%, transparent 20%), radial-gradient(circle at 100% 100%, #e5e5f7 20%, transparent 20%), radial-gradient(circle at 0% 100%, #e5e5f7 20%, transparent 20%); background-size: 40px 40px; background-color: #f4f4f9; }
+    function changeTheme(color) {
+        document.documentElement.style.setProperty('--main-color', color);
+        localStorage.setItem('themeColor', color);
+    }
 
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); }
-        h2 { color: var(--main-color); text-align: center; border-bottom: 2px solid var(--main-color); padding-bottom: 10px; }
-        
-        /* لوحة التحكم بالتنسيق المحدثة */
-        .theme-panel { position: fixed; left: 10px; top: 20px; z-index: 1000; }
-        .panel-toggle { background: #333; color: white; border: none; padding: 10px 15px; cursor: pointer; border-radius: 5px; font-weight: bold; }
-        .controls-content { display: none; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); width: 220px; margin-top: 5px; }
-        .color-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
-        .color-box { width: 30px; height: 30px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
-        .full-width { grid-column: 1 / -1; }
-        
-        .btn-save { background: var(--main-color); color: white; padding: 12px 50px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; display: block; margin: 0 auto; }
-        
-        .search-box { margin: 25px 0; width: 100%; padding: 15px; border: 2px solid var(--main-color); border-radius: 30px; outline: none; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background-color: var(--main-color); color: white; padding: 15px; }
-        td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+    function changePattern(pattern) {
+        document.body.className = pattern;
+        localStorage.setItem('themePattern', pattern);
+    }
 
-        .btn-action { border: none; padding: 8px; border-radius: 4px; cursor: pointer; color: white; margin: 2px; }
-        .btn-view { background: #0288d1; } .btn-print { background: #607d8b; } .btn-delete { background: #d32f2f; }
+    // --- إدارة البيانات ---
+    const dataForm = document.getElementById('dataForm');
+    dataForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        let record = {};
+        // جمع البيانات من كل الحقول
+        const fields = dataForm.querySelectorAll('input, select, textarea');
+        fields.forEach(field => { record[field.id] = field.value; });
 
-        /* مودال التفاصيل */
-        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; width: 85%; border-radius: 15px; max-height: 90vh; overflow-y: auto; direction: rtl; }
+        let data = JSON.parse(localStorage.getItem('army_db_final') || '[]');
+        data.push(record);
+        localStorage.setItem('army_db_final', JSON.stringify(data));
+        
+        dataForm.reset();
+        renderTable();
+        alert("تم الحفظ بنجاح");
+    });
 
-        /* تنسيق الطباعة المحسن */
-        @media print {
-            body * { visibility: hidden; }
-            #printSection, #printSection * { visibility: visible; }
-            #printSection { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
-            .print-item { border-bottom: 1px solid #000; padding: 10px; display: inline-block; width: 45%; }
+    function renderTable(filterData = null) {
+        const data = filterData || JSON.parse(localStorage.getItem('army_db_final') || '[]');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+
+        data.forEach((item, index) => {
+            const row = `<tr>
+                <td>${item.fullName}</td>
+                <td>${item.idNo}</td>
+                <td>${item.battalion}</td>
+                <td>${item.companyNo}</td>
+                <td>
+                    <button onclick="showDetails(${index})" style="background:#0288d1; color:white; border:none; padding:5px; cursor:pointer">👁</button>
+                    <button onclick="printRecord(${index})" style="background:#607d8b; color:white; border:none; padding:5px; cursor:pointer">🖨</button>
+                    <button onclick="deleteRecord(${index})" style="background:#d32f2f; color:white; border:none; padding:5px; cursor:pointer">🗑</button>
+                </td>
+            </tr>`;
+            tbody.innerHTML += row;
+        });
+    }
+
+    function searchData() {
+        const val = document.getElementById('searchInput').value.toLowerCase();
+        const data = JSON.parse(localStorage.getItem('army_db_final') || '[]');
+        const filtered = data.filter(i => 
+            i.fullName.toLowerCase().includes(val) || 
+            i.idNo.toLowerCase().includes(val)
+        );
+        renderTable(filtered);
+    }
+
+    function showDetails(index) {
+        const data = JSON.parse(localStorage.getItem('army_db_final'));
+        const item = data[index];
+        let content = '<h3>تفاصيل المنتسب</h3><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px">';
+        for (let key in item) {
+            content += `<p style="border-bottom:1px solid #eee; padding:5px"><b>${key}:</b> ${item[key] || '---'}</p>`;
         }
-    </style>
-</head>
-<body class="none">
+        content += '</div>';
+        document.getElementById('fullDetailsContent').innerHTML = content;
+        document.getElementById('detailsModal').style.display = 'block';
+    }
 
-<div class="theme-panel">
-    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق</button>
-    <div id="controls" class="controls-content">
-        <label><b>الألوان:</b></label>
-        <div class="color-options">
-            <div class="color-box"
+    function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
+
+    function deleteRecord(index) {
+        if(confirm("هل تريد الحذف؟")) {
+            let data = JSON.parse(localStorage.getItem('army_db_final'));
+            data.splice(index, 1);
+            localStorage.setItem('army_db_final', JSON.stringify(data));
+            renderTable();
+        }
+    }
+
+    // --- حل مشكلة الطباعة الجذري ---
+    function printRecord(index) {
+        const data = JSON.parse(localStorage.getItem('army_db_final'));
+        const item = data[index];
+        
+        // فتح نافذة جديدة للطباعة لضمان ظهور البيانات
+        const printWindow = window.open('', '', 'height=600,width=800');
+        printWindow.document.write('<html><head><title>طباعة تقرير</title>');
+        printWindow.document.write('<style>body{direction:rtl; font-family:tahoma; padding:20px;} .item{border-bottom:1px solid #ccc; padding:10px; width:45%; display:inline-block;}</style>');
+        printWindow.document.write('</head><body><h2 style="text-align:center">تقرير معلومات المنتسب</h2><hr>');
+        
+        for (let key in item) {
+            printWindow.document.write(`<div class="item"><b>${key}:</b> ${item[key] || '---'}</div>`);
+        }
+        
+        printWindow.document.write('</body></html>');
+        printWindow.document.close();
+        printWindow.print();
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem('themeColor')) changeTheme(localStorage.getItem('themeColor'));
+        if(localStorage.getItem('themePattern')) changePattern(localStorage.getItem('themePattern'));
+        renderTable();
+    };
+</script>
+</body>
+</html>
