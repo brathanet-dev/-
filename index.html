@@ -2,29 +2,32 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام إدارة البيانات المتطور</title>
+    <title>نظام إدارة البيانات - نسخة محدثة</title>
     <style>
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { color: #d32f2f; text-align: center; }
+        h2 { color: #2e7d32; text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
         
-        /* التنسيق الشبكي للحقول */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
         .full-width { grid-column: 1 / -1; }
         
-        /* الأزرار */
-        .btn-save { background: #28a745; color: white; padding: 10px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        .btn-save:hover { background: #218838; }
+        .btn-save { background: #2e7d32; color: white; padding: 12px 40px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s; }
+        .btn-save:hover { background: #1b5e20; }
         
-        /* البحث والجدول */
-        .search-box { margin: 20px 0; width: 100%; padding: 12px; border: 2px solid #007bff; border-radius: 25px; }
-        .table-wrapper { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 1000px; }
+        .search-box { margin: 20px 0; width: 100%; padding: 12px; border: 2px solid #2e7d32; border-radius: 25px; outline: none; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #007bff; color: white; }
+        th { background-color: #2e7d32; color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
 
-        /* النافذة المنبثقة والطباعة */
+        .btn-action { border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; color: white; margin: 2px; }
+        .btn-view { background: #0288d1; }
+        .btn-print { background: #757575; }
+        .btn-delete { background: #d32f2f; }
+
+        /* Modal & Print */
         .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
         .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; border-radius: 10px; max-height: 80vh; overflow-y: auto; }
         @media print { body * { visibility: hidden; } #printSection, #printSection * { visibility: visible; } #printSection { position: absolute; left: 0; top: 0; width: 100%; } }
@@ -33,10 +36,10 @@
 <body>
 
 <div class="container">
-    <h2>نظام إدارة البيانات</h2>
+    <h2>نظام إدارة البيانات الاستخباراتي</h2>
     
     <form id="dataForm">
-        <div class="grid-container" id="fieldsContainer">
+        <div class="grid-container">
             <input type="number" id="idNo" placeholder="ID" required>
             <input type="text" id="fullName" placeholder="الاسم الرباعي واللقب" required>
             <input type="number" id="birthYear" placeholder="المواليد">
@@ -58,10 +61,21 @@
             <input type="text" id="zuqaq" placeholder="الزقاق">
             <input type="text" id="dar" placeholder="الدار">
             <input type="text" id="landmark" placeholder="نقطة دالة">
-            <input type="number" id="phone" placeholder="الهاتف">
+            <input type="number" id="phone" placeholder="رقم الهاتف">
             <input type="number" id="brigade" placeholder="اللواء">
-            <select id="battalion"><option value="">الفوج</option><option>الأول</option><option>الثاني</option></select>
-            <input type="number" id="companyNo" placeholder="السرية">
+            
+            <select id="battalion">
+                <option value="">اختر الفوج</option>
+                <option>الفوج الأول</option>
+                <option>الفوج الثاني</option>
+                <option>الفوج الثالث</option>
+                <option>الفوج الرابع</option>
+                <option>الفوج الخامس</option>
+                <option>الفوج السادس</option>
+                <option>الفوج السابع</option>
+            </select>
+
+            <input type="number" id="companyNo" placeholder="رقم السرية">
             <input type="text" id="companyName" placeholder="اسم السرية">
             <input type="text" id="category" placeholder="الصنف">
             <input type="text" id="refName" placeholder="المعرف">
@@ -69,16 +83,20 @@
             <textarea id="experience" class="full-width" placeholder="الخبرات"></textarea>
             <textarea id="notes" class="full-width" placeholder="الملاحظات"></textarea>
         </div>
-        <center><button type="submit" class="btn-save">حفظ البيانات</button></center>
+        <center><button type="submit" class="btn-save">حفظ البيانات في النظام</button></center>
     </form>
 
-    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID أو الفوج...">
 
-    <div class="table-wrapper">
+    <div style="overflow-x:auto;">
         <table>
             <thead>
                 <tr>
-                    <th>ID</th><th>الاسم</th><th>الهاتف</th><th>الصنف</th><th>الإجراءات</th>
+                    <th>الاسم الرباعي واللقب</th>
+                    <th>ID</th>
+                    <th>الفوج</th>
+                    <th>السرية</th>
+                    <th>الإجراءات</th>
                 </tr>
             </thead>
             <tbody id="tableBody"></tbody>
@@ -88,7 +106,7 @@
 
 <div id="detailsModal" class="modal">
     <div class="modal-content">
-        <span onclick="closeModal()" style="cursor:pointer; font-size:24px;">&times;</span>
+        <span onclick="closeModal()" style="cursor:pointer; font-size:28px; color:red;">&times; إغلاق</span>
         <div id="fullDetailsContent"></div>
     </div>
 </div>
@@ -97,27 +115,32 @@
 
 <script>
     const form = document.getElementById('dataForm');
+    
     form.onsubmit = function(e) {
         e.preventDefault();
         let record = {};
         form.querySelectorAll('input, select, textarea').forEach(el => record[el.id] = el.value);
-        let data = JSON.parse(localStorage.getItem('sysData') || '[]');
+        let data = JSON.parse(localStorage.getItem('armySystemData') || '[]');
         data.push(record);
-        localStorage.setItem('sysData', JSON.stringify(data));
+        localStorage.setItem('armySystemData', JSON.stringify(data));
         form.reset();
         renderTable();
+        alert("تم حفظ البيانات بنجاح");
     };
 
     function renderTable(filterData = null) {
-        let data = filterData || JSON.parse(localStorage.getItem('sysData') || '[]');
+        let data = filterData || JSON.parse(localStorage.getItem('armySystemData') || '[]');
         let html = '';
         data.forEach((item, index) => {
             html += `<tr>
-                <td>${item.idNo}</td><td>${item.fullName}</td><td>${item.phone}</td><td>${item.category}</td>
+                <td>${item.fullName}</td>
+                <td>${item.idNo}</td>
+                <td>${item.battalion}</td>
+                <td>${item.companyNo || item.companyName}</td>
                 <td>
-                    <button onclick="showDetails(${index})">👁</button>
-                    <button onclick="printReport(${index})">🖨</button>
-                    <button onclick="deleteItem(${index})">🗑</button>
+                    <button class="btn-action btn-view" onclick="showDetails(${index})">👁 عرض</button>
+                    <button class="btn-action btn-print" onclick="printReport(${index})">🖨 طباعة</button>
+                    <button class="btn-action btn-delete" onclick="deleteItem(${index})">🗑 حذف</button>
                 </td>
             </tr>`;
         });
@@ -126,15 +149,32 @@
 
     function searchData() {
         let val = document.getElementById('searchInput').value.toLowerCase();
-        let data = JSON.parse(localStorage.getItem('sysData') || '[]');
-        let filtered = data.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
+        let data = JSON.parse(localStorage.getItem('armySystemData') || '[]');
+        let filtered = data.filter(i => 
+            i.fullName.toLowerCase().includes(val) || 
+            i.idNo.includes(val) || 
+            i.battalion.includes(val)
+        );
         renderTable(filtered);
     }
 
     function showDetails(i) {
-        let item = JSON.parse(localStorage.getItem('sysData'))[i];
-        let content = "<h3>التفاصيل الكاملة</h3>";
-        for(let key in item) content += `<p><b>${key}:</b> ${item[key]}</p>`;
+        let data = JSON.parse(localStorage.getItem('armySystemData'));
+        let item = data[i];
+        let content = "<h2 style='color:#2e7d32'>التفاصيل الكاملة للمنتسب</h2><div style='display:grid; grid-template-columns: 1fr 1fr; gap:10px;'>";
+        
+        const labels = {
+            idNo: "ID", fullName: "الاسم", birthYear: "المواليد", birthPlace: "محل التولد",
+            gender: "الجنس", motherName: "اسم الأم", civilId: "رقم الهوية", maritalStatus: "الحالة الزوجية",
+            spouseName: "اسم الزوج/ة", childrenCount: "الأطفال", education: "التحصيل",
+            province: "المحافظة", district: "القضاء", phone: "الهاتف",
+            battalion: "الفوج", companyNo: "السرية", category: "الصنف", notes: "ملاحظات"
+        };
+
+        for(let key in labels) {
+            content += `<p style='border-bottom:1px solid #eee; padding:5px;'><b>${labels[key]}:</b> ${item[key] || '---'}</p>`;
+        }
+        content += "</div>";
         document.getElementById('fullDetailsContent').innerHTML = content;
         document.getElementById('detailsModal').style.display = 'block';
     }
@@ -142,10 +182,24 @@
     function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
     
     function deleteItem(i) {
-        let data = JSON.parse(localStorage.getItem('sysData'));
-        data.splice(i, 1);
-        localStorage.setItem('sysData', JSON.stringify(data));
-        renderTable();
+        if(confirm("هل أنت متأكد من حذف هذا السجل؟")) {
+            let data = JSON.parse(localStorage.getItem('armySystemData'));
+            data.splice(i, 1);
+            localStorage.setItem('armySystemData', JSON.stringify(data));
+            renderTable();
+        }
+    }
+
+    function printReport(i) {
+        showDetails(i); // تجهيز المحتوى
+        setTimeout(() => {
+            const printContent = document.getElementById('fullDetailsContent').innerHTML;
+            const printArea = document.getElementById('printSection');
+            printArea.innerHTML = printContent;
+            printArea.style.display = 'block';
+            window.print();
+            printArea.style.display = 'none';
+        }, 500);
     }
 
     renderTable();
