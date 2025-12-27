@@ -2,57 +2,103 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام إدارة البيانات - نسخة محدثة</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة البيانات المتكامل</title>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { color: #2e7d32; text-align: center; border-bottom: 2px solid #2e7d32; padding-bottom: 10px; }
+        /* تعريف المتغيرات اللونية */
+        :root { --main-color: #2e7d32; }
+
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; transition: 0.3s; }
         
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        /* النقشات الخلفية */
+        body.dots { background-image: radial-gradient(#d1d1d1 1px, transparent 1px); background-size: 20px 20px; }
+        body.lines { background: repeating-linear-gradient(45deg, #f0f0f0, #f0f0f0 10px, #f9f9f9 10px, #f9f9f9 20px); }
+        body.grid { background-image: linear-gradient(#e0e0e0 1px, transparent 1px), linear-gradient(90deg, #e0e0e0 1px, transparent 1px); background-size: 30px 30px; }
+
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 15px rgba(0,0,0,0.1); position: relative; }
+        
+        h2 { color: var(--main-color); text-align: center; border-bottom: 2px solid var(--main-color); padding-bottom: 10px; transition: 0.3s; }
+        
+        /* لوحة التحكم بالتنسيق */
+        .theme-panel { position: fixed; left: 10px; top: 20px; z-index: 1000; }
+        .panel-toggle { background: #333; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; font-weight: bold; }
+        .controls-content { display: none; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); margin-top: 5px; width: 200px; }
+        .color-options { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .color-box { width: 35px; height: 35px; border-radius: 50%; cursor: pointer; border: 2px solid #fff; box-shadow: 0 0 3px rgba(0,0,0,0.3); }
+        
+        /* شبكة الحقول */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
         input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; font-size: 14px; }
+        input:focus { border-color: var(--main-color); outline: none; }
         .full-width { grid-column: 1 / -1; }
         
-        .btn-save { background: #2e7d32; color: white; padding: 12px 40px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; transition: 0.3s; }
-        .btn-save:hover { background: #1b5e20; }
+        /* الأزرار */
+        .btn-save { background: var(--main-color); color: white; padding: 12px 50px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.3s; }
+        .btn-save:hover { filter: brightness(0.9); }
         
-        .search-box { margin: 20px 0; width: 100%; padding: 12px; border: 2px solid #2e7d32; border-radius: 25px; outline: none; }
-        
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
-        th { background-color: #2e7d32; color: white; }
+        /* البحث والجدول */
+        .search-box { margin: 20px 0; width: 100%; padding: 12px; border: 2px solid var(--main-color); border-radius: 25px; outline: none; transition: 0.3s; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th { background-color: var(--main-color); color: white; padding: 12px; transition: 0.3s; }
+        td { border: 1px solid #ddd; padding: 10px; text-align: center; }
         tr:nth-child(even) { background-color: #f9f9f9; }
 
-        .btn-action { border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer; color: white; margin: 2px; }
+        .btn-action { border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; color: white; margin: 2px; font-size: 12px; }
         .btn-view { background: #0288d1; }
-        .btn-print { background: #757575; }
+        .btn-print { background: #607d8b; }
         .btn-delete { background: #d32f2f; }
 
-        /* Modal & Print */
-        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
-        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; border-radius: 10px; max-height: 80vh; overflow-y: auto; }
+        /* النافذة المنبثقة */
+        .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); }
+        .modal-content { background: white; margin: 2% auto; padding: 25px; width: 85%; border-radius: 12px; max-height: 90vh; overflow-y: auto; position: relative; }
+        .close-btn { position: absolute; left: 20px; top: 20px; font-size: 24px; cursor: pointer; color: #d32f2f; font-weight: bold; }
+
         @media print { body * { visibility: hidden; } #printSection, #printSection * { visibility: visible; } #printSection { position: absolute; left: 0; top: 0; width: 100%; } }
     </style>
 </head>
-<body>
+<body class="none">
+
+<div class="theme-panel">
+    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق</button>
+    <div id="controls" class="controls-content">
+        <label><b>لون النظام:</b></label>
+        <div class="color-options">
+            <div class="color-box" style="background: #2e7d32;" onclick="changeTheme('#2e7d32')"></div>
+            <div class="color-box" style="background: #1565c0;" onclick="changeTheme('#1565c0')"></div>
+            <div class="color-box" style="background: #c62828;" onclick="changeTheme('#c62828')"></div>
+            <div class="color-box" style="background: #37474f;" onclick="changeTheme('#37474f')"></div>
+            <div class="color-box" style="background: #6a1b9a;" onclick="changeTheme('#6a1b9a')"></div>
+        </div>
+        <hr>
+        <label><b>النقشة:</b></label>
+        <select id="patternSelect" onchange="changePattern(this.value)" style="margin-top:5px;">
+            <option value="none">بدون نقشة</option>
+            <option value="dots">نقاط</option>
+            <option value="lines">خطوط</option>
+            <option value="grid">شبكة</option>
+        </select>
+    </div>
+</div>
 
 <div class="container">
-    <h2>نظام إدارة البيانات الاستخباراتي</h2>
+    <h2>نظام إدارة بيانات المنتسبين</h2>
     
     <form id="dataForm">
         <div class="grid-container">
-            <input type="number" id="idNo" placeholder="ID" required>
+            <input type="number" id="idNo" placeholder="ID الرقم التعريفي" required>
             <input type="text" id="fullName" placeholder="الاسم الرباعي واللقب" required>
             <input type="number" id="birthYear" placeholder="المواليد">
             <input type="text" id="birthPlace" placeholder="محل التولد">
             <select id="gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select>
             <input type="text" id="motherName" placeholder="اسم الأم الثلاثي">
-            <input type="number" id="civilId" placeholder="رقم الهوية">
+            <input type="number" id="civilId" placeholder="رقم هوية الأحوال">
             <select id="maritalStatus"><option value="">الحالة الزوجية</option><option>أعزب</option><option>متزوج</option><option>مطلق</option><option>أرمل</option></select>
             <input type="text" id="spouseName" placeholder="اسم الزوج/الزوجة">
             <input type="number" id="childrenCount" placeholder="عدد الأطفال">
             <input type="text" id="education" placeholder="التحصيل الدراسي">
-            <input type="text" id="specialization" placeholder="التخصص الدراسي">
+            <input type="text" id="specialization" placeholder="التخصص">
             <input type="text" id="job" placeholder="العمل أو الوظيفة">
+            
             <input type="text" id="province" placeholder="المحافظة">
             <input type="text" id="district" placeholder="القضاء">
             <input type="text" id="subDistrict" placeholder="الناحية">
@@ -60,33 +106,29 @@
             <input type="text" id="mahala" placeholder="المحلة">
             <input type="text" id="zuqaq" placeholder="الزقاق">
             <input type="text" id="dar" placeholder="الدار">
-            <input type="text" id="landmark" placeholder="نقطة دالة">
+            <input type="text" id="landmark" placeholder="أقرب نقطة دالة">
+            
             <input type="number" id="phone" placeholder="رقم الهاتف">
             <input type="number" id="brigade" placeholder="اللواء">
-            
             <select id="battalion">
                 <option value="">اختر الفوج</option>
-                <option>الفوج الأول</option>
-                <option>الفوج الثاني</option>
-                <option>الفوج الثالث</option>
-                <option>الفوج الرابع</option>
-                <option>الفوج الخامس</option>
-                <option>الفوج السادس</option>
+                <option>الفوج الأول</option><option>الفوج الثاني</option><option>الفوج الثالث</option>
+                <option>الفوج الرابع</option><option>الفوج الخامس</option><option>الفوج السادس</option>
                 <option>الفوج السابع</option>
             </select>
-
             <input type="number" id="companyNo" placeholder="رقم السرية">
             <input type="text" id="companyName" placeholder="اسم السرية">
             <input type="text" id="category" placeholder="الصنف">
-            <input type="text" id="refName" placeholder="المعرف">
+            <input type="text" id="refName" placeholder="المعرف الأول">
             <input type="number" id="refPhone" placeholder="هاتف المعرف">
-            <textarea id="experience" class="full-width" placeholder="الخبرات"></textarea>
-            <textarea id="notes" class="full-width" placeholder="الملاحظات"></textarea>
+            
+            <textarea id="experience" class="full-width" placeholder="الخبرات والمهارات"></textarea>
+            <textarea id="notes" class="full-width" placeholder="ملاحظات إضافية"></textarea>
         </div>
-        <center><button type="submit" class="btn-save">حفظ البيانات في النظام</button></center>
+        <center><button type="submit" class="btn-save">حفظ البيانات</button></center>
     </form>
 
-    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID أو الفوج...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم، ID، الفوج، أو السرية...">
 
     <div style="overflow-x:auto;">
         <table>
@@ -106,7 +148,7 @@
 
 <div id="detailsModal" class="modal">
     <div class="modal-content">
-        <span onclick="closeModal()" style="cursor:pointer; font-size:28px; color:red;">&times; إغلاق</span>
+        <span onclick="closeModal()" class="close-btn">&times; إغلاق</span>
         <div id="fullDetailsContent"></div>
     </div>
 </div>
@@ -114,33 +156,50 @@
 <div id="printSection" style="display:none;"></div>
 
 <script>
+    // --- وظائف التنسيق والألوان ---
+    function togglePanel() {
+        const content = document.getElementById('controls');
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    }
+
+    function changeTheme(color) {
+        document.documentElement.style.setProperty('--main-color', color);
+        localStorage.setItem('themeColor', color);
+    }
+
+    function changePattern(pattern) {
+        document.body.className = pattern;
+        localStorage.setItem('themePattern', pattern);
+    }
+
+    // --- وظائف البيانات ---
     const form = document.getElementById('dataForm');
     
     form.onsubmit = function(e) {
         e.preventDefault();
         let record = {};
         form.querySelectorAll('input, select, textarea').forEach(el => record[el.id] = el.value);
-        let data = JSON.parse(localStorage.getItem('armySystemData') || '[]');
+        let data = JSON.parse(localStorage.getItem('armyDB') || '[]');
         data.push(record);
-        localStorage.setItem('armySystemData', JSON.stringify(data));
+        localStorage.setItem('armyDB', JSON.stringify(data));
         form.reset();
         renderTable();
-        alert("تم حفظ البيانات بنجاح");
+        alert("تم الحفظ بنجاح في قاعدة البيانات");
     };
 
     function renderTable(filterData = null) {
-        let data = filterData || JSON.parse(localStorage.getItem('armySystemData') || '[]');
+        let data = filterData || JSON.parse(localStorage.getItem('armyDB') || '[]');
         let html = '';
         data.forEach((item, index) => {
             html += `<tr>
-                <td>${item.fullName}</td>
+                <td style="text-align:right;">${item.fullName}</td>
                 <td>${item.idNo}</td>
                 <td>${item.battalion}</td>
-                <td>${item.companyNo || item.companyName}</td>
+                <td>${item.companyNo || '---'}</td>
                 <td>
-                    <button class="btn-action btn-view" onclick="showDetails(${index})">👁 عرض</button>
-                    <button class="btn-action btn-print" onclick="printReport(${index})">🖨 طباعة</button>
-                    <button class="btn-action btn-delete" onclick="deleteItem(${index})">🗑 حذف</button>
+                    <button class="btn-action btn-view" onclick="showDetails(${index})">عرض</button>
+                    <button class="btn-action btn-print" onclick="printReport(${index})">طباعة</button>
+                    <button class="btn-action btn-delete" onclick="deleteItem(${index})">حذف</button>
                 </td>
             </tr>`;
         });
@@ -149,32 +208,33 @@
 
     function searchData() {
         let val = document.getElementById('searchInput').value.toLowerCase();
-        let data = JSON.parse(localStorage.getItem('armySystemData') || '[]');
+        let data = JSON.parse(localStorage.getItem('armyDB') || '[]');
         let filtered = data.filter(i => 
             i.fullName.toLowerCase().includes(val) || 
             i.idNo.includes(val) || 
-            i.battalion.includes(val)
+            (i.battalion && i.battalion.includes(val)) ||
+            (i.companyNo && i.companyNo.includes(val))
         );
         renderTable(filtered);
     }
 
     function showDetails(i) {
-        let data = JSON.parse(localStorage.getItem('armySystemData'));
+        let data = JSON.parse(localStorage.getItem('armyDB'));
         let item = data[i];
-        let content = "<h2 style='color:#2e7d32'>التفاصيل الكاملة للمنتسب</h2><div style='display:grid; grid-template-columns: 1fr 1fr; gap:10px;'>";
+        let content = `<h2 style="color:var(--main-color)">التقرير الكامل للمنتسب</h2><div style="display:grid; grid-template-columns: 1fr 1fr; gap:15px; text-align:right;">`;
         
         const labels = {
-            idNo: "ID", fullName: "الاسم", birthYear: "المواليد", birthPlace: "محل التولد",
+            idNo: "رقم المعرف ID", fullName: "الاسم الكامل", birthYear: "سنة المواليد", birthPlace: "محل التولد",
             gender: "الجنس", motherName: "اسم الأم", civilId: "رقم الهوية", maritalStatus: "الحالة الزوجية",
-            spouseName: "اسم الزوج/ة", childrenCount: "الأطفال", education: "التحصيل",
-            province: "المحافظة", district: "القضاء", phone: "الهاتف",
+            spouseName: "اسم الزوج/ة", childrenCount: "عدد الأطفال", education: "التحصيل",
+            province: "المحافظة", district: "القضاء", phone: "رقم الهاتف",
             battalion: "الفوج", companyNo: "السرية", category: "الصنف", notes: "ملاحظات"
         };
 
         for(let key in labels) {
-            content += `<p style='border-bottom:1px solid #eee; padding:5px;'><b>${labels[key]}:</b> ${item[key] || '---'}</p>`;
+            content += `<div style="border-bottom:1px solid #eee; padding:8px;"><b>${labels[key]}:</b> ${item[key] || '---'}</div>`;
         }
-        content += "</div>";
+        content += `</div>`;
         document.getElementById('fullDetailsContent').innerHTML = content;
         document.getElementById('detailsModal').style.display = 'block';
     }
@@ -182,27 +242,37 @@
     function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
     
     function deleteItem(i) {
-        if(confirm("هل أنت متأكد من حذف هذا السجل؟")) {
-            let data = JSON.parse(localStorage.getItem('armySystemData'));
+        if(confirm("هل أنت متأكد من حذف هذا السجل نهائياً؟")) {
+            let data = JSON.parse(localStorage.getItem('armyDB'));
             data.splice(i, 1);
-            localStorage.setItem('armySystemData', JSON.stringify(data));
+            localStorage.setItem('armyDB', JSON.stringify(data));
             renderTable();
         }
     }
 
     function printReport(i) {
-        showDetails(i); // تجهيز المحتوى
+        showDetails(i);
         setTimeout(() => {
-            const printContent = document.getElementById('fullDetailsContent').innerHTML;
+            const content = document.getElementById('fullDetailsContent').innerHTML;
             const printArea = document.getElementById('printSection');
-            printArea.innerHTML = printContent;
+            printArea.innerHTML = content;
             printArea.style.display = 'block';
             window.print();
             printArea.style.display = 'none';
-        }, 500);
+        }, 300);
     }
 
-    renderTable();
+    // استعادة الإعدادات المحفوظة
+    window.onload = function() {
+        const savedColor = localStorage.getItem('themeColor');
+        const savedPattern = localStorage.getItem('themePattern');
+        if (savedColor) changeTheme(savedColor);
+        if (savedPattern) {
+            changePattern(savedPattern);
+            document.getElementById('patternSelect').value = savedPattern;
+        }
+        renderTable();
+    };
 </script>
 </body>
 </html>
