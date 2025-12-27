@@ -6,19 +6,16 @@
     <title>نظام العديد المركزي - لواء 306</title>
     <style>
         :root { --main-color: #1b5e20; }
-        
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; transition: 0.3s; background-attachment: fixed; background-size: cover; }
         
-        /* النقشات الإضافية */
+        /* النقشات */
         body.dots { background-image: radial-gradient(#aaa 1px, transparent 1px); background-size: 20px 20px; }
         body.grid { background-image: linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px); background-size: 30px 30px; }
         body.army { background-color: #4b5320; background-image: linear-gradient(45deg, #556b2f 25%, transparent 25%), linear-gradient(-45deg, #556b2f 25%, transparent 25%); background-size: 4px 4px; }
         body.desert { background-color: #c2b280; background-image: linear-gradient(90deg, #d2b48c 50%, transparent 50%); background-size: 50px 50px; }
-        body.luxury { background: linear-gradient(135deg, #2c3e50, #000000); color: #fff; }
 
         .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.95); padding: 30px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); color: #333; }
         
-        /* العنوان الكبير والمميز */
         .main-header { text-align: center; border-bottom: 4px double var(--main-color); margin-bottom: 30px; padding-bottom: 10px; }
         .main-header h1 { margin: 0; font-size: 35px; color: var(--main-color); text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
         .main-header p { margin: 5px 0; font-size: 20px; font-weight: bold; color: #555; }
@@ -27,24 +24,19 @@
         .theme-panel { position: fixed; left: 10px; top: 10px; z-index: 1000; }
         .panel-toggle { background: #333; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 5px; font-weight: bold; }
         .controls-content { display: none; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; width: 250px; color: #333; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .color-options { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 10px 0; }
-        .color-box { width: 35px; height: 35px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
         
-        /* مدخل الصورة */
-        .img-input { width: 100%; padding: 5px; margin-top: 10px; border: 1px solid #ccc; font-size: 12px; }
-
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 14px; }
         .full-width { grid-column: 1 / -1; }
         
         .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; transition: 0.3s; }
-        .btn-save:hover { transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
         .search-box { margin: 20px 0; width: 100%; padding: 15px; border: 3px solid var(--main-color); border-radius: 30px; font-size: 16px; }
         table { width: 100%; border-collapse: collapse; margin-top: 10px; }
         th { background: var(--main-color); color: white; padding: 15px; font-size: 16px; }
         td { border: 1px solid #ddd; padding: 12px; text-align: center; font-weight: 500; }
         
+        /* مودال التفاصيل */
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); }
         .modal-content { background: white; margin: 1% auto; padding: 30px; width: 85%; border-radius: 15px; max-height: 95vh; overflow-y: auto; color: #333; position: relative; }
     </style>
@@ -52,35 +44,23 @@
 <body>
 
 <div class="theme-panel">
-    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق والالوان</button>
+    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق</button>
     <div id="controls" class="controls-content">
-        <b>اختر اللون الأساسي:</b>
-        <div class="color-options">
-            <div class="color-box" style="background:#1b5e20" onclick="changeTheme('#1b5e20')"></div>
-            <div class="color-box" style="background:#b8860b" onclick="changeTheme('#b8860b')"></div>
-            <div class="color-box" style="background:#0d47a1" onclick="changeTheme('#0d47a1')"></div>
-            <div class="color-box" style="background:#b71c1c" onclick="changeTheme('#b71c1c')"></div>
-            <div class="color-box" style="background:#212121" onclick="changeTheme('#212121')"></div>
-            <div class="color-box" style="background:#4e342e" onclick="changeTheme('#4e342e')"></div>
-            <div class="color-box" style="background:#006064" onclick="changeTheme('#006064')"></div>
-            <div class="color-box" style="background:#ad1457" onclick="changeTheme('#ad1457')"></div>
-            <div class="color-box" style="background:#33691e" onclick="changeTheme('#33691e')"></div>
-            <div class="color-box" style="background:#fbc02d" onclick="changeTheme('#fbc02d')"></div>
+        <b>الألوان الأساسية:</b>
+        <div style="display: flex; flex-wrap: wrap; gap: 5px; margin: 10px 0;">
+            <div style="width:30px;height:30px;background:#1b5e20;cursor:pointer;" onclick="changeTheme('#1b5e20')"></div>
+            <div style="width:30px;height:30px;background:#0d47a1;cursor:pointer;" onclick="changeTheme('#0d47a1')"></div>
+            <div style="width:30px;height:30px;background:#b71c1c;cursor:pointer;" onclick="changeTheme('#b71c1c')"></div>
+            <div style="width:30px;height:30px;background:#b8860b;cursor:pointer;" onclick="changeTheme('#b8860b')"></div>
         </div>
-        <hr>
-        <b>اختر نقشة الخلفية:</b>
-        <select id="patternSelect" onchange="changePattern(this.value)" style="width:100%; margin-top:5px; padding:5px;">
-            <option value="none">بدون نقشة (سادة)</option>
-            <option value="dots">نقاط خفيفة</option>
-            <option value="grid">شبكة مربعات</option>
-            <option value="army">نمط عسكري 1</option>
-            <option value="desert">نمط صحراوي</option>
-            <option value="luxury">نمط ملكي داكن</option>
+        <b>النقشات:</b>
+        <select onchange="changePattern(this.value)" style="width:100%; margin-top:5px;">
+            <option value="none">سادة</option>
+            <option value="dots">نقاط</option>
+            <option value="grid">شبكة</option>
+            <option value="army">عسكري</option>
+            <option value="desert">صحراوي</option>
         </select>
-        <hr>
-        <b>رابط صورة كخلفية:</b>
-        <input type="text" id="bgImgInput" class="img-input" placeholder="ضع رابط الصورة هنا..." onchange="changeBgImage(this.value)">
-        <button onclick="clearBgImage()" style="width:100%; margin-top:5px; font-size:10px;">حذف صورة الخلفية</button>
     </div>
 </div>
 
@@ -98,13 +78,13 @@
             <input type="text" id="birthPlace" placeholder="محل التولد">
             <select id="gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select>
             <input type="text" id="motherName" placeholder="اسم الأم الثلاثي">
-            <input type="number" id="civilId" placeholder="رقم البطاقة الوطنية / الهوية">
+            <input type="number" id="civilId" placeholder="رقم البطاقة الوطنية">
             <select id="maritalStatus"><option value="">الحالة الزوجية</option><option>أعزب</option><option>متزوج</option><option>مطلق</option><option>أرمل</option></select>
             <input type="text" id="spouseName" placeholder="اسم الزوج/ة">
             <input type="number" id="childrenCount" placeholder="عدد الأطفال">
             <input type="text" id="education" placeholder="التحصيل الدراسي">
             <input type="text" id="specialization" placeholder="التخصص">
-            <input type="text" id="job" placeholder="المهنة قبل التطوع">
+            <input type="text" id="job" placeholder="المهنة">
             <input type="text" id="province" placeholder="المحافظة">
             <input type="text" id="district" placeholder="القضاء">
             <input type="text" id="subDistrict" placeholder="الناحية">
@@ -115,24 +95,26 @@
             <input type="text" id="landmark" placeholder="نقطة دالة">
             <input type="text" id="phone" placeholder="رقم الهاتف">
             <input type="number" id="brigade" placeholder="رقم اللواء">
+            
             <select id="battalion">
                 <option value="">اختر الفوج</option>
                 <option>الفوج الأول</option><option>الفوج الثاني</option><option>الفوج الثالث</option>
                 <option>الفوج الرابع</option><option>الفوج الخامس</option><option>الفوج السادس</option>
                 <option>الفوج السابع</option>
             </select>
-            <input type="text" id="companyNo" placeholder="السرية">
-            <input type="text" id="companyName" placeholder="اسم السرية">
+
+            <select id="companyNo" required>
+                <option value="">اختر السرية</option>
+                </select>
+
             <input type="text" id="category" placeholder="الصنف">
-            <input type="text" id="refName" placeholder="المعرف الأول">
-            <input type="text" id="refPhone" placeholder="هاتف المعرف">
             <textarea id="experience" class="full-width" placeholder="الخبرات والمهارات"></textarea>
-            <textarea id="notes" class="full-width" placeholder="ملاحظات آخرى"></textarea>
+            <textarea id="notes" class="full-width" placeholder="ملاحظات إضافية"></textarea>
         </div>
-        <button type="submit" class="btn-save">حفظ البيانات في السجل المركزي</button>
+        <button type="submit" class="btn-save">حفظ في السجل المركزي</button>
     </form>
 
-    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم، ID، الفوج، أو السرية...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم، ID، الفوج أو السرية...">
 
     <div style="overflow-x:auto">
         <table>
@@ -148,12 +130,34 @@
 
 <div id="detailsModal" class="modal">
     <div class="modal-content">
-        <button onclick="closeModal()" style="background:#d32f2f; color:white; border:none; padding:10px 20px; cursor:pointer; float:left; border-radius:5px;">إغلاق النافذة</button>
+        <button onclick="closeModal()" style="background:#d32f2f; color:white; border:none; padding:10px; cursor:pointer; float:left; border-radius:5px;">إغلاق</button>
         <div id="fullDetailsContent"></div>
     </div>
 </div>
 
 <script>
+    // قاموس التعريب
+    const labelsAR = {
+        idNo: "الرقم التعريفي (ID)", fullName: "الاسم الرباعي واللقب", birthYear: "المواليد",
+        birthPlace: "محل التولد", gender: "الجنس", motherName: "اسم الأم الثلاثي",
+        civilId: "رقم البطاقة الوطنية", maritalStatus: "الحالة الزوجية", spouseName: "اسم الزوج/ة",
+        childrenCount: "عدد الأطفال", education: "التحصيل الدراسي", specialization: "التخصص",
+        job: "المهنة", province: "المحافظة", district: "القضاء", subDistrict: "الناحية",
+        region: "المنطقة / الحي", mahala: "المحلة", zuqaq: "الزقاق", dar: "الدار",
+        landmark: "نقطة دالة", phone: "رقم الهاتف", brigade: "رقم اللواء",
+        battalion: "الفوج", companyNo: "السرية", category: "الصنف",
+        experience: "الخبرات", notes: "ملاحظات"
+    };
+
+    // توليد قائمة السرايا من 1 إلى 40 تلقائياً
+    const companySelect = document.getElementById('companyNo');
+    for (let i = 1; i <= 40; i++) {
+        let option = document.createElement('option');
+        option.value = "السرية " + i;
+        option.text = "السرية " + i;
+        companySelect.appendChild(option);
+    }
+
     function togglePanel() {
         const ctrl = document.getElementById('controls');
         ctrl.style.display = ctrl.style.display === 'block' ? 'none' : 'block';
@@ -169,47 +173,30 @@
         localStorage.setItem('themePattern_306', pattern);
     }
 
-    function changeBgImage(url) {
-        document.body.style.backgroundImage = `url('${url}')`;
-        localStorage.setItem('themeBgImg_306', url);
-    }
-
-    function clearBgImage() {
-        document.body.style.backgroundImage = '';
-        localStorage.removeItem('themeBgImg_306');
-        document.getElementById('bgImgInput').value = '';
-    }
-
     const dataForm = document.getElementById('dataForm');
     dataForm.addEventListener('submit', function(e) {
         e.preventDefault();
         let record = {};
         dataForm.querySelectorAll('input, select, textarea').forEach(field => { record[field.id] = field.value; });
-
         let data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
         data.push(record);
         localStorage.setItem('army_db_306', JSON.stringify(data));
-        
         dataForm.reset();
         renderTable();
-        alert("تم الحفظ بنجاح في سجلات لواء 306");
+        alert("تم الحفظ بنجاح");
     });
 
     function renderTable(filterData = null) {
         const data = filterData || JSON.parse(localStorage.getItem('army_db_306') || '[]');
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-
         data.forEach((item, index) => {
             tbody.innerHTML += `<tr>
-                <td style="text-align:right">${item.fullName}</td>
-                <td>${item.idNo}</td>
-                <td>${item.battalion}</td>
-                <td>${item.companyNo}</td>
+                <td style="text-align:right">${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.companyNo}</td>
                 <td>
-                    <button onclick="showDetails(${index})" style="background:#0288d1; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">👁 عرض</button>
-                    <button onclick="printRecord(${index})" style="background:#455a64; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">🖨 طباعة</button>
-                    <button onclick="deleteRecord(${index})" style="background:#c62828; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">🗑 حذف</button>
+                    <button onclick="showDetails(${index})" style="background:#0288d1; color:white; border:none; padding:5px; cursor:pointer; border-radius:4px">👁 عرض</button>
+                    <button onclick="printRecord(${index})" style="background:#455a64; color:white; border:none; padding:5px; cursor:pointer; border-radius:4px">🖨 طباعة</button>
+                    <button onclick="deleteRecord(${index})" style="background:#c62828; color:white; border:none; padding:5px; cursor:pointer; border-radius:4px">🗑 حذف</button>
                 </td>
             </tr>`;
         });
@@ -218,7 +205,11 @@
     function searchData() {
         const val = document.getElementById('searchInput').value.toLowerCase();
         const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
-        const filtered = data.filter(i => i.fullName.toLowerCase().includes(val) || i.idNo.toLowerCase().includes(val) || i.battalion.toLowerCase().includes(val));
+        const filtered = data.filter(i => 
+            i.fullName.toLowerCase().includes(val) || 
+            i.idNo.toLowerCase().includes(val) || 
+            i.companyNo.toLowerCase().includes(val)
+        );
         renderTable(filtered);
     }
 
@@ -227,11 +218,12 @@
         const item = data[index];
         let content = `<div style="text-align:center; border-bottom:2px dashed #333; margin-bottom:20px;">
                         <h2>العديد المركزي - لواء 306</h2>
-                        <p>تقرير المعلومات التفصيلي</p>
+                        <p>تفاصيل بيانات المنتسب</p>
                        </div>
                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; font-size:16px;">`;
         for (let key in item) {
-            content += `<p style="border-bottom:1px solid #ddd; padding:8px;"><b>${key}:</b> ${item[key] || '---'}</p>`;
+            let label = labelsAR[key] || key;
+            content += `<p style="border-bottom:1px solid #ddd; padding:8px;"><b>${label}:</b> ${item[key] || '---'}</p>`;
         }
         content += '</div>';
         document.getElementById('fullDetailsContent').innerHTML = content;
@@ -241,7 +233,7 @@
     function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
 
     function deleteRecord(index) {
-        if(confirm("هل أنت متأكد من حذف سجل هذا المنتسب نهائياً؟")) {
+        if(confirm("هل أنت متأكد من الحذف؟")) {
             let data = JSON.parse(localStorage.getItem('army_db_306'));
             data.splice(index, 1);
             localStorage.setItem('army_db_306', JSON.stringify(data));
@@ -253,23 +245,23 @@
         const data = JSON.parse(localStorage.getItem('army_db_306'));
         const item = data[index];
         const printWindow = window.open('', '', 'height=800,width=1000');
-        printWindow.document.write('<html><head><title>طباعة تقرير لواء 306</title>');
+        printWindow.document.write('<html><head><title>طباعة استمارة</title>');
         printWindow.document.write('<style>body{direction:rtl; font-family:tahoma; padding:40px;} .header{text-align:center; border:2px solid #000; padding:10px; margin-bottom:30px;} .item{border-bottom:1px dotted #666; padding:12px; width:48%; display:inline-block; font-size:14px;}</style>');
         printWindow.document.write('</head><body>');
         printWindow.document.write('<div class="header"><h1>العديد المركزي - لواء 306 / ذي قار</h1><h3>استمارة بيانات المنتسب الرسمية</h3></div>');
         for (let key in item) {
-            printWindow.document.write(`<div class="item"><b>${key}:</b> ${item[key] || '---'}</div>`);
+            let label = labelsAR[key] || key;
+            printWindow.document.write(`<div class="item"><b>${label}:</b> ${item[key] || '---'}</div>`);
         }
-        printWindow.document.write('<div style="margin-top:50px; text-align:left;"><p>توقيع وختم الآمر المختص: ............................</p></div>');
         printWindow.document.write('</body></html>');
         printWindow.document.close();
-        printWindow.print();
+        printWindow.focus();
+        setTimeout(() => { printWindow.print(); printWindow.close(); }, 500);
     }
 
     window.onload = function() {
         if(localStorage.getItem('themeColor_306')) changeTheme(localStorage.getItem('themeColor_306'));
         if(localStorage.getItem('themePattern_306')) changePattern(localStorage.getItem('themePattern_306'));
-        if(localStorage.getItem('themeBgImg_306')) changeBgImage(localStorage.getItem('themeBgImg_306'));
         renderTable();
     };
 </script>
