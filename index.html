@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <title>نظام إدارة البيانات المتطور</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { color: #d32f2f; text-align: center; }
+        
+        /* التنسيق الشبكي للحقول */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 5px; box-sizing: border-box; }
+        .full-width { grid-column: 1 / -1; }
+        
+        /* الأزرار */
+        .btn-save { background: #28a745; color: white; padding: 10px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
+        .btn-save:hover { background: #218838; }
+        
+        /* البحث والجدول */
+        .search-box { margin: 20px 0; width: 100%; padding: 12px; border: 2px solid #007bff; border-radius: 25px; }
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; min-width: 1000px; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: center; }
+        th { background-color: #007bff; color: white; }
+
+        /* النافذة المنبثقة والطباعة */
+        .modal { display: none; position: fixed; z-index: 100; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+        .modal-content { background: white; margin: 5% auto; padding: 20px; width: 80%; border-radius: 10px; max-height: 80vh; overflow-y: auto; }
+        @media print { body * { visibility: hidden; } #printSection, #printSection * { visibility: visible; } #printSection { position: absolute; left: 0; top: 0; width: 100%; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>نظام إدارة البيانات</h2>
+    
+    <form id="dataForm">
+        <div class="grid-container" id="fieldsContainer">
+            <input type="number" id="idNo" placeholder="ID" required>
+            <input type="text" id="fullName" placeholder="الاسم الرباعي واللقب" required>
+            <input type="number" id="birthYear" placeholder="المواليد">
+            <input type="text" id="birthPlace" placeholder="محل التولد">
+            <select id="gender"><option value="">الجنس</option><option>ذكر</option><option>أنثى</option></select>
+            <input type="text" id="motherName" placeholder="اسم الأم الثلاثي">
+            <input type="number" id="civilId" placeholder="رقم الهوية">
+            <select id="maritalStatus"><option value="">الحالة الزوجية</option><option>أعزب</option><option>متزوج</option><option>مطلق</option><option>أرمل</option></select>
+            <input type="text" id="spouseName" placeholder="اسم الزوج/الزوجة">
+            <input type="number" id="childrenCount" placeholder="عدد الأطفال">
+            <input type="text" id="education" placeholder="التحصيل الدراسي">
+            <input type="text" id="specialization" placeholder="التخصص الدراسي">
+            <input type="text" id="job" placeholder="العمل أو الوظيفة">
+            <input type="text" id="province" placeholder="المحافظة">
+            <input type="text" id="district" placeholder="القضاء">
+            <input type="text" id="subDistrict" placeholder="الناحية">
+            <input type="text" id="region" placeholder="المنطقة">
+            <input type="text" id="mahala" placeholder="المحلة">
+            <input type="text" id="zuqaq" placeholder="الزقاق">
+            <input type="text" id="dar" placeholder="الدار">
+            <input type="text" id="landmark" placeholder="نقطة دالة">
+            <input type="number" id="phone" placeholder="الهاتف">
+            <input type="number" id="brigade" placeholder="اللواء">
+            <select id="battalion"><option value="">الفوج</option><option>الأول</option><option>الثاني</option></select>
+            <input type="number" id="companyNo" placeholder="السرية">
+            <input type="text" id="companyName" placeholder="اسم السرية">
+            <input type="text" id="category" placeholder="الصنف">
+            <input type="text" id="refName" placeholder="المعرف">
+            <input type="number" id="refPhone" placeholder="هاتف المعرف">
+            <textarea id="experience" class="full-width" placeholder="الخبرات"></textarea>
+            <textarea id="notes" class="full-width" placeholder="الملاحظات"></textarea>
+        </div>
+        <center><button type="submit" class="btn-save">حفظ البيانات</button></center>
+    </form>
+
+    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID...">
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th><th>الاسم</th><th>الهاتف</th><th>الصنف</th><th>الإجراءات</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<div id="detailsModal" class="modal">
+    <div class="modal-content">
+        <span onclick="closeModal()" style="cursor:pointer; font-size:24px;">&times;</span>
+        <div id="fullDetailsContent"></div>
+    </div>
+</div>
+
+<div id="printSection" style="display:none;"></div>
+
+<script>
+    const form = document.getElementById('dataForm');
+    form.onsubmit = function(e) {
+        e.preventDefault();
+        let record = {};
+        form.querySelectorAll('input, select, textarea').forEach(el => record[el.id] = el.value);
+        let data = JSON.parse(localStorage.getItem('sysData') || '[]');
+        data.push(record);
+        localStorage.setItem('sysData', JSON.stringify(data));
+        form.reset();
+        renderTable();
+    };
+
+    function renderTable(filterData = null) {
+        let data = filterData || JSON.parse(localStorage.getItem('sysData') || '[]');
+        let html = '';
+        data.forEach((item, index) => {
+            html += `<tr>
+                <td>${item.idNo}</td><td>${item.fullName}</td><td>${item.phone}</td><td>${item.category}</td>
+                <td>
+                    <button onclick="showDetails(${index})">👁</button>
+                    <button onclick="printReport(${index})">🖨</button>
+                    <button onclick="deleteItem(${index})">🗑</button>
+                </td>
+            </tr>`;
+        });
+        document.getElementById('tableBody').innerHTML = html;
+    }
+
+    function searchData() {
+        let val = document.getElementById('searchInput').value.toLowerCase();
+        let data = JSON.parse(localStorage.getItem('sysData') || '[]');
+        let filtered = data.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
+        renderTable(filtered);
+    }
+
+    function showDetails(i) {
+        let item = JSON.parse(localStorage.getItem('sysData'))[i];
+        let content = "<h3>التفاصيل الكاملة</h3>";
+        for(let key in item) content += `<p><b>${key}:</b> ${item[key]}</p>`;
+        document.getElementById('fullDetailsContent').innerHTML = content;
+        document.getElementById('detailsModal').style.display = 'block';
+    }
+
+    function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
+    
+    function deleteItem(i) {
+        let data = JSON.parse(localStorage.getItem('sysData'));
+        data.splice(i, 1);
+        localStorage.setItem('sysData', JSON.stringify(data));
+        renderTable();
+    }
+
+    renderTable();
+</script>
+</body>
+</html>
