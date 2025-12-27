@@ -6,67 +6,74 @@
     <title>نظام العديد المركزي - لواء 306</title>
     <style>
         :root { --main-color: #1b5e20; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; transition: 0.3s; background-attachment: fixed; background-size: cover; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; transition: 0.3s; background-attachment: fixed; background-size: cover; background-position: center; }
         
-        /* مكاتب النقشات الـ 20 الجديدة (CSS Patterns) */
+        /* النقشات الـ 20 */
         body.p1 { background-image: radial-gradient(#aaa 1px, transparent 1px); background-size: 20px 20px; }
         body.p2 { background-image: linear-gradient(#ddd 1px, transparent 1px), linear-gradient(90deg, #ddd 1px, transparent 1px); background-size: 30px 30px; }
         body.p3 { background: repeating-linear-gradient(45deg, #eee, #eee 10px, #f9f9f9 10px, #f9f9f9 20px); }
-        body.p4 { background-color: #e5e5f7; background-image:  repeating-radial-gradient( circle at 0 0, transparent 0, #e5e5f7 10px ), repeating-linear-gradient( #d2d2f155, #d2d2f1 ); }
+        body.p4 { background-color: #e5e5f7; background-image: repeating-radial-gradient( circle at 0 0, transparent 0, #e5e5f7 10px ), repeating-linear-gradient( #d2d2f155, #d2d2f1 ); }
         body.p5 { background: #4b5320; background-image: linear-gradient(45deg, #556b2f 25%, transparent 25%); background-size: 4px 4px; }
         body.p6 { background: #c2b280; background-image: linear-gradient(90deg, #d2b48c 50%, transparent 50%); background-size: 50px 50px; }
         body.p7 { background: radial-gradient(circle, #ddd 10%, transparent 10%); background-size: 15px 15px; }
         body.p8 { background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); }
         body.p9 { background: white; background-image: linear-gradient(to right, #f0f0f0 1px, transparent 1px), linear-gradient(to bottom, #f0f0f0 1px, transparent 1px); background-size: 20px 20px; }
-        body.p10 { background: #fafafa; background-image:  zigzag; /* Placeholder for complex CSS */ }
-        /* أنماط إضافية مختارة بدقة لسهولة القراءة */
-        body.p11 { background: #fdfdfd; border-top: 5px solid var(--main-color); }
-        body.p12 { background: #e0e0e0; background-image: linear-gradient(white 2px, transparent 2px); background-size: 100% 20px; }
-        body.p13 { background: #f0f4f7; } body.p14 { background: #f9f1e7; } body.p15 { background: #e8f5e9; }
-        body.p16 { background: #eceff1; } body.p17 { background: #fffde7; } body.p18 { background: #efebe9; }
-        body.p19 { background: #f3e5f5; } body.p20 { background: #eeeeee; }
+        body.p10 { background: #fafafa; border: 1px solid #ddd; }
+        body.p11 { background: #fdfdfd; } body.p12 { background: #e0e0e0; } body.p13 { background: #f0f4f7; }
+        body.p14 { background: #f9f1e7; } body.p15 { background: #e8f5e9; } body.p16 { background: #eceff1; }
+        body.p17 { background: #fffde7; } body.p18 { background: #efebe9; } body.p19 { background: #f3e5f5; }
+        body.p20 { background: #eeeeee; }
 
-        .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.97); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
+        .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.97); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; z-index: 1; }
         .main-header { text-align: center; border-bottom: 4px double var(--main-color); margin-bottom: 30px; padding-bottom: 10px; }
         .main-header h1 { margin: 0; font-size: 32px; color: var(--main-color); }
 
         /* لوحة التحكم الجانبية */
         .theme-panel { position: fixed; left: 10px; top: 10px; z-index: 1000; max-height: 90vh; overflow-y: auto; }
-        .panel-toggle { background: #222; color: white; border: none; padding: 10px; cursor: pointer; border-radius: 5px; width: 100%; }
+        .panel-toggle { background: #222; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
         .controls-content { display: none; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; width: 260px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
-        /* شبكة الألوان الـ 20 */
         .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin: 10px 0; }
-        .color-box { width: 35px; height: 35px; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; }
+        .color-box { width: 35px; height: 35px; border-radius: 4px; cursor: pointer; border: 1px solid #ddd; transition: 0.2s; }
+        .color-box:hover { transform: scale(1.1); }
 
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; font-size: 14px; }
         .full-width { grid-column: 1 / -1; }
         
-        .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; }
+        .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; transition: 0.3s; }
+        .btn-save:hover { opacity: 0.9; transform: translateY(-2px); }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; }
+        .search-box { margin: 20px 0; width: 100%; padding: 15px; border: 2px solid var(--main-color); border-radius: 30px; font-size: 16px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; border-radius: 8px; overflow: hidden; }
         th { background: var(--main-color); color: white; padding: 12px; }
-        td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        td { border: 1px solid #ddd; padding: 10px; text-align: center; font-weight: 500; }
 
         .modal { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); }
-        .modal-content { background: white; margin: 2% auto; padding: 30px; width: 85%; border-radius: 15px; max-height: 90vh; overflow-y: auto; }
+        .modal-content { background: white; margin: 2% auto; padding: 30px; width: 85%; border-radius: 15px; max-height: 90vh; overflow-y: auto; position: relative; }
+        
+        /* استايل زر الرفع */
+        .file-upload-btn { display: block; background: #f0f0f0; border: 2px dashed #ccc; padding: 10px; text-align: center; cursor: pointer; border-radius: 5px; margin-top: 10px; font-size: 12px; }
+        .file-upload-btn:hover { background: #e0e0e0; }
     </style>
 </head>
 <body>
 
 <div class="theme-panel">
-    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق المطور</button>
+    <button onclick="togglePanel()" class="panel-toggle">⚙️ التنسيق والطباعة</button>
     <div id="controls" class="controls-content">
-        <b>اختر من 20 لوناً:</b>
+        <b>اختر لون النظام (20 خياراً):</b>
         <div class="color-grid" id="colorGrid"></div>
         <hr>
-        <b>اختر من 20 نقشة:</b>
-        <select onchange="changePattern(this.value)" id="patternSelect" style="width:100%; margin:5px 0;"></select>
+        <b>اختر نقشة الخلفية (20 خياراً):</b>
+        <select onchange="changePattern(this.value)" id="patternSelect" style="width:100%; margin:5px 0; padding:5px;"></select>
         <hr>
-        <b>صورة خلفية/علامة مائية:</b>
-        <input type="text" id="customBg" placeholder="ضع رابط الصورة هنا..." onchange="updateBg(this.value)" style="font-size:11px;">
-        <button onclick="localStorage.removeItem('306_bg'); location.reload();" style="width:100%; margin-top:5px; font-size:10px;">إعادة تعيين</button>
+        <b>صورة الخلفية والعلامة المائية:</b>
+        <label class="file-upload-btn">
+            📁 ارفع صورة من جهازك
+            <input type="file" id="imageInput" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
+        </label>
+        <button onclick="clearCustomImage()" style="width:100%; margin-top:5px; font-size:10px; color:red;">حذف الصورة الحالية</button>
     </div>
 </div>
 
@@ -104,17 +111,17 @@
             <select id="battalion">
                 <option value="">الفوج</option>
                 <option>الفوج الأول</option><option>الفوج الثاني</option><option>الفوج الثالث</option>
-                <option>الفوج الرابع</option><option>الفوج الخامس</option>
+                <option>الفوج الرابع</option><option>الفوج الخامس</option><option>الفوج السادس</option>
             </select>
             <select id="companyNo" required><option value="">اختر السرية</option></select>
             <input type="text" id="category" placeholder="الصنف">
             <textarea id="experience" class="full-width" placeholder="الخبرات"></textarea>
             <textarea id="notes" class="full-width" placeholder="الملاحظات"></textarea>
         </div>
-        <button type="submit" class="btn-save">حفظ البيانات</button>
+        <button type="submit" class="btn-save">حفظ البيانات في السجل</button>
     </form>
 
-    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث هنا...">
+    <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم، ID، الفوج، أو السرية...">
 
     <div style="overflow-x:auto">
         <table>
@@ -130,7 +137,7 @@
 
 <div id="detailsModal" class="modal">
     <div class="modal-content">
-        <button onclick="closeModal()" style="background:#d32f2f; color:white; border:none; padding:10px; cursor:pointer; float:left;">إغلاق</button>
+        <button onclick="closeModal()" style="background:#d32f2f; color:white; border:none; padding:10px 20px; cursor:pointer; float:left; border-radius:5px;">إغلاق</button>
         <div id="fullDetailsContent"></div>
     </div>
 </div>
@@ -148,12 +155,11 @@
         experience: "الخبرات", notes: "الملاحظات"
     };
 
-    // توليد الألوان والخيارات
+    // إعداد الألوان والخيارات
     const colors = [
-        '#1b5e20', '#2e7d32', '#4b5320', '#1a237e', '#0d47a1', 
-        '#01579b', '#006064', '#004d40', '#bf360c', '#b71c1c', 
-        '#880e4f', '#4a148c', '#311b92', '#212121', '#37474f', 
-        '#4e342e', '#b8860b', '#d4af37', '#5d4037', '#263238'
+        '#1b5e20', '#2e7d32', '#4b5320', '#1a237e', '#0d47a1', '#01579b', '#006064', '#004d40', 
+        '#bf360c', '#b71c1c', '#880e4f', '#4a148c', '#311b92', '#212121', '#37474f', '#4e342e', 
+        '#b8860b', '#d4af37', '#795548', '#263238'
     ];
 
     const colorGrid = document.getElementById('colorGrid');
@@ -179,6 +185,7 @@
         compSel.appendChild(opt);
     }
 
+    // وظائف التنسيق
     function togglePanel() {
         const ctrl = document.getElementById('controls');
         ctrl.style.display = ctrl.style.display === 'block' ? 'none' : 'block';
@@ -194,11 +201,27 @@
         localStorage.setItem('306_pattern', p);
     }
 
-    function updateBg(url) {
-        document.body.style.backgroundImage = `url('${url}')`;
-        localStorage.setItem('306_bg', url);
+    // وظيفة رفع الصورة من الجهاز
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64Image = e.target.result;
+                document.body.style.backgroundImage = `url('${base64Image}')`;
+                localStorage.setItem('306_custom_img', base64Image);
+                alert("تم رفع الصورة وتعيينها كخلفية وعلامة مائية بنجاح.");
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
     }
 
+    function clearCustomImage() {
+        localStorage.removeItem('306_custom_img');
+        document.body.style.backgroundImage = '';
+        alert("تم حذف الصورة.");
+    }
+
+    // إدارة البيانات
     const dataForm = document.getElementById('dataForm');
     dataForm.addEventListener('submit', function(e) {
         e.preventDefault();
@@ -218,11 +241,11 @@
         tbody.innerHTML = '';
         data.forEach((item, index) => {
             tbody.innerHTML += `<tr>
-                <td>${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.companyNo}</td>
+                <td style="text-align:right">${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.companyNo}</td>
                 <td>
-                    <button onclick="showDetails(${index})" style="background:#0288d1; color:white; border:none; padding:5px; cursor:pointer;">👁</button>
-                    <button onclick="printRecord(${index})" style="background:#455a64; color:white; border:none; padding:5px; cursor:pointer;">🖨</button>
-                    <button onclick="deleteRecord(${index})" style="background:#c62828; color:white; border:none; padding:5px; cursor:pointer;">🗑</button>
+                    <button onclick="showDetails(${index})" style="background:#0288d1; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">👁</button>
+                    <button onclick="printRecord(${index})" style="background:#455a64; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">🖨</button>
+                    <button onclick="deleteRecord(${index})" style="background:#c62828; color:white; border:none; padding:8px; cursor:pointer; border-radius:4px">🗑</button>
                 </td>
             </tr>`;
         });
@@ -238,7 +261,7 @@
     function showDetails(index) {
         const data = JSON.parse(localStorage.getItem('army_db_306'));
         const item = data[index];
-        let content = `<h2 style="text-align:center; color:var(--main-color);">معلومات المنتسب</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
+        let content = `<h2 style="text-align:center; color:var(--main-color);">استمارة معلومات المنتسب</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
         for(let key in item) {
             content += `<p style="border-bottom:1px solid #eee; padding:8px;"><b>${labelsAR[key]}:</b> ${item[key] || '---'}</p>`;
         }
@@ -250,7 +273,7 @@
     function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
 
     function deleteRecord(i) {
-        if(confirm("حذف؟")) {
+        if(confirm("هل تريد حذف السجل نهائياً؟")) {
             let data = JSON.parse(localStorage.getItem('army_db_306'));
             data.splice(i, 1);
             localStorage.setItem('army_db_306', JSON.stringify(data));
@@ -258,36 +281,43 @@
         }
     }
 
+    // وظيفة الطباعة مع العلامة المائية المرفوعة
     function printRecord(index) {
         const data = JSON.parse(localStorage.getItem('army_db_306'));
         const item = data[index];
-        const bgUrl = localStorage.getItem('306_bg') || '';
+        const customImg = localStorage.getItem('306_custom_img') || '';
         const printWindow = window.open('', '', 'height=900,width=1000');
         
-        printWindow.document.write(`<html><head><title>طباعة</title>
+        printWindow.document.write(`<html><head><title>طباعة استمارة</title>
         <style>
             body { direction:rtl; font-family:tahoma; padding:40px; position:relative; }
-            .watermark { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:60%; opacity:0.08; z-index:-1; }
+            .watermark { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:70%; opacity:0.07; z-index:-1; }
             .header { text-align:center; border:2px solid #000; padding:15px; margin-bottom:30px; }
             .item { border-bottom:1px solid #ccc; padding:10px; width:48%; display:inline-block; font-size:13px; }
+            .footer { margin-top:50px; text-align:left; font-weight:bold; }
         </style></head><body>`);
         
-        if(bgUrl) printWindow.document.write(`<img src="${bgUrl}" class="watermark">`);
+        if(customImg) {
+            printWindow.document.write(`<img src="${customImg}" class="watermark">`);
+        }
         
         printWindow.document.write(`<div class="header"><h1>العديد المركزي - لواء 306 / ذي قار</h1><h3>استمارة بيانات المنتسب الرسمية</h3></div>`);
         for(let key in item) {
             printWindow.document.write(`<div class="item"><b>${labelsAR[key]}:</b> ${item[key] || '---'}</div>`);
         }
+        printWindow.document.write(`<div class="footer"><p>توقيع وختم الآمر المختص: ............................</p></div>`);
         printWindow.document.write(`</body></html>`);
         printWindow.document.close();
         printWindow.focus();
-        setTimeout(() => { printWindow.print(); printWindow.close(); }, 700);
+        setTimeout(() => { printWindow.print(); printWindow.close(); }, 800);
     }
 
     window.onload = function() {
         if(localStorage.getItem('306_color')) changeTheme(localStorage.getItem('306_color'));
         if(localStorage.getItem('306_pattern')) changePattern(localStorage.getItem('306_pattern'));
-        if(localStorage.getItem('306_bg')) updateBg(localStorage.getItem('306_bg'));
+        if(localStorage.getItem('306_custom_img')) {
+            document.body.style.backgroundImage = `url('${localStorage.getItem('306_custom_img')}')`;
+        }
         renderTable();
     };
 </script>
