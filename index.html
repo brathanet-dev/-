@@ -11,8 +11,8 @@
         .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.97); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; }
         .main-header { text-align: center; border-bottom: 4px double var(--main-color); margin-bottom: 30px; padding-bottom: 10px; }
         
-        .theme-panel { position: fixed; left: 10px; top: 10px; z-index: 1000; max-height: 90vh; overflow-y: auto; }
-        .panel-toggle { background: #222; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 5px; width: 100%; font-weight: bold; }
+        .theme-panel { position: fixed; left: 10px; top: 10px; z-index: 1000; }
+        .panel-toggle { background: #222; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 5px; font-weight: bold; }
         .controls-content { display: none; background: white; padding: 15px; border: 1px solid #ccc; border-radius: 8px; width: 260px; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
@@ -22,10 +22,11 @@
         .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; transition: 0.3s; }
         .btn-edit-mode { background: var(--edit-color) !important; }
         
-        .action-bar { display: flex; gap: 10px; align-items: center; margin: 20px 0; }
-        .search-box { flex-grow: 1; padding: 15px; border: 2px solid var(--main-color); border-radius: 30px; font-size: 16px; }
-        .btn-excel { background: var(--excel-color); color: white; border: none; padding: 12px 20px; border-radius: 30px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .btn-excel:hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        /* شريط البحث والتصدير */
+        .action-bar { display: flex; gap: 10px; align-items: center; margin: 30px 0; background: #eee; padding: 15px; border-radius: 10px; border: 1px solid #ddd; }
+        .search-box { flex: 2; padding: 12px; border: 2px solid var(--main-color); border-radius: 8px; font-size: 16px; }
+        .btn-excel { flex: 1; background: var(--excel-color); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-excel:hover { background: #1b5e20; }
 
         table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; }
         th { background: var(--main-color); color: white; padding: 12px; }
@@ -39,10 +40,10 @@
 <body>
 
 <div class="theme-panel">
-    <button onclick="togglePanel()" class="panel-toggle">⚙️ الإعدادات</button>
+    <button onclick="togglePanel()" class="panel-toggle">⚙️ الإعدادات والسمات</button>
     <div id="controls" class="controls-content">
-        <b>رفع علامة مائية:</b>
-        <label class="file-upload-btn">📁 ارفع صورة من الجهاز
+        <b>رفع صورة العلامة المائية:</b>
+        <label class="file-upload-btn">📁 ارفع من جهازك
             <input type="file" accept="image/*" style="display:none;" onchange="handleImageUpload(this)">
         </label>
         <button onclick="clearCustomImage()" style="width:100%; margin-top:10px; color:red; cursor:pointer; background:none; border:none;">حذف الصورة</button>
@@ -96,8 +97,8 @@
     </form>
 
     <div class="action-bar">
-        <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID...">
-        <button onclick="exportToExcel()" class="btn-excel">📊 تصدير إلى Excel</button>
+        <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID هنا...">
+        <button onclick="exportToExcel()" class="btn-excel">📊 تصدير السجل إلى Excel</button>
     </div>
 
     <div style="overflow-x:auto">
@@ -132,7 +133,6 @@
         experience: "الخبرات", notes: "الملاحظات", companyName: "اسم السرية"
     };
 
-    // توليد السرايا
     const compSel = document.getElementById('companyNo');
     for(let i=1; i<=40; i++) {
         let opt = document.createElement('option');
@@ -161,13 +161,11 @@
         document.body.style.backgroundImage = '';
     }
 
-    // إدارة البيانات
     const dataForm = document.getElementById('dataForm');
     dataForm.addEventListener('submit', function(e) {
         e.preventDefault();
         let record = {};
         dataForm.querySelectorAll('input, select, textarea').forEach(f => { if(f.id !== 'editIndex') record[f.id] = f.value; });
-        
         let data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
         let editIdx = document.getElementById('editIndex').value;
 
@@ -183,7 +181,7 @@
         localStorage.setItem('army_db_306', JSON.stringify(data));
         dataForm.reset();
         renderTable();
-        alert("تمت العملية بنجاح");
+        alert("تم حفظ البيانات بنجاح");
     });
 
     function renderTable(filter = null) {
@@ -212,37 +210,35 @@
         }
         document.getElementById('editIndex').value = index;
         const btn = document.getElementById('submitBtn');
-        btn.innerText = "تحديث: " + item.fullName;
+        btn.innerText = "تحديث بيانات: " + item.fullName;
         btn.classList.add('btn-edit-mode');
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    // وظيفة التصدير إلى Excel
+    // وظيفة التصدير الجديدة والمحسنة
     function exportToExcel() {
         const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
-        if(data.length === 0) { alert("لا توجد بيانات للتصدير"); return; }
+        if(data.length === 0) { alert("لا توجد بيانات مسجلة لتصديرها."); return; }
 
-        let csvContent = "\uFEFF"; // إضافة BOM لدعم العربية في Excel
-        const headers = Object.values(labelsAR);
-        csvContent += headers.join(",") + "\n";
+        let csvContent = "\uFEFF"; // لدعم اللغة العربية في اكسل
+        const headKeys = Object.keys(labelsAR);
+        const headLabels = Object.values(labelsAR);
+        
+        csvContent += headLabels.join(",") + "\n";
 
         data.forEach(row => {
-            const values = Object.keys(labelsAR).map(key => {
-                let val = row[key] || "";
-                return `"${val.toString().replace(/"/g, '""')}"`;
+            let rowData = headKeys.map(key => {
+                let cellValue = row[key] ? row[key].toString().replace(/,/g, " ") : "";
+                return `"${cellValue}"`;
             });
-            csvContent += values.join(",") + "\n";
+            csvContent += rowData.join(",") + "\n";
         });
 
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
         const link = document.createElement("a");
-        const url = URL.createObjectURL(blob);
-        link.setAttribute("href", url);
-        link.setAttribute("download", `سجل_العديد_لواء_306_${new Date().toLocaleDateString()}.csv`);
-        link.style.visibility = 'hidden';
-        document.body.appendChild(link);
+        link.href = URL.createObjectURL(blob);
+        link.download = `سجل_عديد_306_${new Date().toLocaleDateString()}.csv`;
         link.click();
-        document.body.removeChild(link);
     }
 
     function searchData() {
@@ -255,7 +251,7 @@
     function showDetails(index) {
         const data = JSON.parse(localStorage.getItem('army_db_306'));
         const item = data[index];
-        let content = `<h2>معلومات المنتسب</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
+        let content = `<h2>تفاصيل المنتسب</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
         for(let key in item) { content += `<p style="border-bottom:1px solid #eee; padding:8px;"><b>${labelsAR[key]}:</b> ${item[key] || '---'}</p>`; }
         content += `</div>`;
         document.getElementById('fullDetailsContent').innerHTML = content;
@@ -265,7 +261,7 @@
     function closeModal() { document.getElementById('detailsModal').style.display = 'none'; }
 
     function deleteRecord(i) {
-        if(confirm("حذف نهائي؟")) {
+        if(confirm("هل أنت متأكد من الحذف النهائي؟")) {
             let data = JSON.parse(localStorage.getItem('army_db_306'));
             data.splice(i, 1);
             localStorage.setItem('army_db_306', JSON.stringify(data));
@@ -280,7 +276,7 @@
         const printWindow = window.open('', '', 'height=900,width=1000');
         printWindow.document.write(`<html><head><style>body{direction:rtl; font-family:tahoma; padding:40px;} .watermark{position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); width:70%; opacity:0.08; z-index:-1;} .header{text-align:center; border:2px solid #000; padding:15px; margin-bottom:30px;} .item{border-bottom:1px solid #ccc; padding:10px; width:48%; display:inline-block; font-size:13px;}</style></head><body>`);
         if(customImg) printWindow.document.write(`<img src="${customImg}" class="watermark">`);
-        printWindow.document.write(`<div class="header"><h1>لواء 306 - العديد المركزي</h1></div>`);
+        printWindow.document.write(`<div class="header"><h1>العديد المركزي - لواء 306</h1></div>`);
         for(let key in item) { printWindow.document.write(`<div class="item"><b>${labelsAR[key]}:</b> ${item[key] || '---'}</div>`); }
         printWindow.document.write(`</body></html>`);
         printWindow.document.close();
