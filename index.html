@@ -13,46 +13,41 @@
         .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 350px; text-align: center; }
         .login-card input { margin-bottom: 12px; padding: 12px; width: 100%; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
 
-        /* واجهة المستخدمين */
+        /* الواجهة الرئيسية */
         #mainContent { display: none; padding: 20px; }
-        .admin-only { display: none; } /* سيتم إظهارها للمدير فقط */
-
-        /* الإحصائيات */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 20px; }
-        .stat-card { background: white; padding: 15px; border-radius: 10px; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border-top: 4px solid var(--main-color); }
-        .stat-card h4 { margin: 0; color: #666; font-size: 14px; }
-        .stat-card p { margin: 5px 0 0; font-size: 24px; font-weight: bold; color: var(--main-color); }
-
+        .admin-only { display: none; } 
         .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.96); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .main-header { text-align: center; border-bottom: 4px double var(--main-color); margin-bottom: 30px; padding-bottom: 10px; position: relative; }
         .logout-btn { position: absolute; left: 0; top: 0; background: #c62828; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-        /* الجداول */
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; border-radius: 8px; overflow: hidden; }
+        /* الجداول والتنسيق */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
+        input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
+        .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; }
+        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
         th { background: var(--main-color); color: white; padding: 12px; }
         td { border: 1px solid #ddd; padding: 10px; text-align: center; }
-        .penalty-row { background-color: #ffebee; }
 
-        /* النوافذ */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; max-height: 80vh; overflow-y: auto; }
-        
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-        .btn-save { background: var(--main-color); color: white; padding: 15px 50px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; display: block; margin: 20px auto; }
-        
-        .action-bar { display: flex; gap: 10px; margin: 20px 0; background: #eee; padding: 15px; border-radius: 10px; align-items: center; }
-        .search-box { flex: 2; padding: 12px; border: 2px solid var(--main-color); border-radius: 8px; font-size: 16px; }
+        /* الأزرار العائمة */
+        .fab-container { position: fixed; bottom: 20px; right: 20px; display: flex; flex-direction: column; gap: 10px; z-index: 1001; }
+        .fab { width: 55px; height: 55px; border-radius: 50%; background: #222; color: white; border: none; cursor: pointer; font-size: 22px; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+
+        /* صفحة الإحصائيات والمنبثقات */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; max-height: 80vh; overflow-y: auto; text-align: center; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-top: 20px; }
+        .stat-card { padding: 30px; border-radius: 15px; background: #f8f9fa; border-top: 5px solid var(--main-color); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .stat-card h2 { font-size: 40px; margin: 10px 0; color: var(--main-color); }
     </style>
 </head>
 <body>
 
 <div id="loginPage">
     <div class="login-card">
-        <h2 id="loginTitle" style="color: var(--main-color);">نظام العديد المركزي</h2>
+        <h2 style="color: var(--main-color);">دخول النظام</h2>
         <input type="text" id="userInp" placeholder="اسم المستخدم">
         <input type="password" id="passInp" placeholder="كلمة المرور">
         <button onclick="handleLogin()" class="btn-save" style="width: 100%; margin: 0;">دخول</button>
-        <p style="font-size: 12px; color: #888; margin-top: 10px;">مدير: admin | مستخدم: user</p>
     </div>
 </div>
 
@@ -60,21 +55,16 @@
     <div class="container">
         <div class="main-header">
             <button class="logout-btn" onclick="logout()">خروج</button>
-            <h1 id="welcomeMsg">العديد المركزي - لواء 306</h1>
-            <p>ذي قار - إدارة البيانات والأرشفة</p>
-        </div>
-
-        <div class="admin-only">
-            <div class="stats-grid" id="statsArea">
-                </div>
+            <h1 id="welcomeTitle">لواء 306 - العديد المركزي</h1>
+            <p id="subTitle">إدارة شؤون المنتسبين والأرشفة</p>
         </div>
 
         <div class="admin-only">
             <form id="dataForm">
                 <input type="hidden" id="editIndex" value="-1">
                 <div class="grid-container">
-                    <input type="text" id="idNo" placeholder="ID" required>
-                    <input type="text" id="fullName" placeholder="الاسم الكامل" required>
+                    <input type="text" id="idNo" placeholder="الرقم التعريفي (ID)" required>
+                    <input type="text" id="fullName" placeholder="الاسم الرباعي واللقب" required>
                     <select id="battalion">
                         <option value="">اختر الفوج</option>
                         <option>الفوج الأول</option><option>الفوج الثاني</option><option>الفوج الثالث</option>
@@ -88,32 +78,26 @@
             </form>
         </div>
 
-        <div class="action-bar">
-            <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث هنا بالاسم أو ID للطباعة...">
-            <div class="admin-only" style="display:flex; gap:5px;">
-                <button onclick="exportToExcel()" style="background:var(--excel-color); color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">تصدير</button>
-                <button onclick="document.getElementById('importFile').click()" style="background:#0277bd; color:white; border:none; padding:10px; border-radius:5px; cursor:pointer;">استيراد</button>
-                <input type="file" id="importFile" hidden accept=".csv" onchange="importCSV(this)">
+        <div class="action-bar" style="display:flex; gap:10px; margin-bottom:20px;">
+            <input type="text" id="searchInput" onkeyup="searchData()" class="search-box" style="flex:1; padding:12px; border:2px solid var(--main-color); border-radius:8px;" placeholder="🔍 ابحث بالاسم أو ID للطباعة...">
+            <div class="admin-only">
+                <button onclick="exportToExcel()" style="background:var(--excel-color); color:white; padding:12px 20px; border:none; border-radius:8px; cursor:pointer;">تصدير Excel</button>
             </div>
         </div>
 
-        <h3 id="tableTitle">قاعدة البيانات النشطة</h3>
+        <h3>السجل النشط</h3>
         <div style="overflow-x:auto">
             <table>
-                <thead>
-                    <tr><th>الاسم</th><th>ID</th><th>الفوج</th><th>السرية</th><th>الإجراءات</th></tr>
-                </thead>
+                <thead><tr><th>الاسم</th><th>ID</th><th>الفوج</th><th>السرية</th><th>الإجراءات</th></tr></thead>
                 <tbody id="tableBody"></tbody>
             </table>
         </div>
 
-        <div class="admin-only" style="margin-top: 50px;">
-            <h3 style="color: var(--archive-color);">سجل العقوبات والأرشيف</h3>
+        <div class="admin-only" style="margin-top:50px;">
+            <h3 style="color:var(--archive-color)">سجل العقوبات / الأرشيف</h3>
             <div style="overflow-x:auto">
-                <table>
-                    <thead style="background: var(--archive-color);">
-                        <tr><th>الاسم</th><th>ID</th><th>الفوج</th><th>سبب الأرشفة</th><th>الإجراءات</th></tr>
-                    </thead>
+                <table style="border:1px solid var(--archive-color)">
+                    <thead style="background:var(--archive-color)"><tr><th>الاسم</th><th>ID</th><th>الفوج</th><th>السبب</th><th>الإجراءات</th></tr></thead>
                     <tbody id="archiveBody"></tbody>
                 </table>
             </div>
@@ -121,207 +105,172 @@
     </div>
 </div>
 
-<div id="viewModal" class="modal">
-    <div class="modal-content">
-        <div id="viewArea"></div>
-        <hr>
-        <button onclick="document.getElementById('viewModal').style.display='none'" style="padding:10px; cursor:pointer;">إغلاق</button>
+<div id="statsModal" class="modal">
+    <div class="modal-content" style="width: 90%;">
+        <h1 style="color: var(--main-color);">📊 إحصائيات النظام الشاملة</h1>
+        <div class="stats-grid" id="statsContainer"></div>
+        <hr style="margin: 30px 0;">
+        <button onclick="closeModal('statsModal')" class="btn-save" style="margin: 0 auto;">إغلاق الإحصائيات</button>
     </div>
 </div>
 
+<div id="viewModal" class="modal">
+    <div class="modal-content">
+        <div id="viewArea"></div>
+        <button onclick="closeModal('viewModal')" style="padding:10px 20px; margin-top:20px; cursor:pointer;">إغلاق</button>
+    </div>
+</div>
+
+<div class="fab-container admin-only">
+    <button class="fab" onclick="openStats()" title="الإحصائيات">📊</button>
+    <button class="fab" onclick="openSettings()" title="الإعدادات">⚙️</button>
+</div>
+
 <script>
-    let currentUser = null;
+    let role = 'guest';
     const labels = { idNo: "ID", fullName: "الاسم", battalion: "الفوج", companyNo: "السرية", phone: "الهاتف", category: "الصنف", notes: "ملاحظات" };
 
-    // 1. نظام الدخول المتطور
     function handleLogin() {
         const u = document.getElementById('userInp').value;
         const p = document.getElementById('passInp').value;
-        
-        if (u === 'admin' && p === '1234') {
-            currentUser = 'admin';
-            localStorage.setItem('role', 'admin');
-            initApp();
-        } else if (u === 'user' && p === '1234') {
-            currentUser = 'user';
-            localStorage.setItem('role', 'user');
-            initApp();
-        } else {
-            alert("بيانات خاطئة!");
-        }
+        if(u === 'admin' && p === '1234') { role = 'admin'; startApp(); }
+        else if(u === 'user' && p === '1234') { role = 'user'; startApp(); }
+        else alert("خطأ في البيانات");
     }
 
-    function initApp() {
+    function startApp() {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
-        
-        if (currentUser === 'admin') {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-            document.getElementById('welcomeMsg').innerText = "لوحة المدير - لواء 306";
+        if(role === 'admin') {
+            document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
         } else {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
-            document.getElementById('welcomeMsg').innerText = "نظام الاستعلام والطباعة";
-            document.getElementById('tableTitle').innerText = "نتائج البحث المخصصة";
+            document.getElementById('welcomeTitle').innerText = "نظام الاستعلام";
+            renderTable([]); // ابدأ بجدول فارغ للمستخدم
         }
-        updateStats();
         renderTable();
     }
 
-    // 2. الإحصائيات
-    function updateStats() {
-        if (currentUser !== 'admin') return;
+    function openStats() {
         const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
-        const stats = {
+        const arch = JSON.parse(localStorage.getItem('army_archive_306') || '[]');
+        const s = {
             total: data.length,
             f1: data.filter(i => i.battalion === 'الفوج الأول').length,
             f2: data.filter(i => i.battalion === 'الفوج الثاني').length,
             f3: data.filter(i => i.battalion === 'الفوج الثالث').length,
-            archive: JSON.parse(localStorage.getItem('army_archive_306') || '[]').length
+            penalty: arch.length
         };
-
-        document.getElementById('statsArea').innerHTML = `
-            <div class="stat-card"><h4>الإجمالي</h4><p>${stats.total}</p></div>
-            <div class="stat-card"><h4>الفوج 1</h4><p>${stats.f1}</p></div>
-            <div class="stat-card"><h4>الفوج 2</h4><p>${stats.f2}</p></div>
-            <div class="stat-card"><h4>الفوج 3</h4><p>${stats.f3}</p></div>
-            <div class="stat-card" style="border-color:red"><h4>عقوبات</h4><p>${stats.archive}</p></div>
+        document.getElementById('statsContainer').innerHTML = `
+            <div class="stat-card"><h4>إجمالي المنتسبين</h4><h2>${s.total}</h2></div>
+            <div class="stat-card"><h4>الفوج الأول</h4><h2>${s.f1}</h2></div>
+            <div class="stat-card"><h4>الفوج الثاني</h4><h2>${s.f2}</h2></div>
+            <div class="stat-card"><h4>الفوج الثالث</h4><h2>${s.f3}</h2></div>
+            <div class="stat-card" style="border-color:var(--archive-color)"><h4>سجل العقوبات</h4><h2>${s.penalty}</h2></div>
         `;
+        document.getElementById('statsModal').style.display = 'block';
     }
 
-    // 3. إدارة الجداول
     function renderTable(filterData = null) {
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
-        
-        // للمستخدم الثانوي: لا تظهر بيانات إلا إذا كان هناك بحث
         let data = filterData;
-        if (currentUser === 'user' && !filterData) {
-            tbody.innerHTML = '<tr><td colspan="5">يرجى كتابة اسم للبحث عنه...</td></tr>';
-            return;
-        }
-        
-        if (!data) data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        if (!data && role === 'admin') data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        if (!data) return;
 
         data.forEach((item, index) => {
-            let row = `<tr>
+            tbody.innerHTML += `<tr>
                 <td>${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.companyNo}</td>
                 <td>
-                    <button onclick="previewRecord(${index}, false)" style="background:#0288d1; color:white; border:none; padding:5px; cursor:pointer;">👁</button>
-                    <button onclick="printRecord(${index}, false)" style="background:#444; color:white; border:none; padding:5px; cursor:pointer;">🖨</button>
-                    ${currentUser === 'admin' ? `
-                        <button onclick="editRecord(${index})" style="background:#f57c00; color:white; border:none; padding:5px; cursor:pointer;">✏️</button>
-                        <button onclick="archiveRecord(${index})" title="نقل للعقوبات" style="background:red; color:white; border:none; padding:5px; cursor:pointer;">⚖️</button>
+                    <button onclick="previewRecord(${index}, false)" style="background:#0288d1; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">👁</button>
+                    <button onclick="printRecord(${index}, false)" style="background:#444; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">🖨</button>
+                    ${role === 'admin' ? `
+                        <button onclick="editRecord(${index})" style="background:orange; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">✏️</button>
+                        <button onclick="archiveRecord(${index})" style="background:red; color:white; border:none; padding:5px 10px; border-radius:4px; cursor:pointer;">⚖️</button>
                     ` : ''}
                 </td>
             </tr>`;
-            tbody.innerHTML += row;
         });
-
-        if (currentUser === 'admin') renderArchive();
+        if(role === 'admin') renderArchive();
     }
 
     function renderArchive() {
         const abody = document.getElementById('archiveBody');
         abody.innerHTML = '';
-        const archive = JSON.parse(localStorage.getItem('army_archive_306') || '[]');
-        archive.forEach((item, index) => {
-            abody.innerHTML += `<tr class="penalty-row">
-                <td>${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.archiveReason || 'عقوبة'}</td>
-                <td>
-                    <button onclick="previewRecord(${index}, true)" style="background:#0288d1; color:white; border:none; padding:5px; cursor:pointer;">👁</button>
-                    <button onclick="restoreRecord(${index})" style="background:green; color:white; border:none; padding:5px; cursor:pointer;">♻️</button>
-                </td>
+        const arch = JSON.parse(localStorage.getItem('army_archive_306') || '[]');
+        arch.forEach((item, index) => {
+            abody.innerHTML += `<tr>
+                <td>${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.archiveReason}</td>
+                <td><button onclick="restoreRecord(${index})" style="background:green; color:white; border:none; padding:5px; cursor:pointer;">♻️ استرجاع</button></td>
             </tr>`;
         });
     }
 
-    // 4. وظائف الأرشفة والعقوبات
-    function archiveRecord(index) {
-        let reason = prompt("ادخل سبب العقوبة أو الأرشفة:");
-        if (!reason) return;
-        
-        let data = JSON.parse(localStorage.getItem('army_db_306'));
-        let archive = JSON.parse(localStorage.getItem('army_archive_306') || '[]');
-        
-        let item = data.splice(index, 1)[0];
-        item.archiveReason = reason;
-        archive.push(item);
-        
-        localStorage.setItem('army_db_306', JSON.stringify(data));
-        localStorage.setItem('army_archive_306', JSON.stringify(archive));
-        updateStats();
+    function archiveRecord(i) {
+        let r = prompt("سبب العقوبة:");
+        if(!r) return;
+        let d = JSON.parse(localStorage.getItem('army_db_306'));
+        let a = JSON.parse(localStorage.getItem('army_archive_306') || '[]');
+        let item = d.splice(i, 1)[0];
+        item.archiveReason = r;
+        a.push(item);
+        localStorage.setItem('army_db_306', JSON.stringify(d));
+        localStorage.setItem('army_archive_306', JSON.stringify(a));
         renderTable();
     }
 
-    function restoreRecord(index) {
-        let archive = JSON.parse(localStorage.getItem('army_archive_306'));
-        let data = JSON.parse(localStorage.getItem('army_db_306'));
-        data.push(archive.splice(index, 1)[0]);
-        localStorage.setItem('army_db_306', JSON.stringify(data));
-        localStorage.setItem('army_archive_306', JSON.stringify(archive));
-        updateStats();
+    function restoreRecord(i) {
+        let a = JSON.parse(localStorage.getItem('army_archive_306'));
+        let d = JSON.parse(localStorage.getItem('army_db_306'));
+        d.push(a.splice(i, 1)[0]);
+        localStorage.setItem('army_db_306', JSON.stringify(d));
+        localStorage.setItem('army_archive_306', JSON.stringify(a));
         renderTable();
     }
 
-    // 5. البحث المخصص
     function searchData() {
         const v = document.getElementById('searchInput').value.toLowerCase();
         const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
-        
-        if (v.trim() === "") {
-            renderTable(currentUser === 'admin' ? data : null);
-            return;
-        }
-
-        const filtered = data.filter(i => i.fullName.toLowerCase().includes(v) || i.idNo.includes(v));
-        renderTable(filtered);
+        if(v === "" && role === 'user') return renderTable([]);
+        renderTable(data.filter(i => i.fullName.toLowerCase().includes(v) || i.idNo.includes(v)));
     }
 
-    // 6. تهيئة باقي النظام
     document.getElementById('dataForm').onsubmit = function(e) {
         e.preventDefault();
-        let record = {};
-        this.querySelectorAll('input, select, textarea').forEach(f => { if(f.id !== 'editIndex') record[f.id] = f.value; });
-        let data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        let rec = {};
+        this.querySelectorAll('input, select, textarea').forEach(f => { if(f.id !== 'editIndex') rec[f.id] = f.value; });
+        let d = JSON.parse(localStorage.getItem('army_db_306') || '[]');
         let idx = document.getElementById('editIndex').value;
-        if(idx === "-1") data.push(record); else data[idx] = record;
-        localStorage.setItem('army_db_306', JSON.stringify(data));
-        this.reset();
-        document.getElementById('editIndex').value = "-1";
-        updateStats();
+        if(idx === "-1") d.push(rec); else d[idx] = rec;
+        localStorage.setItem('army_db_306', JSON.stringify(d));
+        this.reset(); document.getElementById('editIndex').value = "-1";
         renderTable();
     };
 
-    function previewRecord(index, isArchive) {
-        const source = isArchive ? 'army_archive_306' : 'army_db_306';
-        const item = JSON.parse(localStorage.getItem(source))[index];
-        let h = `<h2>معاينة: ${item.fullName}</h2><div class="grid-container">`;
-        for(let k in labels) h += `<p><b>${labels[k]}:</b> ${item[k] || '---'}</p>`;
-        if(isArchive) h += `<p style="color:red"><b>السبب:</b> ${item.archiveReason}</p>`;
+    function previewRecord(i, isA) {
+        const item = JSON.parse(localStorage.getItem(isA?'army_archive_306':'army_db_306'))[i];
+        let h = `<h2>معلومات المنتسب</h2><div class="grid-container" style="text-align:right">`;
+        for(let k in labels) h += `<p style="border-bottom:1px solid #eee; padding:10px;"><b>${labels[k]}:</b> ${item[k] || '-'}</p>`;
         document.getElementById('viewArea').innerHTML = h + `</div>`;
         document.getElementById('viewModal').style.display = 'block';
     }
 
-    function printRecord(index, isArchive) {
-        const source = isArchive ? 'army_archive_306' : 'army_db_306';
-        const item = JSON.parse(localStorage.getItem(source))[index];
-        const win = window.open('', '_blank');
-        win.document.write(`<html><head><style>body{direction:rtl; font-family:tahoma; padding:40px; border:10px double #1b5e20; min-height:90vh;}</style></head><body><h1 style="text-align:center">لواء 306 - استمارة معلومات</h1><hr>`);
-        for(let k in labels) win.document.write(`<p style="font-size:20px;"><b>${labels[k]}:</b> ${item[k] || '---'}</p>`);
-        win.document.write(`</body></html>`);
-        win.document.close();
-        setTimeout(() => win.print(), 500);
+    function printRecord(i) {
+        const item = JSON.parse(localStorage.getItem('army_db_306'))[i];
+        const w = window.open('', '_blank');
+        w.document.write(`<html><body dir="rtl" style="font-family:tahoma; padding:50px; border:2px solid #000;"><h1>استمارة معلومات - لواء 306</h1><hr>`);
+        for(let k in labels) w.document.write(`<p style="font-size:22px"><b>${labels[k]}:</b> ${item[k] || '-'}</p>`);
+        w.document.write(`</body></html>`);
+        w.document.close(); setTimeout(()=>w.print(), 500);
     }
 
-    function logout() { localStorage.clear(); location.reload(); }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function logout() { location.reload(); }
 
     const compSel = document.getElementById('companyNo');
     for(let i=1; i<=40; i++) {
-        let opt = document.createElement('option'); opt.value = "السرية " + i; opt.text = "السرية " + i;
-        compSel.appendChild(opt);
+        let o = document.createElement('option'); o.value = "السرية " + i; o.text = "السرية " + i;
+        compSel.appendChild(o);
     }
-
-    window.onload = () => { if(localStorage.getItem('role')) { currentUser = localStorage.getItem('role'); initApp(); } };
 </script>
 </body>
 </html>
