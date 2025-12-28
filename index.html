@@ -2,41 +2,40 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام العديد المطور - لواء 306</title>
+    <title>نظام العديد المتطور - لواء 306</title>
     <style>
         :root { --main-color: #1b5e20; --edit-color: #f57c00; --archive-color: #c62828; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; transition: 0.3s; background-size: cover; background-attachment: fixed; }
         
-        /* شاشة الدخول */
         #loginPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--main-color), #000); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 15px; width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
 
-        /* التصميم العام */
         .container { max-width: 1300px; margin: 20px auto; background: rgba(255, 255, 255, 0.97); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
         .admin-only { display: none; }
         
-        /* الاستمارة (30 حقل) */
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .form-grid div { display: flex; flex-direction: column; }
         label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: #fff; }
         textarea { grid-column: span 2; height: 60px; }
 
-        /* شريط البحث والإجراءات */
-        .action-bar { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid var(--main-color); }
+        .action-bar { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid var(--main-color); position: relative; }
         .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
-        .btn:hover { opacity: 0.8; }
+        
+        /* قائمة البحث الذكي */
+        #searchDropdown { position: absolute; top: 60px; right: 20px; width: calc(100% - 150px); background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 1000; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; text-align: right; }
+        .search-item:hover { background: #f5f5f5; color: var(--main-color); }
 
-        /* المودالات */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; overflow-y: auto; }
         .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; text-align: center; }
 
-        /* الأزرار العائمة */
         .fab-container { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; }
         .fab { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-
-        .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.05; pointer-events: none; width: 60%; }
+        
+        #colors { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 15px; }
+        .color-dot { height: 35px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
     </style>
 </head>
 <body>
@@ -46,11 +45,8 @@
         <h2 style="color:var(--main-color)">نظام العديد المركزي</h2>
         <input type="text" id="uInp" placeholder="اسم المستخدم">
         <input type="password" id="pInp" placeholder="كلمة المرور">
-        <div style="text-align:right; font-size:13px; margin-bottom:10px;">
-            <input type="checkbox" id="remMe"> تذكرني
-        </div>
+        <div style="text-align:right; font-size:13px; margin-bottom:10px;"><input type="checkbox" id="remMe"> تذكرني</div>
         <button onclick="login()" class="btn" style="background:var(--main-color); width:100%; padding:12px;">دخول</button>
-        <p style="font-size:12px; color:blue; cursor:pointer; margin-top:15px;" onclick="alert('يرجى مراسلة الدعم الفني أو استخدام كود الطوارئ لبريدك المسجل')">نسيت كلمة المرور؟</p>
     </div>
 </div>
 
@@ -64,9 +60,9 @@
         <form id="mainForm" style="margin-top:20px;">
             <input type="hidden" id="editIdx" value="-1">
             <div class="form-grid">
-                <div><label>ID (نص)</label><input type="text" id="idNo" required></div>
+                <div><label>ID</label><input type="text" id="idNo" required></div>
                 <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required></div>
-                <div><label>المواليد (نص)</label><input type="text" id="birthDate"></div>
+                <div><label>المواليد</label><input type="text" id="birthDate"></div>
                 <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
                 <div><label>الجنس</label><select id="gender"><option>ذكر</option><option>أنثى</option></select></div>
                 <div><label>اسم الأم الثلاثي</label><input type="text" id="motherName"></div>
@@ -85,7 +81,7 @@
                 <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
                 <div><label>الدار</label><input type="text" id="dar"></div>
                 <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
-                <div><label>الهاتف (رقم)</label><input type="number" id="phone"></div>
+                <div><label>الهاتف</label><input type="number" id="phone"></div>
                 <div><label>اللواء</label><input type="text" id="brigade" value="لواء 306"></div>
                 <div><label>الفوج</label><select id="fowj"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option><option>السابع</option></select></div>
                 <div><label>رقم السرية</label><select id="sariyaNum"></select></div>
@@ -96,20 +92,19 @@
                 <div><label>اسم السرية</label><input type="text" id="sariyaName"></div>
                 <textarea id="notes" placeholder="ملاحظات إضافية..."></textarea>
             </div>
-            <div class="admin-only" style="text-align:center;">
+            <div class="admin-only" id="saveArea" style="text-align:center;">
                 <button type="submit" class="btn" style="background:var(--main-color); padding:12px 80px;">حفظ البيانات</button>
             </div>
         </form>
 
         <div class="action-bar">
-            <div style="display:flex; gap:10px; margin-bottom:15px;">
-                <input type="text" id="sInp" placeholder="🔍 ابحث بالاسم أو ID..." style="flex:1;">
-                <button onclick="search()" class="btn" style="background:#333;">بحث</button>
-                <div class="admin-only">
-                    <button onclick="exportCSV()" class="btn" style="background:#2e7d32;">تصدير Excel</button>
-                </div>
+            <div style="display:flex; gap:10px; margin-bottom:5px;">
+                <input type="text" id="sInp" placeholder="🔍 ابدأ بكتابة الاسم للبحث..." onkeyup="liveSearch(this.value)" autocomplete="off" style="flex:1;">
+                <button onclick="search()" class="btn" style="background:#333;">بحث دقيق</button>
             </div>
-            <div id="resTools" style="display:none; justify-content:center; gap:10px;">
+            <div id="searchDropdown"></div>
+            
+            <div id="resTools" style="display:none; justify-content:center; gap:10px; margin-top:15px;">
                 <button onclick="preview()" class="btn" style="background:#0097a7;">معاينة 👁</button>
                 <button onclick="printRec()" class="btn" style="background:#455a64;">طباعة 🖨</button>
                 <div class="admin-only" style="display:contents">
@@ -120,8 +115,9 @@
             </div>
         </div>
 
-        <div style="display:flex; justify-content:space-between; margin-top:20px;">
+        <div class="admin-only" style="display:flex; justify-content:space-between; margin-top:20px;">
             <button onclick="togglePenalty()" id="penBtn" class="btn" style="background:var(--archive-color)">سجل العقوبات ⚖️</button>
+            <button onclick="exportCSV()" class="btn" style="background:#2e7d32;">تصدير Excel</button>
         </div>
     </div>
 </div>
@@ -129,14 +125,13 @@
 <div id="statsMod" class="modal"><div class="modal-content"><h2>📊 الإحصائيات</h2><div id="statArea" class="form-grid"></div><button onclick="closeMod('statsMod')" class="btn" style="background:#333; margin-top:20px;">إغلاق</button></div></div>
 
 <div id="settMod" class="modal">
-    <div class="modal-content" style="width:400px">
-        <h3>⚙️ الإعدادات</h3>
-        <input type="password" id="oldP" placeholder="كلمة المرور القديمة">
-        <input type="password" id="newP" placeholder="كلمة المرور الجديدة">
-        <p>تغيير اللون:</p><div id="colors" style="display:grid; grid-template-columns:repeat(6,1fr); gap:5px;"></div>
-        <p>الخلفية / العلامة المائية:</p>
-        <input type="file" onchange="upImg(this, 'bg')">
-        <button onclick="closeMod('settMod')" class="btn" style="background:#333; width:100%; margin-top:10px;">حفظ</button>
+    <div class="modal-content" style="width:500px">
+        <h3>⚙️ إعدادات النظام المتقدمة</h3>
+        <p>اختر لون النظام (أكثر من 30 لون):</p>
+        <div id="colors"></div>
+        <hr style="margin:20px 0">
+        <label>صورة الخلفية:</label><input type="file" onchange="upImg(this)">
+        <button onclick="closeMod('settMod')" class="btn" style="background:#333; width:100%; margin-top:20px;">حفظ وإغلاق</button>
     </div>
 </div>
 
@@ -146,12 +141,9 @@
 </div>
 
 <script>
-    let role = '';
-    let mode = 'active';
-    let currentIdx = -1;
+    let role = ''; let mode = 'active'; let currentIdx = -1;
     const flds = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","cat","exp","refN","refP","sariyaName","notes"];
 
-    // تعبئة السرايا
     const sSel = document.getElementById('sariyaNum');
     for(let i=1; i<=40; i++) { let o=document.createElement('option'); o.value=i; o.text=i; sSel.appendChild(o); }
 
@@ -159,9 +151,8 @@
         const u = document.getElementById('uInp').value;
         const p = document.getElementById('pInp').value;
         const users = {'admin':'1234','user1':'1234','user2':'1234','user3':'1234','user4':'1234'};
-
         if(p === 'RESET306' || (users[u] && users[u] === p)) {
-            role = (u === 'admin' || p === 'RESET306') ? 'admin' : 'user';
+            role = (u === 'admin' || p === 'RESET306') ? 'admin' : 'assistant';
             if(document.getElementById('remMe').checked) localStorage.setItem('306_sess', role);
             entry();
         } else alert("خطأ في البيانات");
@@ -170,21 +161,50 @@
     function entry() {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
-        if(role === 'admin') document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+        if(role === 'admin') {
+            document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+        } else {
+            document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'none');
+            // المساعد يرى فقط المعاينة والطباعة عند البحث
+        }
         applyStyles();
     }
 
     window.onload = () => { if(localStorage.getItem('306_sess')) { role = localStorage.getItem('306_sess'); entry(); } };
 
+    // نظام البحث الذكي المتشابه
+    function liveSearch(val) {
+        const dropdown = document.getElementById('searchDropdown');
+        if(val.length < 2) { dropdown.style.display = 'none'; return; }
+        const db = JSON.parse(localStorage.getItem(mode === 'active' ? 'db_306' : 'pen_306') || '[]');
+        const filtered = db.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
+        
+        if(filtered.length > 0) {
+            dropdown.innerHTML = '';
+            filtered.forEach(item => {
+                let div = document.createElement('div');
+                div.className = 'search-item';
+                div.innerHTML = `<b>${item.fullName}</b> - ID: ${item.idNo}`;
+                div.onclick = () => { selectItem(item); dropdown.style.display = 'none'; };
+                dropdown.appendChild(div);
+            });
+            dropdown.style.display = 'block';
+        } else dropdown.style.display = 'none';
+    }
+
+    function selectItem(item) {
+        const db = JSON.parse(localStorage.getItem(mode === 'active' ? 'db_306' : 'pen_306') || '[]');
+        currentIdx = db.findIndex(i => i.idNo === item.idNo);
+        flds.forEach(f => document.getElementById(f).value = item[f] || '');
+        document.getElementById('resTools').style.display = 'flex';
+        document.getElementById('sInp').value = item.fullName;
+    }
+
     function search() {
         const val = document.getElementById('sInp').value.trim();
         const db = JSON.parse(localStorage.getItem(mode === 'active' ? 'db_306' : 'pen_306') || '[]');
-        const idx = db.findIndex(i => i.idNo == val || i.fullName.includes(val));
-        if(idx > -1) {
-            currentIdx = idx;
-            flds.forEach(f => document.getElementById(f).value = db[idx][f] || '');
-            document.getElementById('resTools').style.display = 'flex';
-        } else alert("لا توجد نتائج");
+        const idx = db.findIndex(i => i.idNo == val || i.fullName == val);
+        if(idx > -1) selectItem(db[idx]); else alert("لا توجد نتائج دقيقة");
     }
 
     document.getElementById('mainForm').onsubmit = function(e) {
@@ -194,40 +214,16 @@
         let editVal = document.getElementById('editIdx').value;
         if(editVal == "-1") db.push(data); else { db[editVal] = data; document.getElementById('editIdx').value = "-1"; }
         localStorage.setItem('db_306', JSON.stringify(db));
-        alert("تم الحفظ"); this.reset(); document.getElementById('resTools').style.display='none';
+        alert("تم الحفظ بنجاح"); this.reset(); document.getElementById('resTools').style.display='none';
     };
 
-    function togglePenalty() {
-        mode = (mode === 'active') ? 'pen' : 'active';
-        document.getElementById('viewTitle').innerText = mode === 'active' ? "سجل الخدمة النشطة - لواء 306" : "سجل العقوبات";
-        document.getElementById('penBtn').innerText = mode === 'active' ? "سجل العقوبات ⚖️" : "العودة للنشط ✅";
-        document.getElementById('mainForm').reset();
-    }
-
-    function movePenalty() {
-        let db = JSON.parse(localStorage.getItem('db_306'));
-        let pen = JSON.parse(localStorage.getItem('pen_306') || '[]');
-        pen.push(db.splice(currentIdx, 1)[0]);
-        localStorage.setItem('db_306', JSON.stringify(db));
-        localStorage.setItem('pen_306', JSON.stringify(pen));
-        location.reload();
-    }
-
-    function showStats() {
-        const db = JSON.parse(localStorage.getItem('db_306') || '[]');
-        let h = `<div style="background:#eee; padding:15px; border-radius:10px;"><h3>الإجمالي: ${db.length}</h3></div>`;
-        ["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع"].forEach(f => {
-            h += `<div style="background:#fff; border:1px solid #ccc; padding:10px;">فوج ${f}: ${db.filter(i=>i.fowj===f).length}</div>`;
-        });
-        document.getElementById('statArea').innerHTML = h;
-        document.getElementById('statsMod').style.display = 'block';
-    }
-
     function showSett() {
-        const colors = ['#1b5e20','#b71c1c','#0d47a1','#4a148c','#212121','#ff6f00','#006064','#1a237e','#3e2723','#1b5e20','#c2185b','#004d40'];
+        const colors = [
+            '#1b5e20','#2e7d32','#4caf50','#8bc34a','#cddc39','#ffeb3b','#ffc107','#ff9800','#ff5722','#f44336','#e91e63','#9c27b0','#673ab7','#3f51b5','#2196f3','#03a9f4','#00bcd4','#009688','#795548','#9e9e9e','#607d8b','#212121','#b71c1c','#880e4f','#4a148c','#311b92','#1a237e','#0d47a1','#01579b','#006064','#004d40','#33691e','#827717','#f57f17','#ff6f00','#e65100','#bf360c'
+        ];
         const pal = document.getElementById('colors'); pal.innerHTML = '';
         colors.forEach(c => {
-            let d = document.createElement('div'); d.style.background=c; d.style.height='30px'; d.style.cursor='pointer';
+            let d = document.createElement('div'); d.className='color-dot'; d.style.background=c;
             d.onclick = () => { localStorage.setItem('306_c', c); applyStyles(); };
             pal.appendChild(d);
         });
@@ -239,21 +235,43 @@
         const bg = localStorage.getItem('306_bg'); if(bg) document.body.style.backgroundImage = `url(${bg})`;
     }
 
-    function upImg(input, type) {
+    function upImg(input) {
         let r = new FileReader(); r.onload = (e) => { localStorage.setItem('306_bg', e.target.result); applyStyles(); };
         r.readAsDataURL(input.files[0]);
     }
 
     function printRec() {
         const win = window.open('','_blank');
-        win.document.write(`<html><body dir="rtl" style="font-family:tahoma; padding:40px; border:5px solid #000"><h1>استمارة معلومات - لواء 306</h1><hr>`);
-        flds.forEach(f => { win.document.write(`<p style="font-size:18px"><b>${f}:</b> ${document.getElementById(f).value}</p>`); });
+        win.document.write(`<html><body dir="rtl" style="font-family:tahoma; padding:40px; border:10px double var(--main-color)">
+        <h1 style="text-align:center">استمارة معلومات - لواء 306</h1><hr>`);
+        flds.forEach(f => { win.document.write(`<p style="font-size:18px; border-bottom:1px solid #eee"><b>${f}:</b> ${document.getElementById(f).value}</p>`); });
         win.document.write(`</body></html>`); win.document.close(); setTimeout(()=>win.print(),500);
+    }
+
+    function togglePenalty() {
+        mode = (mode === 'active') ? 'pen' : 'active';
+        document.getElementById('viewTitle').innerText = mode === 'active' ? "سجل الخدمة النشطة - لواء 306" : "سجل العقوبات";
+        document.getElementById('penBtn').innerText = mode === 'active' ? "سجل العقوبات ⚖️" : "العودة للنشط ✅";
+    }
+
+    function showStats() {
+        const db = JSON.parse(localStorage.getItem('db_306') || '[]');
+        let h = `<div style="grid-column:1/-1; background:#eee; padding:15px; border-radius:10px;"><h3>الإجمالي الكلي: ${db.length}</h3></div>`;
+        ["الأول","الثاني","الثالث","الرابع","الخامس","السادس","السابع"].forEach(f => {
+            h += `<div style="background:#fff; border:2px solid var(--main-color); padding:10px; border-radius:8px;">فوج ${f}: <b>${db.filter(i=>i.fowj===f).length}</b></div>`;
+        });
+        document.getElementById('statArea').innerHTML = h;
+        document.getElementById('statsMod').style.display = 'block';
     }
 
     function logout() { localStorage.removeItem('306_sess'); location.reload(); }
     function closeMod(id) { document.getElementById(id).style.display = 'none'; }
-    function setEdit() { document.getElementById('editIdx').value = currentIdx; alert("وضع التعديل نشط"); }
+    function setEdit() { document.getElementById('editIdx').value = currentIdx; alert("وضع التعديل مفعل للحقل المختار"); }
+    function movePenalty() {
+        let db = JSON.parse(localStorage.getItem('db_306')); let pen = JSON.parse(localStorage.getItem('pen_306') || '[]');
+        pen.push(db.splice(currentIdx, 1)[0]); localStorage.setItem('db_306', JSON.stringify(db));
+        localStorage.setItem('pen_306', JSON.stringify(pen)); alert("نقل إلى العقوبات"); location.reload();
+    }
     function delRec() { if(confirm("حذف نهائي؟")) { let db=JSON.parse(localStorage.getItem('db_306')); db.splice(currentIdx,1); localStorage.setItem('db_306',JSON.stringify(db)); location.reload(); }}
 </script>
 </body>
