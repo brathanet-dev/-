@@ -22,19 +22,30 @@
 
         .db-view { display: none; }
         .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
-        .db-table { width: 100%; border-collapse: collapse; min-width: 3400px; }
+        .db-table { width: 100%; border-collapse: collapse; min-width: 3200px; }
         .db-table th { background: var(--db-color); color: white; padding: 10px; border: 1px solid #ddd; position: sticky; top: 0; }
         .db-table td { padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 13px; }
-        
-        /* تلوين المكرر */
-        .duplicate-row { color: #c62828 !important; font-weight: bold; background-color: #ffebee !important; }
+        .duplicate-row { color: red !important; font-weight: bold; background: #fff1f1 !important; }
 
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 45%; border-radius: 15px; max-height: 85vh; overflow-y: auto; }
-        @media print { .no-print { display: none !important; } }
+        .modal-content { background: white; margin: 3% auto; padding: 25px; width: 40%; border-radius: 15px; }
+
+        /* إعدادات الطباعة A4 المصلحة */
+        @media print {
+            body { background: white !important; -webkit-print-color-adjust: exact; }
+            .no-print { display: none !important; }
+            .container { width: 100%; box-shadow: none; border: none; margin: 0; padding: 10px; }
+            .form-grid { grid-template-columns: 1fr 1fr !important; display: grid !important; }
+            .form-grid div { border-bottom: 1px solid #ddd; padding: 8px; margin-bottom: 5px; }
+            input { border: none !important; background: transparent !important; font-weight: bold; font-size: 16px; text-align: right !important; }
+            .print-watermark { display: block !important; position: fixed; top: 30%; left: 10%; width: 80%; opacity: 0.1; z-index: -1; pointer-events: none; }
+        }
+        .print-watermark { display: none; }
     </style>
 </head>
 <body>
+
+<img id="wmImage" class="print-watermark" src="">
 
 <div class="container no-print" id="formView">
     <div class="header-section">
@@ -43,7 +54,7 @@
 
     <form id="mainForm" onsubmit="saveData(event); return false;">
         <input type="hidden" id="editIdx" value="-1">
-        <div class="form-grid" id="printableArea">
+        <div class="form-grid">
             <div><label>ID</label><input type="text" id="idNo"></div>
             <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required></div>
             <div><label>المواليد</label><input type="text" id="birthDate"></div>
@@ -79,38 +90,34 @@
         <button type="submit" class="btn btn-main">حفظ البيانات</button>
     </form>
 
-    <div style="margin-top:20px; background:#f0f0f0; padding:15px; border-radius:10px;">
-        <div style="display:flex; gap:8px; margin-bottom:10px; align-items: center;">
+    <div style="margin-top:20px; background:#eee; padding:15px; border-radius:10px;">
+        <div style="display:flex; gap:8px; margin-bottom:10px;">
             <div id="searchWrapper">
-                <input type="text" id="mainSearch" placeholder="🔍 بحث بالاسم..." onkeyup="liveSearch(this.value)" style="width:100%">
+                <input type="text" id="mainSearch" placeholder="🔍 بحث سريع..." onkeyup="liveSearch(this.value)" style="width:100%">
                 <div id="searchDropdown"></div>
             </div>
-            <button onclick="window.print()" class="btn" style="background:#444">🖨️ طباعة</button>
-            <button onclick="transferToPenalty()" class="btn" style="background:var(--pen-color)">⚖️ عقوبة</button>
-            <button onclick="showStats()" class="btn" style="background:#6a1b9a">📊 إحصائيات</button>
+            <button onclick="window.print()" class="btn" style="background:#444">🖨️ طباعة A4</button>
+            <button onclick="transferToPenalty()" class="btn" style="background:var(--pen-color)">⚖️ ترحيل عقوبة</button>
         </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
-            <button onclick="exportFullData()" class="btn" style="background:#2e7d32">تصدير كامل القاعدة</button>
-            <button onclick="document.getElementById('impFile').click()" class="btn" style="background:#1565c0">استيراد CSV</button>
-            <input type="file" id="impFile" hidden onchange="importCSV(this)">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+            <button onclick="showView('db')" class="btn" style="background:var(--db-color)">القاعدة الشاملة</button>
+            <button onclick="showView('pen')" class="btn" style="background:var(--pen-color)">قاعدة العقوبات</button>
         </div>
-        <button onclick="showView('db')" class="btn" style="background:var(--db-color); width:100%; margin-bottom:10px;">القاعدة الشاملة 📋</button>
-        <button onclick="showView('pen')" class="btn" style="background:var(--pen-color); width:100%; margin-bottom:10px;">قاعدة العقوبات ⚖️</button>
+        <button onclick="openSettings()" class="btn" style="background:#333; width:100%; margin-top:10px;">⚙️ الإعدادات والسمات</button>
     </div>
 </div>
 
 <div class="container db-view" id="tableView">
-    <div class="header-section">
+    <div class="header-section no-print">
         <h2 id="tableTitle">عرض البيانات</h2>
-        <button onclick="showView('form')" class="btn" style="background:#333">رجوع</button>
+        <button onclick="showView('form')" class="btn" style="background:#333">العودة</button>
     </div>
-    <div class="no-print" style="display:flex; gap:5px; background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap: wrap;">
-        <input type="text" id="tableSearch" placeholder="بحث سريع..." onkeyup="tableFilter()" style="width:130px">
-        <select id="filterFowj" onchange="tableFilter()"><option value="">كل الأفواج</option></select>
-        <select id="filterSNum" onchange="tableFilter()"><option value="">سرية (رقم)</option></select>
-        <select id="filterSName" onchange="tableFilter()"><option value="">سرية (اسم)</option></select>
-        <select id="filterColor" onchange="tableFilter()"><option value="all">كل الألوان</option><option value="dup">المكرر فقط (أحمر)</option></select>
-        <button onclick="toggleSelectAll()" class="btn" id="selBtn" style="background:#555">تحديد الكل</button>
+    <div class="no-print" style="display:flex; gap:5px; background:#ddd; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap:wrap;">
+        <select id="fFowj" onchange="applyFilters()"><option value="">كل الأفواج</option></select>
+        <select id="fSNum" onchange="applyFilters()"><option value="">كل السرايا (رقم)</option></select>
+        <select id="fSName" onchange="applyFilters()"><option value="">كل السرايا (اسم)</option></select>
+        <select id="fColor" onchange="applyFilters()"><option value="all">كل الألوان</option><option value="red">المكرر (أحمر)</option></select>
+        <button onclick="toggleSelectAll()" id="selBtn" class="btn" style="background:#555">تحديد الكل</button>
         <button onclick="exportSelected()" class="btn" style="background:#2e7d32">تصدير المحدد</button>
         <button onclick="bulkDelete()" class="btn" style="background:red">حذف المحدد</button>
         <button id="pnlRemoveBtn" onclick="removeFromPenalty()" class="btn" style="background:orange; display:none;">رفع العقوبة 🔓</button>
@@ -118,20 +125,36 @@
     <div class="table-wrapper"><table class="db-table"><thead><tr id="tableHeaders"></tr></thead><tbody id="tableBody"></tbody></table></div>
 </div>
 
+<div id="settMod" class="modal no-print">
+    <div class="modal-content">
+        <h3>⚙️ إعدادات النظام والأمان</h3>
+        <label>اللون الرئيسي (عتلة):</label><input type="color" onchange="changeTheme(this.value)" style="width:100%; height:40px; margin-bottom:15px;">
+        <label>خلفية البرنامج وعلامة الطباعة:</label><input type="file" onchange="updateBg(this)" style="width:100%; margin-bottom:15px;">
+        <hr>
+        <p style="font-weight:bold; color:red;">تغيير بيانات الدخول:</p>
+        <input type="text" id="oldU" placeholder="المستخدم القديم" style="width:100%; margin-bottom:5px;">
+        <input type="password" id="oldP" placeholder="كلمة المرور القديمة" style="width:100%; margin-bottom:10px;">
+        <input type="text" id="newU" placeholder="المستخدم الجديد" style="width:100%; margin-bottom:5px;">
+        <input type="password" id="newP" placeholder="المرور الجديدة" style="width:100%; margin-bottom:10px;">
+        <button onclick="updateSecurity()" class="btn" style="background:var(--main-color); width:100%">تحديث البيانات</button>
+        <button onclick="document.getElementById('settMod').style.display='none'" class="btn" style="background:red; width:100%; margin-top:10px;">إغلاق</button>
+    </div>
+</div>
+
 <script>
     const fields = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
-    const labels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة","الزوجة","أطفال","تحصيل","تخصص","عمل","محافظة","قضاء","ناحية","منطقة","محلة","زقاق","دار","دالة","هاتف","لواء","فوج","سرية","صنف","خبرات","معرف","هاتف معرف","ملاحظات","اسم سرية"];
+    const labels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","الأم","الهوية","الحالة","الزوجة","أطفال","تحصيل","تخصص","عمل","محافظة","قضاء","ناحية","منطقة","محلة","زقاق","دار","دالة","هاتف","لواء","فوج","سرية","صنف","خبرات","معرف","هاتف معرف","ملاحظات","اسم سرية"];
     let currentTable = 'db';
-    let isAllSelected = false;
+    let allSel = false;
 
-    // --- نظام الحفظ والبحث ---
+    // --- الحفظ والبحث ---
     function saveData(e) {
         let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
         let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
         let idx = document.getElementById('editIdx').value;
         if(idx === "-1") db.push(data); else db[idx] = data;
         localStorage.setItem('db_306_data', JSON.stringify(db));
-        alert("تم الحفظ بنجاح");
+        alert("تم الحفظ");
         document.getElementById('mainForm').reset();
         document.getElementById('editIdx').value = "-1";
     }
@@ -141,18 +164,18 @@
         if(!v) { drop.style.display='none'; return; }
         let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
         let matches = db.filter(i => i.fullName.includes(v));
-        drop.innerHTML = matches.map(m => `<div class="search-item" onclick="loadByIdx(${db.indexOf(m)})">${m.fullName}</div>`).join('');
+        drop.innerHTML = matches.map(m => `<div class="search-item" onclick="loadIdx(${db.indexOf(m)})">${m.fullName}</div>`).join('');
         drop.style.display = matches.length ? 'block' : 'none';
     }
 
-    function loadByIdx(i) {
+    function loadIdx(i) {
         let db = JSON.parse(localStorage.getItem('db_306_data'));
         fields.forEach(f => document.getElementById(f).value = db[i][f] || '');
         document.getElementById('editIdx').value = i;
         document.getElementById('searchDropdown').style.display='none';
     }
 
-    // --- نظام الجداول المطور ---
+    // --- الجداول والفلاتر الدقيقة ---
     function showView(v) {
         document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
         document.getElementById('tableView').style.display = v === 'form' ? 'none' : 'block';
@@ -162,142 +185,114 @@
     function renderTable() {
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key) || '[]');
-        
-        // كشف التكرار (فقط للقاعدة الشاملة)
         let nameCounts = {};
-        if(currentTable === 'db') db.forEach(i => nameCounts[i.fullName] = (nameCounts[i.fullName] || 0) + 1);
+        db.forEach(i => nameCounts[i.fullName] = (nameCounts[i.fullName] || 0) + 1);
 
         document.getElementById('pnlRemoveBtn').style.display = currentTable === 'pen' ? 'block' : 'none';
-        document.getElementById('tableHeaders').innerHTML = `<th class="no-print">تحديد</th><th class="no-print">تعديل</th>` + labels.map(l => `<th>${l}</th>`).join('');
+        document.getElementById('tableHeaders').innerHTML = `<th>تحديد</th><th>تعديل</th>` + labels.map(l => `<th>${l}</th>`).join('');
         
         document.getElementById('tableBody').innerHTML = db.map((row, i) => {
-            let isDup = currentTable === 'db' && nameCounts[row.fullName] > 1;
-            return `<tr class="${isDup ? 'duplicate-row' : ''}" data-fowj="${row.fowj||''}" data-snum="${row.sariyaNum||''}" data-sname="${row.sariyaName||''}">
-                <td class="no-print"><input type="checkbox" class="row-check" value="${i}"></td>
-                <td class="no-print"><button onclick="loadFromTable(${i})" style="background:orange; border:none; color:white; padding:3px 8px; border-radius:3px; cursor:pointer;">تعديل</button></td>
+            let isDup = nameCounts[row.fullName] > 1;
+            return `<tr class="${isDup ? 'duplicate-row' : ''}" data-f="${row.fowj||''}" data-sn="${row.sariyaNum||''}" data-sna="${row.sariyaName||''}">
+                <td><input type="checkbox" class="row-check" value="${i}"></td>
+                <td><button onclick="loadFromT(${i})">تعديل</button></td>
                 ${fields.map(f => `<td>${row[f]||''}</td>`).join('')}
             </tr>`;
         }).join('');
         
-        updateFilters(db);
-    }
-
-    function updateFilters(db) {
-        const setOpt = (id, key) => {
-            let vals = [...new Set(db.map(i => i[key]))].filter(Boolean);
+        const setO = (id, k) => {
+            let vals = [...new Set(db.map(i => i[k]))].filter(Boolean);
             document.getElementById(id).innerHTML = '<option value="">الكل</option>' + vals.map(v => `<option value="${v}">${v}</option>`).join('');
         };
-        setOpt('filterFowj', 'fowj'); setOpt('filterSNum', 'sariyaNum'); setOpt('filterSName', 'sariyaName');
+        setO('fFowj', 'fowj'); setO('fSNum', 'sariyaNum'); setO('fSName', 'sariyaName');
     }
 
-    function tableFilter() {
-        let term = document.getElementById('tableSearch').value.toLowerCase();
-        let fowj = document.getElementById('filterFowj').value;
-        let snum = document.getElementById('filterSNum').value;
-        let sname = document.getElementById('filterSName').value;
-        let color = document.getElementById('filterColor').value;
+    function applyFilters() {
+        let fowj = document.getElementById('fFowj').value;
+        let snum = document.getElementById('fSNum').value;
+        let sname = document.getElementById('fSName').value;
+        let color = document.getElementById('fColor').value;
 
         document.querySelectorAll('#tableBody tr').forEach(tr => {
-            let txt = tr.innerText.toLowerCase();
-            let mTerm = txt.includes(term);
-            let mFowj = !fowj || tr.dataset.fowj === fowj;
-            let mSnum = !snum || tr.dataset.snum === snum;
-            let mSname = !sname || tr.dataset.sname === sname;
-            let mColor = color === 'all' || (color === 'dup' && tr.classList.contains('duplicate-row'));
-
-            tr.style.display = (mTerm && mFowj && mSnum && mSname && mColor) ? '' : 'none';
+            let mF = !fowj || tr.dataset.f === fowj;
+            let mSN = !snum || tr.dataset.sn === snum;
+            let mSNA = !sname || tr.dataset.sna === sname;
+            let mC = color === 'all' || (color === 'red' && tr.classList.contains('duplicate-row'));
+            tr.style.display = (mF && mSN && mSNA && mC) ? '' : 'none';
         });
     }
 
-    // --- أزرار العمليات (إصلاح شامل) ---
+    // --- العمليات الجماعية ---
     function toggleSelectAll() {
-        isAllSelected = !isAllSelected;
-        document.querySelectorAll('.row-check').forEach(ck => {
-            if(ck.closest('tr').style.display !== 'none') ck.checked = isAllSelected;
-        });
-        document.getElementById('selBtn').innerText = isAllSelected ? "إلغاء التحديد" : "تحديد الكل";
+        allSel = !allSel;
+        document.querySelectorAll('.row-check').forEach(ck => { if(ck.closest('tr').style.display !== 'none') ck.checked = allSel; });
+        document.getElementById('selBtn').innerText = allSel ? "إلغاء التحديد" : "تحديد الكل";
     }
 
     function bulkDelete() {
-        let checks = Array.from(document.querySelectorAll('.row-check:checked'));
-        if(!checks.length || !confirm("حذف المحددين؟")) return;
+        let chks = Array.from(document.querySelectorAll('.row-check:checked'));
+        if(!chks.length || !confirm("حذف المحددين؟")) return;
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key));
-        let indices = checks.map(c => parseInt(c.value)).sort((a,b) => b-a);
-        indices.forEach(idx => db.splice(idx, 1));
-        localStorage.setItem(key, JSON.stringify(db));
-        renderTable();
+        let ids = chks.map(c => parseInt(c.value)).sort((a,b) => b-a);
+        ids.forEach(idx => db.splice(idx, 1));
+        localStorage.setItem(key, JSON.stringify(db)); renderTable();
     }
 
     function exportSelected() {
-        let checks = Array.from(document.querySelectorAll('.row-check:checked'));
-        if(!checks.length) return alert("حدد صفوفاً أولاً");
+        let chks = Array.from(document.querySelectorAll('.row-check:checked'));
+        if(!chks.length) return;
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key));
-        let selected = checks.map(c => db[c.value]);
-        let csv = "\uFEFF" + labels.join(",") + "\n" + selected.map(r => fields.map(f => `"${r[f]||''}"`).join(",")).join("\n");
-        let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "المحددين_306.csv"; link.click();
+        let sel = chks.map(c => db[c.value]);
+        let csv = "\uFEFF" + labels.join(",") + "\n" + sel.map(r => fields.map(f => `"${r[f]||''}"`).join(",")).join("\n");
+        let b = new Blob([csv], {type: 'text/csv'});
+        let a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "محدد.csv"; a.click();
     }
 
     function transferToPenalty() {
-        let name = document.getElementById('fullName').value;
-        if(!name) return alert("اختر اسماً");
         let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
-        let pen = JSON.parse(localStorage.getItem('db_306_pen') || '[]');
-        pen.push(data);
-        localStorage.setItem('db_306_pen', JSON.stringify(pen));
-        alert("تم الترحيل للعقوبات");
+        if(!data.fullName) return;
+        let pen = JSON.parse(localStorage.getItem('db_306_pen') || '[]'); pen.push(data);
+        localStorage.setItem('db_306_pen', JSON.stringify(pen)); alert("تم الترحيل");
     }
 
     function removeFromPenalty() {
-        let checks = Array.from(document.querySelectorAll('.row-check:checked'));
-        if(!checks.length) return alert("حدد أفراداً لرفع العقوبة");
+        let chks = Array.from(document.querySelectorAll('.row-check:checked'));
         let pen = JSON.parse(localStorage.getItem('db_306_pen'));
         let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let indices = checks.map(c => parseInt(c.value)).sort((a,b) => b-a);
-        indices.forEach(idx => { db.push(pen[idx]); pen.splice(idx, 1); });
-        localStorage.setItem('db_306_pen', JSON.stringify(pen));
-        localStorage.setItem('db_306_data', JSON.stringify(db));
-        renderTable(); alert("تم رفع العقوبة بنجاح");
+        chks.forEach(c => { db.push(pen[c.value]); });
+        let ids = chks.map(c => parseInt(c.value)).sort((a,b) => b-a);
+        ids.forEach(idx => pen.splice(idx, 1));
+        localStorage.setItem('db_306_pen', JSON.stringify(pen)); localStorage.setItem('db_306_data', JSON.stringify(db));
+        renderTable();
     }
 
-    function importCSV(input) {
-        let reader = new FileReader();
-        reader.onload = e => {
-            let lines = e.target.result.split("\n").slice(1);
-            let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-            lines.forEach(l => {
-                let cols = l.split(","); if(cols.length > 5) {
-                    let obj = {}; fields.forEach((f, i) => obj[f] = cols[i]?.replace(/"/g,'').trim());
-                    db.push(obj);
-                }
-            });
-            localStorage.setItem('db_306_data', JSON.stringify(db)); location.reload();
-        };
-        reader.readAsText(input.files[0]);
+    // --- الإعدادات والأمان ---
+    function openSettings() { document.getElementById('settMod').style.display='block'; }
+    function changeTheme(c) { document.documentElement.style.setProperty('--main-color', c); localStorage.setItem('306_c', c); }
+    function updateBg(input) {
+        let r = new FileReader(); r.onload = e => {
+            document.body.style.backgroundImage = `url(${e.target.result})`;
+            document.getElementById('wmImage').src = e.target.result;
+            localStorage.setItem('306_bg', e.target.result);
+        }; r.readAsDataURL(input.files[0]);
     }
-
-    function loadFromTable(i) {
-        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
-        let db = JSON.parse(localStorage.getItem(key));
-        fields.forEach(f => document.getElementById(f).value = db[i][f] || '');
-        document.getElementById('editIdx').value = i;
-        showView('form');
+    function updateSecurity() {
+        let sU = localStorage.getItem('306_u') || 'admin';
+        let sP = localStorage.getItem('306_p') || '1234';
+        if(document.getElementById('oldU').value === sU && document.getElementById('oldP').value === sP) {
+            localStorage.setItem('306_u', document.getElementById('newU').value);
+            localStorage.setItem('306_p', document.getElementById('newP').value);
+            alert("تم التحديث");
+            document.getElementById('settMod').style.display='none';
+        } else { alert("خطأ في البيانات القديمة"); }
     }
-
-    function showStats() {
-        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let pen = JSON.parse(localStorage.getItem('db_306_pen') || '[]');
-        alert(`إحصائية سريعة:\n- القاعدة الشاملة: ${db.length} فرد\n- قاعدة العقوبات: ${pen.length} فرد`);
-    }
-
-    function exportFullData() {
-        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let csv = "\uFEFF" + labels.join(",") + "\n" + db.map(r => fields.map(f => `"${r[f]||''}"`).join(",")).join("\n");
-        let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-        let link = document.createElement("a"); link.href = URL.createObjectURL(blob); link.download = "القاعدة_كاملة.csv"; link.click();
-    }
+    function loadFromT(i) { loadIdx(i); showView('form'); }
+    window.onload = () => {
+        let c = localStorage.getItem('306_c'); if(c) changeTheme(c);
+        let bg = localStorage.getItem('306_bg'); if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('wmImage').src = bg; }
+    };
 </script>
 
 </body>
