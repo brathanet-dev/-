@@ -6,42 +6,37 @@
     <style>
         :root { --main-color: #1b5e20; --db-color: #0277bd; --pen-color: #c62828; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
-        .container { max-width: 1350px; margin: 20px auto; background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); }
-        .header-section { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; }
-        .logo-img { width: 90px; height: 90px; object-fit: contain; }
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
+        .container { max-width: 1350px; margin: 20px auto; background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; }
+        .header-section { border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
         .form-grid div { display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #333; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; }
+        label { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #333; }
+        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 14px; }
         .btn { border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; }
         .btn-main { background: var(--main-color); width: 100%; font-size: 16px; }
         
+        #searchWrapper { position: relative; flex: 1; }
+        #searchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .search-item:hover { background: #f0f0f0; }
+
         .db-view { display: none; }
         .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
-        .db-table { width: 100%; border-collapse: collapse; min-width: 3000px; }
-        .db-table th { background: var(--db-color); color: white; padding: 12px; border: 1px solid #ddd; position: sticky; top: 0; }
-        .db-table td { padding: 10px; border: 1px solid #ddd; text-align: center; font-size: 13px; }
+        .db-table { width: 100%; border-collapse: collapse; min-width: 3200px; }
+        .db-table th { background: var(--db-color); color: white; padding: 10px; border: 1px solid #ddd; position: sticky; top: 0; }
+        .db-table td { padding: 8px; border: 1px solid #ddd; text-align: center; font-size: 13px; }
         
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 40%; border-radius: 15px; }
+        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 40%; border-radius: 15px; max-height: 80vh; overflow-y: auto; }
 
-        @media print {
-            .no-print { display: none !important; }
-            .container { width: 100%; box-shadow: none; margin: 0; }
-            .db-table { min-width: 100%; }
-            .watermark { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); opacity: 0.1; width: 70%; z-index: -1; }
-        }
+        @media print { .no-print { display: none !important; } .container { width: 100%; box-shadow: none; } .db-table { min-width: 100%; } }
     </style>
 </head>
 <body>
 
 <div class="container no-print" id="formView">
     <div class="header-section">
-        <div style="display:flex; align-items:center; gap:15px;">
-            <img src="https://i.ibb.co/pPHR7S7/1000190031.jpg" class="logo-img">
-            <h2 style="color:var(--main-color)">العديد المركزي - لواء 306</h2>
-        </div>
-        <button onclick="location.reload()" class="btn" style="background:var(--pen-color)">تسجيل خروج</button>
+        <h2 style="color:var(--main-color); margin:0;">العديد المركزي - لواء 306</h2>
     </div>
 
     <form id="mainForm" onsubmit="saveData(event)">
@@ -52,6 +47,7 @@
             <div><label>المواليد</label><input type="text" id="birthDate"></div>
             <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
             <div><label>الجنس</label><input type="text" id="gender"></div>
+            <div><label>اسم الأم</label><input type="text" id="motherName"></div>
             <div><label>رقم الهوية</label><input type="text" id="natId"></div>
             <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
             <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
@@ -70,19 +66,41 @@
             <div><label>الهاتف</label><input type="text" id="phone"></div>
             <div><label>اللواء</label><input type="text" id="brigade"></div>
             <div><label>الفوج</label><input type="text" id="fowj"></div>
-            <div><label>السرية</label><input type="text" id="sariyaNum"></div>
-            <div><label>اسم السرية</label><input type="text" id="sariyaName"></div>
-            <div style="grid-column: span 2;"><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
+            <div><label>السرية (رقم)</label><input type="text" id="sariyaNum"></div>
+            <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
             <div><label>المعرف</label><input type="text" id="refN"></div>
             <div><label>هاتف المعرف</label><input type="text" id="refP"></div>
+            <div style="grid-column: span 2;"><label>الملاحظات</label><input type="text" id="notes"></div>
+            <div style="grid-column: span 2;"><label>اسم السرية</label><input type="text" id="sariyaName"></div>
         </div>
         <button type="submit" class="btn btn-main">حفظ البيانات</button>
     </form>
 
     <div style="margin-top:20px; background:#f0f0f0; padding:15px; border-radius:10px;">
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <div id="searchWrapper">
+                <input type="text" id="mainSearch" placeholder="🔍 ابحث بالاسم الرباعي..." onkeyup="liveSearch(this.value)" style="width:100%">
+                <div id="searchDropdown"></div>
+            </div>
+            <button onclick="showStats()" class="btn" style="background:#6a1b9a">📊 الإحصائيات العامة</button>
+            <button onclick="downloadTemplate()" class="btn" style="background:#455a64">نموذج Excel</button>
+        </div>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px; margin-bottom:10px;">
+            <button onclick="exportFullData()" class="btn" style="background:#2e7d32">تصدير قاعدة البيانات</button>
+            <button onclick="document.getElementById('impFile').click()" class="btn" style="background:#1565c0">استيراد من CSV</button>
+            <input type="file" id="impFile" hidden accept=".csv" onchange="importCSV(this)">
+        </div>
         <button onclick="showView('db')" class="btn" style="background:var(--db-color); width:100%; margin-bottom:10px;">فتح قاعدة البيانات الشاملة 📋</button>
         <button onclick="showView('pen')" class="btn" style="background:var(--pen-color); width:100%; margin-bottom:10px;">فتح قاعدة بيانات العقوبات ⚖️</button>
-        <button onclick="openSettings()" class="btn" style="background:#333; width:100%;">⚙️ الإعدادات المتقدمة</button>
+        <button onclick="openSettings()" class="btn" style="background:#333; width:100%;">⚙️ الإعدادات</button>
+    </div>
+</div>
+
+<div id="statsMod" class="modal no-print">
+    <div class="modal-content">
+        <h3 style="text-align:center; color:var(--main-color); border-bottom:2px solid #eee; padding-bottom:10px;">📊 تقرير الإحصائيات المركزية</h3>
+        <div id="statsContent" style="line-height: 1.8; font-size: 16px;"></div>
+        <button onclick="document.getElementById('statsMod').style.display='none'" class="btn" style="background:red; width:100%; margin-top:20px;">إغلاق التقرير</button>
     </div>
 </div>
 
@@ -91,63 +109,59 @@
         <h2 id="tableTitle">قاعدة البيانات</h2>
         <button onclick="showView('form')" class="btn" style="background:#333">العودة للرئيسية</button>
     </div>
-    
     <div class="no-print" style="display:flex; gap:8px; background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap: wrap;">
-        <input type="text" id="tableSearch" placeholder="بحث بالاسم..." onkeyup="tableFilter()" style="flex:1; min-width: 200px;">
         <select id="filterFowj" onchange="tableFilter()"><option value="">كل الأفواج</option></select>
         <select id="filterSariyaNum" onchange="tableFilter()"><option value="">كل السرايا (رقم)</option></select>
-        <select id="filterSariyaName" onchange="tableFilter()"><option value="">كل السرايا (اسم)</option></select>
         <button onclick="toggleSelectAll()" class="btn" id="selBtn" style="background:#555">تحديد الكل</button>
-        <button onclick="exportSelectedToExcel()" class="btn" style="background:#2e7d32">نسخ المحدد لـ Excel</button>
+        <button onclick="exportSelectedToExcel()" class="btn" style="background:#2e7d32">تصدير المحدد لـ Excel</button>
         <button onclick="printSelected()" class="btn" style="background:#000">طباعة المحدد</button>
         <button onclick="bulkDelete()" class="btn" style="background:red">حذف المحدد</button>
     </div>
-
-    <div class="table-wrapper">
-        <table class="db-table" id="mainTable">
-            <thead><tr id="tableHeaders"></tr></thead>
-            <tbody id="tableBody"></tbody>
-        </table>
-    </div>
+    <div class="table-wrapper"><table class="db-table" id="mainTable"><thead><tr id="tableHeaders"></tr></thead><tbody id="tableBody"></tbody></table></div>
 </div>
 
 <div id="settMod" class="modal no-print">
     <div class="modal-content">
         <h3>⚙️ إعدادات النظام</h3>
-        <div style="text-align:right;">
-            <label>تغيير كلمة المرور:</label>
-            <input type="password" id="oldPass" placeholder="كلمة المرور القديمة" style="width:100%; margin:5px 0;">
-            <input type="password" id="newPass" placeholder="كلمة المرور الجديدة" style="width:100%; margin:5px 0;">
-            <button onclick="updatePass()" class="btn" style="background:var(--main-color); width:100%">تحديث الدخول</button>
-            <hr>
-            <label>تغيير لون النظام:</label>
-            <input type="color" id="themeColor" onchange="changeTheme(this.value)" style="width:100%; height:40px;">
-            <hr>
-            <label>خلفية البرنامج / علامة مائية:</label>
-            <input type="file" onchange="updateBackground(this)" style="width:100%">
-        </div>
+        <label>تغيير اللون الرئيسي:</label><input type="color" onchange="changeTheme(this.value)" style="width:100%; height:40px; margin-bottom:15px;">
+        <label>خلفية البرنامج / علامة مائية:</label><input type="file" onchange="updateBackground(this)" style="width:100%">
         <button onclick="document.getElementById('settMod').style.display='none'" class="btn" style="background:red; width:100%; margin-top:15px;">إغلاق</button>
     </div>
 </div>
 
-<img id="watermarkImg" class="watermark" src="">
-
 <script>
-    const fields = ["idNo","fullName","birthDate","birthPlace","gender","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sariyaName","exp","refN","refP"];
-    const labels = ["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","اسم السرية","الخبرات","المعرف","هاتف المعرف"];
+    const fields = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","exp","refN","refP","notes","sariyaName"];
+    const labels = ["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الخبرات","المعرف","هاتف المعرف","الملاحظات","اسم السرية"];
     
     let currentTable = 'db';
     let allSelected = false;
 
-    function showView(v) {
-        document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
-        document.getElementById('tableView').style.display = v === 'form' ? 'none' : 'block';
-        if(v !== 'form') {
-            currentTable = v;
-            document.getElementById('tableTitle').innerText = v === 'db' ? 'قاعدة البيانات الشاملة' : 'سجل العقوبات';
-            document.getElementById('tableTitle').style.color = v === 'db' ? 'var(--db-color)' : 'var(--pen-color)';
-            renderTable();
-        }
+    function showStats() {
+        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
+        let pen = JSON.parse(localStorage.getItem('db_306_pen') || '[]');
+        
+        // حساب الأفواج
+        let fowjCounts = {};
+        db.forEach(item => {
+            let f = item.fowj || "غير محدد";
+            fowjCounts[f] = (fowjCounts[f] || 0) + 1;
+        });
+
+        let fowjHtml = Object.keys(fowjCounts).map(f => `<li>فوج <b>${f}</b>: ${fowjCounts[f]} منتسب</li>`).join('');
+
+        document.getElementById('statsContent').innerHTML = `
+            <div style="background:#e8f5e9; padding:15px; border-radius:8px; margin-bottom:10px; border-right:5px solid #2e7d32;">
+                ✅ <b>المجموع الكلي للأفراد:</b> ${db.length} فرد
+            </div>
+            <div style="background:#fff3e0; padding:15px; border-radius:8px; margin-bottom:10px; border-right:5px solid #ef6c00;">
+                👮 <b>توزيع الأفراد حسب الأفواج:</b>
+                <ul style="margin:10px 0 0 0; padding-right:20px;">${fowjHtml || '<li>لا توجد بيانات</li>'}</ul>
+            </div>
+            <div style="background:#ffebee; padding:15px; border-radius:8px; border-right:5px solid #c62828;">
+                ⚖️ <b>إجمالي الأفراد المعاقبين:</b> ${pen.length} فرد
+            </div>
+        `;
+        document.getElementById('statsMod').style.display = 'block';
     }
 
     function saveData(e) {
@@ -155,133 +169,149 @@
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key) || '[]');
         let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
-        
         let idx = document.getElementById('editIdx').value;
         if(idx === "-1") db.push(data); else db[idx] = data;
-        
         localStorage.setItem(key, JSON.stringify(db));
         alert("تم الحفظ بنجاح");
         document.getElementById('mainForm').reset();
         document.getElementById('editIdx').value = "-1";
     }
 
+    function liveSearch(val) {
+        let drop = document.getElementById('searchDropdown');
+        if(!val) { drop.style.display = 'none'; return; }
+        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
+        let matches = db.filter(i => i.fullName.includes(val));
+        drop.innerHTML = matches.map(m => `<div class="search-item" onclick="loadRecord(${db.indexOf(m)})">${m.fullName}</div>`).join('');
+        drop.style.display = matches.length ? 'block' : 'none';
+    }
+
+    function loadRecord(idx) {
+        let db = JSON.parse(localStorage.getItem('db_306_data'));
+        let item = db[idx];
+        fields.forEach(f => document.getElementById(f).value = item[f] || '');
+        document.getElementById('editIdx').value = idx;
+        document.getElementById('searchDropdown').style.display = 'none';
+    }
+
+    function showView(v) {
+        document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
+        document.getElementById('tableView').style.display = v === 'form' ? 'none' : 'block';
+        if(v !== 'form') { currentTable = v; renderTable(); }
+    }
+
     function renderTable() {
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key) || '[]');
-        
         document.getElementById('tableHeaders').innerHTML = '<th class="no-print">تحديد</th><th class="no-print">إجراء</th>' + labels.map(l => `<th>${l}</th>`).join('');
         document.getElementById('tableBody').innerHTML = db.map((row, i) => `
             <tr>
                 <td class="no-print"><input type="checkbox" class="row-check" data-idx="${i}"></td>
-                <td class="no-print"><button onclick="editRecord(${i})" style="background:orange; color:white; border:none; border-radius:3px; cursor:pointer;">تعديل</button></td>
+                <td class="no-print"><button onclick="editFromTable(${i})" style="background:orange; color:white; border:none; padding:4px 8px; border-radius:4px;">تعديل</button></td>
                 ${fields.map(f => `<td>${row[f]||''}</td>`).join('')}
             </tr>
         `).join('');
-
-        // تحديث الفلاتر
         updateFilters(db);
     }
 
     function updateFilters(db) {
-        const populate = (id, key, text) => {
+        const fill = (id, key) => {
             let vals = [...new Set(db.map(i => i[key]))].filter(Boolean);
-            document.getElementById(id).innerHTML = `<option value="">كل ${text}</option>` + vals.map(v => `<option value="${v}">${v}</option>`).join('');
+            document.getElementById(id).innerHTML = `<option value="">الكل</option>` + vals.map(v => `<option value="${v}">${v}</option>`).join('');
         };
-        populate('filterFowj', 'fowj', 'الأفواج');
-        populate('filterSariyaNum', 'sariyaNum', 'السرايا (رقم)');
-        populate('filterSariyaName', 'sariyaName', 'السرايا (اسم)');
+        fill('filterFowj', 'fowj');
+        fill('filterSariyaNum', 'sariyaNum');
     }
 
     function tableFilter() {
-        let term = document.getElementById('tableSearch').value.toLowerCase();
         let fowj = document.getElementById('filterFowj').value;
         let sNum = document.getElementById('filterSariyaNum').value;
-        let sName = document.getElementById('filterSariyaName').value;
-        
         let rows = document.querySelectorAll('#tableBody tr');
         rows.forEach(row => {
             let cells = row.querySelectorAll('td');
-            let txt = row.innerText.toLowerCase();
-            let match = txt.includes(term) && 
-                        (!fowj || cells[fields.indexOf('fowj')+2].innerText === fowj) &&
-                        (!sNum || cells[fields.indexOf('sariyaNum')+2].innerText === sNum) &&
-                        (!sName || cells[fields.indexOf('sariyaName')+2].innerText === sName);
+            let match = (!fowj || cells[fields.indexOf('fowj')+2].innerText === fowj) &&
+                        (!sNum || cells[fields.indexOf('sariyaNum')+2].innerText === sNum);
             row.style.display = match ? '' : 'none';
         });
     }
 
     function toggleSelectAll() {
         allSelected = !allSelected;
-        let boxes = document.querySelectorAll('.row-check');
-        boxes.forEach(b => { if(b.closest('tr').style.display !== 'none') b.checked = allSelected; });
+        document.querySelectorAll('.row-check').forEach(b => { if(b.closest('tr').style.display !== 'none') b.checked = allSelected; });
         document.getElementById('selBtn').innerText = allSelected ? "إلغاء التحديد" : "تحديد الكل";
     }
 
-    function editRecord(idx) {
-        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
-        let db = JSON.parse(localStorage.getItem(key));
-        let item = db[idx];
-        fields.forEach(f => document.getElementById(f).value = item[f] || '');
-        document.getElementById('editIdx').value = idx;
-        showView('form');
-    }
-
     function exportSelectedToExcel() {
-        let selectedData = [];
-        let boxes = document.querySelectorAll('.row-check:checked');
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key));
-        
-        boxes.forEach(box => selectedData.push(db[box.dataset.idx]));
-        
-        if(selectedData.length === 0) return alert("يرجى تحديد صفوف أولاً");
-
+        let selected = Array.from(document.querySelectorAll('.row-check:checked')).map(b => db[b.dataset.idx]);
+        if(!selected.length) return alert("حدد صفوف أولاً");
         let csv = "\uFEFF" + labels.join(",") + "\n";
-        selectedData.forEach(row => {
-            csv += fields.map(f => `"${row[f] || ''}"`).join(",") + "\n";
-        });
-
-        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        selected.forEach(r => csv += fields.map(f => `"${r[f]||''}"`).join(",") + "\n");
+        let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
         let link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "المحددين_لواء_306.csv";
-        link.click();
+        link.href = URL.createObjectURL(blob); link.download = "بيانات_محددة.csv"; link.click();
     }
 
-    function printSelected() {
-        let rows = document.querySelectorAll('#tableBody tr');
-        rows.forEach(row => { if(!row.querySelector('.row-check').checked) row.classList.add('no-print'); });
-        window.print();
-        rows.forEach(row => row.classList.remove('no-print'));
+    function downloadTemplate() {
+        let csv = "\uFEFF" + labels.join(",") + "\n";
+        let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "نموذج_لواء_306.csv"; a.click();
+    }
+
+    function exportFullData() {
+        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
+        let db = JSON.parse(localStorage.getItem(key) || '[]');
+        let csv = "\uFEFF" + labels.join(",") + "\n";
+        db.forEach(r => csv += fields.map(f => `"${r[f]||''}"`).join(",") + "\n");
+        let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "قاعدة_بيانات_كاملة.csv"; a.click();
+    }
+
+    function importCSV(input) {
+        let reader = new FileReader();
+        reader.onload = e => {
+            let lines = e.target.result.split("\n").slice(1);
+            let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
+            lines.forEach(l => {
+                let cols = l.split(",");
+                if(cols.length > 5) {
+                    let obj = {}; fields.forEach((f, i) => obj[f] = cols[i]?.replace(/"/g,''));
+                    db.push(obj);
+                }
+            });
+            localStorage.setItem('db_306_data', JSON.stringify(db));
+            alert("تم الاستيراد بنجاح");
+        };
+        reader.readAsText(input.files[0]);
     }
 
     function bulkDelete() {
-        if(!confirm("هل أنت متأكد من حذف المحددين؟")) return;
+        if(!confirm("حذف المحددين نهائياً؟")) return;
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key));
-        let checkedIndices = Array.from(document.querySelectorAll('.row-check:checked')).map(b => parseInt(b.dataset.idx));
-        let newDb = db.filter((_, i) => !checkedIndices.includes(i));
+        let selectedIdx = Array.from(document.querySelectorAll('.row-check:checked')).map(b => parseInt(b.dataset.idx));
+        let newDb = db.filter((_, i) => !selectedIdx.includes(i));
         localStorage.setItem(key, JSON.stringify(newDb));
         renderTable();
     }
 
+    function editFromTable(idx) { loadRecord(idx); showView('form'); }
     function openSettings() { document.getElementById('settMod').style.display = 'block'; }
-    function changeTheme(color) { document.documentElement.style.setProperty('--main-color', color); localStorage.setItem('306_theme', color); }
+    function changeTheme(c) { document.documentElement.style.setProperty('--main-color', c); localStorage.setItem('306_theme', c); }
     function updateBackground(input) {
         let reader = new FileReader();
-        reader.onload = e => { document.body.style.backgroundImage = `url(${e.target.result})`; document.getElementById('watermarkImg').src = e.target.result; localStorage.setItem('306_bg', e.target.result); };
+        reader.onload = e => { document.body.style.backgroundImage = `url(${e.target.result})`; localStorage.setItem('306_bg', e.target.result); };
         reader.readAsDataURL(input.files[0]);
     }
     function checkDuplicate() {
-        let name = document.getElementById('fullName').value;
+        let n = document.getElementById('fullName').value;
         let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let dup = db.some(i => i.fullName === name && name !== "");
-        document.getElementById('fullName').style.background = dup ? '#ffcccc' : 'white';
+        document.getElementById('fullName').style.background = db.some(i => i.fullName === n && n !== "") ? '#ffcccc' : 'white';
     }
-
     window.onload = () => {
         let c = localStorage.getItem('306_theme'); if(c) changeTheme(c);
-        let bg = localStorage.getItem('306_bg'); if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('watermarkImg').src = bg; }
+        let bg = localStorage.getItem('306_bg'); if(bg) document.body.style.backgroundImage = `url(${bg})`;
     };
 </script>
 </body>
