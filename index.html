@@ -2,176 +2,323 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>نظام العديد المتطور - لواء 306</title>
+    <title>نظام العديد المركزي - لواء 306</title>
     <style>
         :root { --main-color: #1b5e20; --edit-color: #f57c00; --archive-color: #c62828; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
         
-        /* تحسين واجهة الدخول لتكون أوضح للـ PC */
+        /* واجهة الدخول */
         #loginPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--main-color), #000); display: flex; justify-content: center; align-items: center; z-index: 10000; }
-        .login-card { background: white; padding: 35px; border-radius: 15px; width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 2px solid #fff; }
-        .login-card h2 { margin-bottom: 25px; color: var(--main-color); }
-        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; outline: none; }
-        .login-card input:focus { border-color: var(--main-color); box-shadow: 0 0 5px rgba(27,94,32,0.3); }
+        .login-card { background: white; padding: 35px; border-radius: 15px; width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
 
         .container { max-width: 1300px; margin: 20px auto; background: rgba(255, 255, 255, 0.97); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.2); }
         .admin-only { display: none; }
         
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 20px; }
         .form-grid div { display: flex; flex-direction: column; }
         label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
         input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; background: #fff; }
-        
-        .action-bar { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid var(--main-color); }
-        .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
-        .btn:active { transform: scale(0.98); }
+        textarea { grid-column: span 2; height: 60px; }
 
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; text-align: center; }
+        .action-bar { background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid var(--main-color); position: relative; }
+        .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; }
+        
+        /* قائمة البحث الذكي */
+        #searchDropdown { position: absolute; top: 75px; right: 20px; width: calc(100% - 40px); background: white; border: 1px solid #ccc; border-radius: 5px; z-index: 1000; max-height: 200px; overflow-y: auto; display: none; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; text-align: right; }
+        .search-item:hover { background: #f5f5f5; color: var(--main-color); }
+
+        /* المودالات */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 20000; overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 60%; border-radius: 15px; text-align: center; position: relative; }
+
+        /* الأزرار العائمة */
+        .fab-container { position: fixed; bottom: 20px; left: 20px; display: flex; gap: 10px; }
+        .fab { width: 55px; height: 55px; border-radius: 50%; border: none; cursor: pointer; font-size: 22px; color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        
+        #colors { display: grid; grid-template-columns: repeat(8, 1fr); gap: 8px; margin-top: 15px; }
+        .color-dot { height: 35px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
+
+        /* تنسيق الطباعة */
+        @media print {
+            .no-print { display: none !important; }
+            body { background: white !important; }
+            .print-table { width: 100%; border-collapse: collapse; direction: rtl; }
+            .print-table th, .print-table td { border: 1px solid black; padding: 8px; text-align: center; font-size: 12px; }
+        }
     </style>
 </head>
 <body>
 
 <div id="loginPage">
     <div class="login-card">
-        <h2>نظام العديد المركزي</h2>
+        <h2 style="color:var(--main-color)">نظام العديد المركزي</h2>
         <input type="text" id="uInp" placeholder="اسم المستخدم">
         <input type="password" id="pInp" placeholder="كلمة المرور">
-        <div style="text-align:right; font-size:13px; margin-bottom:15px;">
-            <input type="checkbox" id="remMe"> تذكرني على هذا الجهاز
-        </div>
-        <button id="entryBtn" class="btn" style="background:var(--main-color); width:100%; padding:14px; font-size:18px;">دخول النظام</button>
-        <p style="font-size: 11px; margin-top: 15px; color: #777;">رمز الطوارئ: RESET306</p>
+        <button id="loginBtn" class="btn" style="background:var(--main-color); width:100%; padding:12px;">دخول النظام</button>
     </div>
 </div>
 
 <div id="mainContent" style="display:none">
     <div class="container">
-        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--main-color); padding-bottom:10px;">
+        <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--main-color); padding-bottom:10px;">
             <h2 id="viewTitle">سجل الخدمة النشطة - لواء 306</h2>
             <button onclick="logout()" class="btn" style="background:#c62828">تسجيل خروج</button>
         </div>
 
-        <form id="mainForm" style="margin-top:20px;">
+        <form id="mainForm" class="no-print" style="margin-top:20px;">
             <input type="hidden" id="editIdx" value="-1">
-            <div class="form-grid">
-                <div><label>ID</label><input type="text" id="idNo" required></div>
-                <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required></div>
-                <div><label>المواليد</label><input type="text" id="birthDate"></div>
-                <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
-                <div><label>الجنس</label><select id="gender"><option>ذكر</option><option>أنثى</option></select></div>
-                <div><label>اسم الأم الثلاثي</label><input type="text" id="motherName"></div>
-                <div><label>رقم الهوية / الوطنية</label><input type="number" id="natId"></div>
-                <div><label>الحالة الزوجية</label><select id="marital"><option>أعزب</option><option>متزوج</option><option>مطلق</option><option>أرمل</option></select></div>
-                <div><label>اسم الزوج/الزوجة</label><input type="text" id="spouse"></div>
-                <div><label>عدد الأطفال</label><input type="number" id="kids"></div>
-                <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
-                <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
-                <div><label>العمل أو الوظيفة</label><input type="text" id="job"></div>
-                <div><label>المحافظة</label><input type="text" id="prov"></div>
-                <div><label>القضاء</label><input type="text" id="dist"></div>
-                <div><label>الناحية</label><input type="text" id="subDist"></div>
-                <div><label>المنطقة</label><input type="text" id="region"></div>
-                <div><label>المحلة</label><input type="text" id="mahala"></div>
-                <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
-                <div><label>الدار</label><input type="text" id="dar"></div>
-                <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
-                <div><label>الهاتف</label><input type="number" id="phone"></div>
-                <div><label>اللواء</label><input type="text" id="brigade" value="لواء 306"></div>
-                <div><label>الفوج</label><select id="fowj"><option>الأول</option><option>الثاني</option><option>الثالث</option><option>الرابع</option><option>الخامس</option><option>السادس</option><option>السابع</option></select></div>
-                <div><label>رقم السرية</label><input type="number" id="sariyaNum"></div>
-                <div><label>الصنف</label><input type="text" id="cat"></div>
-                <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
-                <div><label>المعرف</label><input type="text" id="refN"></div>
-                <div><label>هاتف المعرف</label><input type="number" id="refP"></div>
-                <div><label>اسم السرية</label><input type="text" id="sariyaName"></div>
-                <textarea id="notes" placeholder="ملاحظات إضافية..." style="grid-column: span 2"></textarea>
-            </div>
-            <div class="admin-only" style="text-align:center;">
+            <div class="form-grid" id="fieldsContainer">
+                </div>
+            <div class="admin-only" id="saveArea" style="text-align:center;">
                 <button type="submit" class="btn" style="background:var(--main-color); padding:12px 80px;">حفظ البيانات</button>
             </div>
         </form>
 
-        <div class="action-bar">
-            <input type="text" id="sInp" placeholder="🔍 ابحث بالاسم أو ID..." onkeyup="doSearch(this.value)" style="width:100%; padding:15px; border-radius:8px; border:1px solid #ddd;">
-            <div id="results" style="display:none; margin-top:10px; background:white; border:1px solid #ccc;"></div>
+        <div class="action-bar no-print">
+            <div style="display:flex; gap:10px;">
+                <input type="text" id="sInp" placeholder="🔍 ابحث بالاسم أو ID..." onkeyup="liveSearch(this.value)" autocomplete="off" style="flex:1;">
+                <div class="admin-only" style="display:flex; gap:5px;">
+                    <button onclick="exportCSV()" class="btn" style="background:#2e7d32;">تصدير</button>
+                    <button onclick="document.getElementById('impFile').click()" class="btn" style="background:#1565c0;">استيراد</button>
+                    <input type="file" id="impFile" hidden accept=".csv" onchange="importCSV(this)">
+                </div>
+            </div>
+            <div id="searchDropdown"></div>
+            
+            <div id="resTools" style="display:none; justify-content:center; gap:10px; margin-top:15px;">
+                <button onclick="printRecord()" class="btn" style="background:#455a64;">🖨 طباعة الحقول</button>
+                <div class="admin-only" style="display:contents">
+                    <button onclick="setEdit()" class="btn" style="background:var(--edit-color);">✏️ تعديل</button>
+                    <button id="penaltyBtn" onclick="movePenalty()" class="btn" style="background:black;">⚖️ ترحيل للعقوبات</button>
+                    <button id="restoreBtn" onclick="restoreFromPenalty()" class="btn" style="background:green; display:none;">✅ إزالة العقوبة</button>
+                    <button onclick="delRec()" class="btn" style="background:red;">🗑 حذف</button>
+                </div>
+            </div>
         </div>
 
-        <div class="admin-only" style="display:flex; justify-content:space-between;">
-            <button onclick="togglePen()" id="pBtn" class="btn" style="background:black">سجل العقوبات ⚖️</button>
-            <button onclick="exportCSV()" class="btn" style="background:#2e7d32">تصدير بيانات</button>
-        </div>
+        <button onclick="toggleMode()" id="modeBtn" class="btn no-print" style="background:var(--archive-color); width:100%;">انتقال لسجل العقوبات ⚖️</button>
     </div>
 </div>
 
-<script>
-    // --- منطق الدخول المحدث والمضمون ---
-    const users = {'admin':'1234', 'user1':'1234'};
-    const entryBtn = document.getElementById('entryBtn');
+<div id="settMod" class="modal">
+    <div class="modal-content">
+        <h3>⚙️ إعدادات النظام</h3>
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px; text-align:right;">
+            <div style="border:1px solid #ddd; padding:10px; border-radius:10px;">
+                <h4>تغيير بيانات الدخول</h4>
+                <input type="text" id="oldUser" placeholder="اسم المستخدم القديم">
+                <input type="password" id="oldPass" placeholder="كلمة المرور القديمة">
+                <hr>
+                <input type="text" id="newUser" placeholder="الاسم الجديد">
+                <input type="password" id="newPass" placeholder="الكلمة الجديدة">
+                <button onclick="updateAuth()" class="btn" style="background:blue; width:100%">تحديث البيانات</button>
+            </div>
+            <div>
+                <h4>تخصيص المظهر</h4>
+                <label>اختر لون النظام:</label>
+                <div id="colors"></div>
+                <br>
+                <label>صورة الخلفية:</label>
+                <input type="file" onchange="upImg(this)">
+            </div>
+        </div>
+        <button onclick="closeMod('settMod')" class="btn" style="background:#333; margin-top:20px;">إغلاق</button>
+    </div>
+</div>
 
-    // استخدام EventListener بدلاً من onclick العادي لضمان الاستجابة في PC
-    entryBtn.addEventListener('click', function() {
+<div class="fab-container admin-only">
+    <button class="fab" style="background:#333" onclick="openMod('settMod')">⚙️</button>
+</div>
+
+<script>
+    const flds = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","cat","exp","refN","refP","sariyaName","notes"];
+    const labels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة","الزوج/ة","الأطفال","التحصيل","التخصص","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","الدالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرة","المعرف","هاتف المعرف","السرية2","ملاحظات"];
+
+    let currentRole = ''; let mode = 'active'; let currentIdx = -1;
+
+    // توليد الحقول
+    const container = document.getElementById('fieldsContainer');
+    flds.forEach((f, i) => {
+        container.innerHTML += `<div><label>${labels[i]}</label><input type="text" id="${f}"></div>`;
+    });
+
+    // --- نظام الدخول ---
+    document.getElementById('loginBtn').addEventListener('click', function() {
         const u = document.getElementById('uInp').value;
         const p = document.getElementById('pInp').value;
+        const auth = JSON.parse(localStorage.getItem('306_auth_data')) || {'u':'admin', 'p':'1234'};
 
-        if (p === 'RESET306' || (users[u] && users[u] === p)) {
-            let role = (u === 'admin' || p === 'RESET306') ? 'admin' : 'user';
-            
-            // محاولة الحفظ
-            try {
-                if(document.getElementById('remMe').checked) localStorage.setItem('306_role', role);
-            } catch(e) { console.log("Storage Blocked"); }
-            
-            startSystem(role);
+        if (p === 'RESET306' || (u === auth.u && p === auth.p)) {
+            currentRole = 'admin';
+            enterSystem();
         } else {
-            alert("بيانات الدخول غير صحيحة");
+            alert("فشل الدخول");
         }
     });
 
-    function startSystem(role) {
+    function enterSystem() {
         document.getElementById('loginPage').style.display = 'none';
         document.getElementById('mainContent').style.display = 'block';
-        if (role === 'admin') {
-            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
-        }
+        document.querySelectorAll('.admin-only').forEach(e => e.style.display = 'block');
+        applyStyles();
     }
 
-    // التحقق عند فتح الصفحة
-    window.onload = function() {
-        try {
-            const saved = localStorage.getItem('306_role');
-            if(saved) startSystem(saved);
-        } catch(e) {}
-    };
-
-    function logout() {
-        try { localStorage.removeItem('306_role'); } catch(e) {}
-        location.reload();
+    // --- البحث المتشابه ---
+    function liveSearch(val) {
+        const drop = document.getElementById('searchDropdown');
+        if(val.length < 1) { drop.style.display = 'none'; return; }
+        
+        let db = JSON.parse(localStorage.getItem(mode === 'active' ? 'db_306' : 'pen_306') || '[]');
+        let filtered = db.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
+        
+        drop.innerHTML = '';
+        if(filtered.length > 0) {
+            filtered.forEach(item => {
+                let d = document.createElement('div');
+                d.className = 'search-item';
+                d.innerHTML = `<b>${item.fullName}</b> - ID: ${item.idNo}`;
+                d.onclick = () => { fillData(item); drop.style.display = 'none'; };
+                drop.appendChild(d);
+            });
+            drop.style.display = 'block';
+        } else drop.style.display = 'none';
     }
 
-    // --- بقية الدوال (البحث والحفظ) كما هي مع تحسينات بسيطة ---
-    const flds = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","cat","exp","refN","refP","sariyaName","notes"];
+    function fillData(item) {
+        let db = JSON.parse(localStorage.getItem(mode === 'active' ? 'db_306' : 'pen_306') || '[]');
+        currentIdx = db.findIndex(i => i.idNo === item.idNo);
+        flds.forEach(f => document.getElementById(f).value = item[f] || '');
+        document.getElementById('resTools').style.display = 'flex';
+        document.getElementById('penaltyBtn').style.display = (mode === 'active') ? 'block' : 'none';
+        document.getElementById('restoreBtn').style.display = (mode === 'pen') ? 'block' : 'none';
+    }
 
+    // --- الحفظ والعقوبات ---
     document.getElementById('mainForm').onsubmit = function(e) {
         e.preventDefault();
         let db = JSON.parse(localStorage.getItem('db_306') || '[]');
         let data = {}; flds.forEach(f => data[f] = document.getElementById(f).value);
-        db.push(data);
+        let editIdx = document.getElementById('editIdx').value;
+        
+        if(editIdx == "-1") db.push(data); else { db[editIdx] = data; document.getElementById('editIdx').value = "-1"; }
         localStorage.setItem('db_306', JSON.stringify(db));
-        alert("تم الحفظ"); this.reset();
+        alert("تم الحفظ"); location.reload();
     };
 
-    function doSearch(val) {
-        if(val.length < 2) return;
-        let db = JSON.parse(localStorage.getItem('db_306') || '[]');
-        let res = db.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
-        // هنا يمكنك إضافة منطق عرض النتائج
+    function toggleMode() {
+        mode = (mode === 'active') ? 'pen' : 'active';
+        document.getElementById('viewTitle').innerText = mode === 'active' ? "سجل الخدمة النشطة - لواء 306" : "سجل العقوبات";
+        document.getElementById('modeBtn').innerText = mode === 'active' ? "انتقال لسجل العقوبات ⚖️" : "العودة للنشط ✅";
+        document.getElementById('mainForm').reset();
+        document.getElementById('resTools').style.display = 'none';
     }
 
+    function movePenalty() {
+        let db = JSON.parse(localStorage.getItem('db_306'));
+        let pen = JSON.parse(localStorage.getItem('pen_306') || '[]');
+        pen.push(db.splice(currentIdx, 1)[0]);
+        localStorage.setItem('db_306', JSON.stringify(db));
+        localStorage.setItem('pen_306', JSON.stringify(pen));
+        alert("تم الترحيل للعقوبات"); location.reload();
+    }
+
+    function restoreFromPenalty() {
+        let pen = JSON.parse(localStorage.getItem('pen_306'));
+        let db = JSON.parse(localStorage.getItem('db_306') || '[]');
+        db.push(pen.splice(currentIdx, 1)[0]);
+        localStorage.setItem('pen_306', JSON.stringify(pen));
+        localStorage.setItem('db_306', JSON.stringify(db));
+        alert("تمت إزالة العقوبة وإعادته للنشط"); location.reload();
+    }
+
+    // --- الإعدادات ---
+    function updateAuth() {
+        const auth = JSON.parse(localStorage.getItem('306_auth_data')) || {'u':'admin', 'p':'1234'};
+        const ou = document.getElementById('oldUser').value;
+        const op = document.getElementById('oldPass').value;
+        if(ou === auth.u && op === auth.p) {
+            localStorage.setItem('306_auth_data', JSON.stringify({
+                'u': document.getElementById('newUser').value,
+                'p': document.getElementById('newPass').value
+            }));
+            alert("تم تحديث بيانات الدخول بنجاح");
+        } else alert("البيانات القديمة غير صحيحة!");
+    }
+
+    // --- الطباعة الاحترافية ---
+    function printRecord() {
+        const wm = localStorage.getItem('306_bg');
+        let win = window.open('','_blank');
+        let content = `
+            <style>
+                body { direction: rtl; font-family: sans-serif; padding: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+                th, td { border: 1px solid #000; padding: 10px; text-align: center; }
+                .wm { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); opacity: 0.1; width: 60%; z-index: -1; }
+                .header { text-align: center; border-bottom: 3px double #000; padding-bottom: 10px; }
+            </style>
+            <div class="header">
+                <h2>جمهورية العراق - لواء 306</h2>
+                <h3>استمارة معلومات المنتسب (سجل ${mode === 'active' ? 'نشط' : 'عقوبات'})</h3>
+            </div>
+            ${wm ? `<img src="${wm}" class="wm">` : ''}
+            <table>
+                <tr>${labels.slice(0, 6).map(l => `<th>${l}</th>`).join('')}</tr>
+                <tr>${flds.slice(0, 6).map(f => `<td>${document.getElementById(f).value}</td>`).join('')}</tr>
+                <tr>${labels.slice(6, 12).map(l => `<th>${l}</th>`).join('')}</tr>
+                <tr>${flds.slice(6, 12).map(f => `<td>${document.getElementById(f).value}</td>`).join('')}</tr>
+                </table>
+        `;
+        win.document.write(content); win.document.close(); win.print();
+    }
+
+    // --- الاستيراد ---
+    function importCSV(input) {
+        let reader = new FileReader();
+        reader.onload = (e) => {
+            let lines = e.target.result.split("\n").slice(1);
+            let db = JSON.parse(localStorage.getItem('db_306') || '[]');
+            lines.forEach(l => {
+                let c = l.split(",");
+                if(c.length > 5) {
+                    let o = {}; flds.forEach((f, i) => o[f] = c[i]?.replace(/"/g,''));
+                    db.push(o);
+                }
+            });
+            localStorage.setItem('db_306', JSON.stringify(db));
+            alert("تم الاستيراد بنجاح"); location.reload();
+        };
+        reader.readAsText(input.files[0]);
+    }
+
+    // المساعدة الجمالية
+    function openMod(id) { 
+        document.getElementById(id).style.display = 'block'; 
+        if(id === 'settMod') {
+            const colors = ['#1b5e20','#b71c1c','#0d47a1','#4a148c','#212121','#ff6f00','#006064','#1a237e','#3e2723','#33691e','#004d40','#bf360c','#01579b','#880e4f','#455a64','#5d4037','#00838f','#2e7d32','#1565c0','#c62828','#d84315','#558b2f','#00695c','#000'];
+            const pal = document.getElementById('colors'); pal.innerHTML = '';
+            colors.forEach(c => {
+                let d = document.createElement('div'); d.className='color-dot'; d.style.background=c;
+                d.onclick = () => { localStorage.setItem('306_c', c); applyStyles(); };
+                pal.appendChild(d);
+            });
+        }
+    }
+    function closeMod(id) { document.getElementById(id).style.display = 'none'; }
+    function applyStyles() {
+        const c = localStorage.getItem('306_c'); if(c) document.documentElement.style.setProperty('--main-color', c);
+        const bg = localStorage.getItem('306_bg'); if(bg) document.body.style.backgroundImage = `url(${bg})`;
+    }
+    function upImg(input) { let r=new FileReader(); r.onload=(e)=>{localStorage.setItem('306_bg',e.target.result); applyStyles();}; r.readAsDataURL(input.files[0]); }
+    function setEdit() { document.getElementById('editIdx').value = currentIdx; alert("وضع التعديل مفعل"); }
+    function logout() { location.reload(); }
+    function delRec() { if(confirm("حذف نهائي؟")) { let db=JSON.parse(localStorage.getItem('db_306')); db.splice(currentIdx,1); localStorage.setItem('db_306',JSON.stringify(db)); location.reload(); }}
     function exportCSV() {
         let db = JSON.parse(localStorage.getItem('db_306') || '[]');
-        let csv = "\uFEFF" + flds.join(",") + "\n";
-        db.forEach(row => { csv += flds.map(f => `"${row[f]||''}"`).join(",") + "\n"; });
+        let csv = "\uFEFF" + labels.join(",") + "\n";
+        db.forEach(r => { csv += flds.map(f => `"${r[f]||''}"`).join(",") + "\n"; });
         let blob = new Blob([csv], {type:'text/csv;charset=utf-8'});
         let a = document.createElement('a'); a.href=URL.createObjectURL(blob); a.download="data.csv"; a.click();
     }
