@@ -16,10 +16,9 @@
         .btn { border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; }
         .btn-main { background: var(--main-color); width: 100%; font-size: 16px; }
         
-        /* الجداول والقواعد */
         .db-view { display: none; }
         .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
-        .db-table { width: 100%; border-collapse: collapse; min-width: 2800px; }
+        .db-table { width: 100%; border-collapse: collapse; min-width: 3000px; }
         .db-table th { background: var(--db-color); color: white; padding: 12px; border: 1px solid #ddd; position: sticky; top: 0; }
         .db-table td { padding: 10px; border: 1px solid #ddd; text-align: center; font-size: 13px; }
         
@@ -89,14 +88,17 @@
 
 <div class="container db-view" id="tableView">
     <div class="header-section no-print">
-        <h2 id="tableTitle" style="color:var(--db-color)">قاعدة البيانات</h2>
+        <h2 id="tableTitle">قاعدة البيانات</h2>
         <button onclick="showView('form')" class="btn" style="background:#333">العودة للرئيسية</button>
     </div>
     
-    <div class="no-print" style="display:flex; gap:10px; background:#eee; padding:10px; border-radius:5px; margin-bottom:10px;">
-        <input type="text" id="tableSearch" placeholder="بحث سريع..." onkeyup="tableFilter()" style="flex:1">
+    <div class="no-print" style="display:flex; gap:8px; background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap: wrap;">
+        <input type="text" id="tableSearch" placeholder="بحث بالاسم..." onkeyup="tableFilter()" style="flex:1; min-width: 200px;">
         <select id="filterFowj" onchange="tableFilter()"><option value="">كل الأفواج</option></select>
-        <button onclick="selectAll()" class="btn" style="background:#555">تحديد الكل</button>
+        <select id="filterSariyaNum" onchange="tableFilter()"><option value="">كل السرايا (رقم)</option></select>
+        <select id="filterSariyaName" onchange="tableFilter()"><option value="">كل السرايا (اسم)</option></select>
+        <button onclick="toggleSelectAll()" class="btn" id="selBtn" style="background:#555">تحديد الكل</button>
+        <button onclick="exportSelectedToExcel()" class="btn" style="background:#2e7d32">نسخ المحدد لـ Excel</button>
         <button onclick="printSelected()" class="btn" style="background:#000">طباعة المحدد</button>
         <button onclick="bulkDelete()" class="btn" style="background:red">حذف المحدد</button>
     </div>
@@ -118,10 +120,10 @@
             <input type="password" id="newPass" placeholder="كلمة المرور الجديدة" style="width:100%; margin:5px 0;">
             <button onclick="updatePass()" class="btn" style="background:var(--main-color); width:100%">تحديث الدخول</button>
             <hr>
-            <label>لون النظام (عبر العتلة):</label>
+            <label>تغيير لون النظام:</label>
             <input type="color" id="themeColor" onchange="changeTheme(this.value)" style="width:100%; height:40px;">
             <hr>
-            <label>صورة الخلفية / العلامة المائية:</label>
+            <label>خلفية البرنامج / علامة مائية:</label>
             <input type="file" onchange="updateBackground(this)" style="width:100%">
         </div>
         <button onclick="document.getElementById('settMod').style.display='none'" class="btn" style="background:red; width:100%; margin-top:15px;">إغلاق</button>
@@ -135,13 +137,14 @@
     const labels = ["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","اسم السرية","الخبرات","المعرف","هاتف المعرف"];
     
     let currentTable = 'db';
+    let allSelected = false;
 
     function showView(v) {
         document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
         document.getElementById('tableView').style.display = v === 'form' ? 'none' : 'block';
         if(v !== 'form') {
             currentTable = v;
-            document.getElementById('tableTitle').innerText = v === 'db' ? 'قاعدة البيانات الشاملة' : 'سجل العقوبات والأرشيف';
+            document.getElementById('tableTitle').innerText = v === 'db' ? 'قاعدة البيانات الشاملة' : 'سجل العقوبات';
             document.getElementById('tableTitle').style.color = v === 'db' ? 'var(--db-color)' : 'var(--pen-color)';
             renderTable();
         }
@@ -149,74 +152,126 @@
 
     function saveData(e) {
         e.preventDefault();
-        let storageKey = 'db_306_data';
-        let db = JSON.parse(localStorage.getItem(storageKey) || '[]');
+        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
+        let db = JSON.parse(localStorage.getItem(key) || '[]');
         let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
-        db.push(data);
-        localStorage.setItem(storageKey, JSON.stringify(db));
-        alert("تم الحفظ في القاعدة الشاملة");
+        
+        let idx = document.getElementById('editIdx').value;
+        if(idx === "-1") db.push(data); else db[idx] = data;
+        
+        localStorage.setItem(key, JSON.stringify(db));
+        alert("تم الحفظ بنجاح");
         document.getElementById('mainForm').reset();
+        document.getElementById('editIdx').value = "-1";
     }
 
     function renderTable() {
         let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
         let db = JSON.parse(localStorage.getItem(key) || '[]');
         
-        document.getElementById('tableHeaders').innerHTML = '<th class="no-print">تحديد</th>' + labels.map(l => `<th>${l}</th>`).join('');
+        document.getElementById('tableHeaders').innerHTML = '<th class="no-print">تحديد</th><th class="no-print">إجراء</th>' + labels.map(l => `<th>${l}</th>`).join('');
         document.getElementById('tableBody').innerHTML = db.map((row, i) => `
             <tr>
-                <td class="no-print"><input type="checkbox" class="row-check" value="${i}"></td>
+                <td class="no-print"><input type="checkbox" class="row-check" data-idx="${i}"></td>
+                <td class="no-print"><button onclick="editRecord(${i})" style="background:orange; color:white; border:none; border-radius:3px; cursor:pointer;">تعديل</button></td>
                 ${fields.map(f => `<td>${row[f]||''}</td>`).join('')}
             </tr>
         `).join('');
 
-        // تحديث فلتر الأفواج
-        let foaj = [...new Set(db.map(i => i.fowj))].filter(Boolean);
-        document.getElementById('filterFowj').innerHTML = '<option value="">كل الأفواج</option>' + foaj.map(f => `<option>${f}</option>`).join('');
+        // تحديث الفلاتر
+        updateFilters(db);
+    }
+
+    function updateFilters(db) {
+        const populate = (id, key, text) => {
+            let vals = [...new Set(db.map(i => i[key]))].filter(Boolean);
+            document.getElementById(id).innerHTML = `<option value="">كل ${text}</option>` + vals.map(v => `<option value="${v}">${v}</option>`).join('');
+        };
+        populate('filterFowj', 'fowj', 'الأفواج');
+        populate('filterSariyaNum', 'sariyaNum', 'السرايا (رقم)');
+        populate('filterSariyaName', 'sariyaName', 'السرايا (اسم)');
     }
 
     function tableFilter() {
         let term = document.getElementById('tableSearch').value.toLowerCase();
         let fowj = document.getElementById('filterFowj').value;
+        let sNum = document.getElementById('filterSariyaNum').value;
+        let sName = document.getElementById('filterSariyaName').value;
+        
         let rows = document.querySelectorAll('#tableBody tr');
         rows.forEach(row => {
+            let cells = row.querySelectorAll('td');
             let txt = row.innerText.toLowerCase();
-            let match = txt.includes(term) && (!fowj || txt.includes(fowj.toLowerCase()));
+            let match = txt.includes(term) && 
+                        (!fowj || cells[fields.indexOf('fowj')+2].innerText === fowj) &&
+                        (!sNum || cells[fields.indexOf('sariyaNum')+2].innerText === sNum) &&
+                        (!sName || cells[fields.indexOf('sariyaName')+2].innerText === sName);
             row.style.display = match ? '' : 'none';
         });
     }
 
-    function selectAll() {
+    function toggleSelectAll() {
+        allSelected = !allSelected;
         let boxes = document.querySelectorAll('.row-check');
-        boxes.forEach(b => { if(b.parentElement.parentElement.style.display !== 'none') b.checked = true; });
+        boxes.forEach(b => { if(b.closest('tr').style.display !== 'none') b.checked = allSelected; });
+        document.getElementById('selBtn').innerText = allSelected ? "إلغاء التحديد" : "تحديد الكل";
+    }
+
+    function editRecord(idx) {
+        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
+        let db = JSON.parse(localStorage.getItem(key));
+        let item = db[idx];
+        fields.forEach(f => document.getElementById(f).value = item[f] || '');
+        document.getElementById('editIdx').value = idx;
+        showView('form');
+    }
+
+    function exportSelectedToExcel() {
+        let selectedData = [];
+        let boxes = document.querySelectorAll('.row-check:checked');
+        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
+        let db = JSON.parse(localStorage.getItem(key));
+        
+        boxes.forEach(box => selectedData.push(db[box.dataset.idx]));
+        
+        if(selectedData.length === 0) return alert("يرجى تحديد صفوف أولاً");
+
+        let csv = "\uFEFF" + labels.join(",") + "\n";
+        selectedData.forEach(row => {
+            csv += fields.map(f => `"${row[f] || ''}"`).join(",") + "\n";
+        });
+
+        let blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        let link = document.createElement("a");
+        link.href = URL.createObjectURL(blob);
+        link.download = "المحددين_لواء_306.csv";
+        link.click();
     }
 
     function printSelected() {
         let rows = document.querySelectorAll('#tableBody tr');
-        rows.forEach(row => {
-            if(!row.querySelector('.row-check').checked) row.classList.add('no-print');
-        });
+        rows.forEach(row => { if(!row.querySelector('.row-check').checked) row.classList.add('no-print'); });
         window.print();
         rows.forEach(row => row.classList.remove('no-print'));
     }
 
-    function openSettings() { document.getElementById('settMod').style.display = 'block'; }
-
-    function changeTheme(color) {
-        document.documentElement.style.setProperty('--main-color', color);
-        localStorage.setItem('306_theme', color);
+    function bulkDelete() {
+        if(!confirm("هل أنت متأكد من حذف المحددين؟")) return;
+        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
+        let db = JSON.parse(localStorage.getItem(key));
+        let checkedIndices = Array.from(document.querySelectorAll('.row-check:checked')).map(b => parseInt(b.dataset.idx));
+        let newDb = db.filter((_, i) => !checkedIndices.includes(i));
+        localStorage.setItem(key, JSON.stringify(newDb));
+        renderTable();
     }
 
+    function openSettings() { document.getElementById('settMod').style.display = 'block'; }
+    function changeTheme(color) { document.documentElement.style.setProperty('--main-color', color); localStorage.setItem('306_theme', color); }
     function updateBackground(input) {
         let reader = new FileReader();
-        reader.onload = function(e) {
-            document.body.style.backgroundImage = `url(${e.target.result})`;
-            document.getElementById('watermarkImg').src = e.target.result;
-            localStorage.setItem('306_bg', e.target.result);
-        };
+        reader.onload = e => { document.body.style.backgroundImage = `url(${e.target.result})`; document.getElementById('watermarkImg').src = e.target.result; localStorage.setItem('306_bg', e.target.result); };
         reader.readAsDataURL(input.files[0]);
     }
-
     function checkDuplicate() {
         let name = document.getElementById('fullName').value;
         let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
@@ -226,10 +281,8 @@
 
     window.onload = () => {
         let c = localStorage.getItem('306_theme'); if(c) changeTheme(c);
-        let bg = localStorage.getItem('306_bg'); 
-        if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('watermarkImg').src = bg; }
-    }
+        let bg = localStorage.getItem('306_bg'); if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('watermarkImg').src = bg; }
+    };
 </script>
-
 </body>
 </html>
