@@ -8,40 +8,40 @@
         :root { --main-color: #1b5e20; --edit-color: #f57c00; --excel-color: #2e7d32; --import-color: #0277bd; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; transition: 0.3s; background-attachment: fixed; background-size: cover; background-position: center; }
         
-        /* واجهات الدخول */
-        #loginPage { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #1b5e20 0%, #000 100%); }
+        /* واجهة الدخول */
+        #loginPage { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, var(--main-color) 0%, #000 100%); position: fixed; width: 100%; top: 0; left: 0; z-index: 9999; }
         .login-card { background: white; padding: 40px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); width: 350px; text-align: center; }
-        .login-card input { margin-bottom: 12px; padding: 10px; width: 100%; box-sizing: border-box; }
+        .login-card input { margin-bottom: 12px; padding: 12px; width: 100%; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; }
         
         /* الواجهة الرئيسية */
         #mainContent { display: none; padding: 20px; }
-        .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.96); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); position: relative; }
+        .container { max-width: 1200px; margin: auto; background: rgba(255, 255, 255, 0.96); padding: 30px; border-radius: 15px; box-shadow: 0 10px 40px rgba(0,0,0,0.2); }
         .main-header { text-align: center; border-bottom: 4px double var(--main-color); margin-bottom: 30px; padding-bottom: 10px; position: relative; }
         .logout-btn { position: absolute; left: 0; top: 0; background: #c62828; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; }
 
-        /* الأزرار والحقول */
+        /* التنسيقات العامة */
         .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
         input, select, textarea { padding: 12px; border: 1px solid #ccc; border-radius: 6px; width: 100%; box-sizing: border-box; }
-        .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; }
+        .full-width { grid-column: 1 / -1; }
+        .btn-save { background: var(--main-color); color: white; padding: 15px 80px; border: none; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; display: block; margin: 25px auto; transition: 0.3s; }
+        .btn-save:hover { opacity: 0.9; transform: scale(1.02); }
         .btn-edit-mode { background: var(--edit-color) !important; }
         
-        /* شريط الإجراءات */
         .action-bar { display: flex; gap: 10px; margin: 20px 0; background: #eee; padding: 15px; border-radius: 10px; align-items: center; flex-wrap: wrap; }
         .search-box { flex: 2; padding: 12px; border: 2px solid var(--main-color); border-radius: 8px; min-width: 200px; }
-        .btn-excel { background: var(--excel-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
-        .btn-import { background: var(--import-color); color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; display: flex; align-items: center; gap: 5px; }
+        .btn-excel, .btn-import { color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .btn-excel { background: var(--excel-color); }
+        .btn-import { background: var(--import-color); }
 
-        /* الجداول */
-        table { width: 100%; border-collapse: collapse; background: white; margin-top: 10px; }
-        th { background: var(--main-color); color: white; padding: 12px; position: sticky; top: 0; }
+        table { width: 100%; border-collapse: collapse; background: white; }
+        th { background: var(--main-color); color: white; padding: 12px; }
         td { border: 1px solid #ddd; padding: 10px; text-align: center; }
 
-        /* نافذة المعاينة */
+        /* النوافذ المنبثقة */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; }
-        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; max-height: 80vh; overflow-y: auto; }
+        .modal-content { background: white; margin: 5% auto; padding: 30px; width: 80%; border-radius: 15px; max-height: 80vh; overflow-y: auto; position: relative; }
         
-        /* لوحة الإعدادات */
-        .settings-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 400px; padding: 25px; border-radius: 15px; box-shadow: 0 0 100px rgba(0,0,0,0.5); z-index: 1002; border: 2px solid var(--main-color); }
+        .settings-panel { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; width: 400px; padding: 25px; border-radius: 15px; box-shadow: 0 0 100px rgba(0,0,0,0.5); z-index: 10000; border: 2px solid var(--main-color); }
         .color-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin: 10px 0; }
         .color-box { width: 100%; height: 35px; border-radius: 5px; cursor: pointer; border: 1px solid #ddd; }
     </style>
@@ -50,15 +50,15 @@
 
 <div id="loginPage">
     <div class="login-card">
-        <h2 style="color: var(--main-color);">نظام العديد المركزي</h2>
+        <h2 style="color: var(--main-color); margin-bottom: 25px;">دخول النظام</h2>
         <input type="text" id="userInp" placeholder="اسم المستخدم">
         <input type="password" id="passInp" placeholder="كلمة المرور">
-        <label style="font-size: 13px; display: block; margin-bottom: 10px;">
+        <label style="font-size: 13px; display: block; margin-bottom: 15px; cursor: pointer;">
             <input type="checkbox" id="rememberMe"> تذكرني على هذا الجهاز
         </label>
-        <button onclick="checkLogin()" class="btn-save" style="width: 100%; margin: 0;">دخول</button>
+        <button onclick="handleLogin()" class="btn-save" style="width: 100%; margin: 0;">دخول</button>
         <p style="margin-top: 15px; font-size: 13px;">
-            <a href="#" onclick="forgotPass()" style="color: #666; text-decoration: none;">نسيت كلمة المرور؟</a>
+            <a href="#" onclick="alert('يرجى مراجعة المسؤول التقني لإعادة التعيين')" style="color: #666; text-decoration: none;">نسيت كلمة المرور؟</a>
         </p>
     </div>
 </div>
@@ -68,7 +68,7 @@
         <div class="main-header">
             <button class="logout-btn" onclick="logout()">تسجيل خروج</button>
             <h1>العديد المركزي - لواء 306</h1>
-            <p>ذي قار - إدارة بيانات المنتسبين</p>
+            <p>ذي قار - إدارة شؤون المنتسبين</p>
         </div>
 
         <form id="dataForm">
@@ -100,19 +100,18 @@
                 <select id="battalion">
                     <option value="">الفوج</option>
                     <option>الفوج الأول</option><option>الفوج الثاني</option><option>الفوج الثالث</option>
-                    <option>الفوج الرابع</option><option>الفوج الخامس</option>
                 </select>
                 <select id="companyNo" required><option value="">اختر السرية</option></select>
                 <input type="text" id="category" placeholder="الصنف">
-                <textarea id="experience" class="full-width" placeholder="الخبرات (اختياري)"></textarea>
-                <textarea id="notes" class="full-width" placeholder="الملاحظات"></textarea>
-                <input type="text" id="companyName" class="full-width" placeholder="اسم السرية">
+                <textarea id="experience" class="full-width" placeholder="الخبرات السابقة"></textarea>
+                <textarea id="notes" class="full-width" placeholder="ملاحظات عامة"></textarea>
+                <input type="text" id="companyName" class="full-width" placeholder="اسم السرية التعريفي">
             </div>
-            <button type="submit" id="submitBtn" class="btn-save">حفظ السجل</button>
+            <button type="submit" id="submitBtn" class="btn-save">حفظ البيانات</button>
         </form>
 
         <div class="action-bar">
-            <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 ابحث بالاسم أو ID...">
+            <input type="text" id="searchInput" class="search-box" onkeyup="searchData()" placeholder="🔍 بحث سريع...">
             <button onclick="exportToExcel()" class="btn-excel">📤 تصدير</button>
             <button onclick="document.getElementById('importFile').click()" class="btn-import">📥 استيراد</button>
             <input type="file" id="importFile" hidden accept=".csv" onchange="importCSV(this)">
@@ -121,7 +120,7 @@
         <div style="overflow-x:auto">
             <table>
                 <thead>
-                    <tr><th>الاسم الرباعي واللقب</th><th>ID</th><th>الفوج</th><th>السرية</th><th>الإجراءات</th></tr>
+                    <tr><th>الاسم الكامل</th><th>ID</th><th>الفوج</th><th>السرية</th><th>الإجراءات</th></tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
             </table>
@@ -133,96 +132,224 @@
     <div class="modal-content">
         <div id="viewArea"></div>
         <hr>
-        <div style="text-align: left;">
-            <button onclick="closeModal()" style="padding:10px 20px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">إغلاق</button>
-        </div>
+        <button onclick="closeModal()" style="padding:10px 20px; background:#444; color:white; border:none; border-radius:5px; cursor:pointer;">إغلاق</button>
     </div>
 </div>
 
-<button onclick="openSettings()" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:#222; color:white; border:none; cursor:pointer; font-size:20px; z-index:1001; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">⚙️</button>
+<button onclick="openSettings()" style="position:fixed; bottom:20px; right:20px; width:50px; height:50px; border-radius:50%; background:#222; color:white; border:none; cursor:pointer; font-size:20px; z-index:1001;">⚙️</button>
 
 <div id="settingsPanel" class="settings-panel">
-    <h3 style="margin-top:0">إعدادات النظام</h3>
+    <h3>إعدادات النظام</h3>
     <hr>
-    <b>الأمان (تحتاج كلمة المرور القديمة):</b>
+    <b>تغيير الحماية:</b>
     <input type="password" id="oldPass" placeholder="كلمة المرور القديمة" style="margin-top:10px;">
     <input type="text" id="newU" placeholder="اسم مستخدم جديد">
     <input type="password" id="newP" placeholder="كلمة مرور جديدة">
-    <button onclick="updateSecurity()" style="width:100%; padding:10px; background:#444; color:white; border:none; margin-top:5px; cursor:pointer; border-radius:5px;">تحديث الحماية</button>
+    <button onclick="updateSecurity()" style="width:100%; padding:8px; background:#444; color:white; border:none; margin-top:5px; border-radius:5px; cursor:pointer;">تحديث</button>
     <hr>
-    <b>تغيير السمة (20 لوناً):</b>
+    <b>الألوان (20 لون):</b>
     <div class="color-grid" id="colorGrid"></div>
     <hr>
-    <b>الخلفية / العلامة المائية:</b>
-    <input type="file" accept="image/*" onchange="handleImageUpload(this)" style="font-size:11px;">
-    <button onclick="localStorage.removeItem('306_custom_img'); location.reload();" style="color:red; background:none; border:none; cursor:pointer; padding:10px;">حذف الخلفية</button>
-    <button onclick="closeSettings()" style="width:100%; padding:12px; background:var(--main-color); color:white; border:none; margin-top:15px; border-radius:5px; cursor:pointer; font-weight:bold;">إغلاق وحفظ</button>
+    <b>الخلفية:</b>
+    <input type="file" accept="image/*" onchange="handleImageUpload(this)">
+    <button onclick="closeSettings()" style="width:100%; padding:10px; background:var(--main-color); color:white; border:none; margin-top:15px; border-radius:5px; cursor:pointer;">حفظ وخروج</button>
 </div>
 
 <script>
-    const labelsAR = {
-        idNo: "الرقم التعريفي (ID)", fullName: "الاسم الرباعي واللقب", birthYear: "المواليد", birthPlace: "محل التولد", gender: "الجنس",
-        motherName: "اسم الأم الثلاثي", civilId: "رقم البطاقة الوطنية", maritalStatus: "الحالة الزوجية", spouseName: "اسم الزوج/ة",
-        childrenCount: "عدد الأطفال", education: "التحصيل الدراسي", specialization: "التخصص", job: "المهنة", province: "المحافظة",
-        district: "القضاء", subDistrict: "الناحية", region: "المنطقة / الحي", mahala: "المحلة", zuqaq: "الزقاق", dar: "الدار",
-        landmark: "نقطة دالة", phone: "رقم الهاتف", brigade: "اللواء", battalion: "الفوج", companyNo: "السرية", category: "الصنف",
+    // بيانات التسمية للطباعة والمعاينة
+    const labels = {
+        idNo: "ID", fullName: "الاسم", birthYear: "المواليد", birthPlace: "محل التولد", gender: "الجنس",
+        motherName: "اسم الأم", civilId: "البطاقة الوطنية", maritalStatus: "الحالة الزوجية", spouseName: "الزوج/ة",
+        childrenCount: "الأطفال", education: "الدراسة", specialization: "التخصص", job: "المهنة", province: "المحافظة",
+        district: "القضاء", subDistrict: "الناحية", region: "المنطقة", mahala: "المحلة", zuqaq: "الزقاق", dar: "الدار",
+        landmark: "نقطة دالة", phone: "الهاتف", brigade: "اللواء", battalion: "الفوج", companyNo: "السرية", category: "الصنف",
         experience: "الخبرات", notes: "الملاحظات", companyName: "اسم السرية"
     };
 
-    // نظام الدخول والحماية
-    function checkLogin() {
+    // 1. نظام الدخول
+    function handleLogin() {
         const u = document.getElementById('userInp').value;
         const p = document.getElementById('passInp').value;
         const sU = localStorage.getItem('306_user') || 'admin';
         const sP = localStorage.getItem('306_pass') || '1234';
+
         if(u === sU && p === sP) {
-            if(document.getElementById('rememberMe').checked) localStorage.setItem('306_logged', 'true');
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            renderTable();
-        } else alert("خطأ في بيانات الدخول!");
+            if(document.getElementById('rememberMe').checked) {
+                localStorage.setItem('306_session', 'active');
+            }
+            showMain();
+        } else {
+            alert("اسم المستخدم أو كلمة المرور غير صحيحة!");
+        }
     }
 
-    function logout() { localStorage.removeItem('306_logged'); location.reload(); }
+    function showMain() {
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        renderTable();
+    }
 
-    function forgotPass() {
-        alert("يرجى التواصل مع مدير النظام التقني أو استخدام البريد المرتبط لاستعادة كلمة المرور.");
+    function logout() {
+        localStorage.removeItem('306_session');
+        location.reload();
+    }
+
+    // 2. إدارة البيانات
+    function renderTable(filter = null) {
+        const data = filter || JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        data.forEach((item, index) => {
+            tbody.innerHTML += `<tr>
+                <td>${item.fullName}</td><td>${item.idNo}</td><td>${item.battalion}</td><td>${item.companyNo}</td>
+                <td>
+                    <button onclick="previewRecord(${index})" style="background:#0288d1; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">👁</button>
+                    <button onclick="editRecord(${index})" style="background:#f57c00; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">✏️</button>
+                    <button onclick="printRecord(${index})" style="background:#444; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">🖨</button>
+                    <button onclick="deleteRecord(${index})" style="background:#c62828; color:white; border:none; padding:5px 8px; border-radius:4px; cursor:pointer;">🗑</button>
+                </td>
+            </tr>`;
+        });
+    }
+
+    document.getElementById('dataForm').onsubmit = function(e) {
+        e.preventDefault();
+        let record = {};
+        new FormData(this).forEach((v, k) => record[k] = v); // Note: this requires 'name' attribute on inputs, let's fix below.
+        
+        // Manual collection to be safe with IDs
+        this.querySelectorAll('input, select, textarea').forEach(f => { if(f.id !== 'editIndex') record[f.id] = f.value; });
+
+        let data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        let idx = document.getElementById('editIndex').value;
+
+        if(idx === "-1") data.push(record);
+        else data[idx] = record;
+
+        localStorage.setItem('army_db_306', JSON.stringify(data));
+        this.reset();
+        document.getElementById('editIndex').value = "-1";
+        document.getElementById('submitBtn').innerText = "حفظ البيانات";
+        document.getElementById('submitBtn').classList.remove('btn-edit-mode');
+        renderTable();
+        alert("تم الحفظ بنجاح");
+    };
+
+    function editRecord(index) {
+        const data = JSON.parse(localStorage.getItem('army_db_306'));
+        const item = data[index];
+        for(let key in item) { if(document.getElementById(key)) document.getElementById(key).value = item[key]; }
+        document.getElementById('editIndex').value = index;
+        document.getElementById('submitBtn').innerText = "تحديث البيانات";
+        document.getElementById('submitBtn').classList.add('btn-edit-mode');
+        window.scrollTo({top: 0, behavior: 'smooth'});
+    }
+
+    // 3. استيراد وتصدير
+    function exportToExcel() {
+        const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        if(!data.length) return alert("السجل فارغ");
+        let csv = "\uFEFF" + Object.values(labels).join(",") + "\n";
+        data.forEach(row => { csv += Object.values(row).map(v => `"${v}"`).join(",") + "\n"; });
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(new Blob([csv], {type:'text/csv;charset=utf-8;'}));
+        link.download = "سجل_العديد_306.csv";
+        link.click();
+    }
+
+    function importCSV(input) {
+        const file = input.files[0];
+        if(!file) return;
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const rows = e.target.result.split('\n').slice(1);
+            const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+            const keys = Object.keys(labels);
+            rows.forEach(row => {
+                if(!row.trim()) return;
+                let vals = row.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
+                let rec = {};
+                keys.forEach((k, i) => rec[k] = vals[i] ? vals[i].replace(/"/g, '') : "");
+                data.push(rec);
+            });
+            localStorage.setItem('army_db_306', JSON.stringify(data));
+            renderTable();
+            alert("تم الاستيراد بنجاح");
+        };
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    // 4. إعدادات ومعاينة
+    function previewRecord(index) {
+        const item = JSON.parse(localStorage.getItem('army_db_306'))[index];
+        let h = `<h2 style="text-align:center">معاينة: ${item.fullName}</h2><div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">`;
+        for(let k in item) h += `<p style="border-bottom:1px solid #eee; padding:5px"><b>${labels[k]}:</b> ${item[k]}</p>`;
+        document.getElementById('viewArea').innerHTML = h + `</div>`;
+        document.getElementById('viewModal').style.display = 'block';
+    }
+
+    function printRecord(index) {
+        const item = JSON.parse(localStorage.getItem('army_db_306'))[index];
+        const win = window.open('', '_blank');
+        win.document.write(`<html><head><style>body{direction:rtl; font-family:tahoma; padding:30px;} .grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}</style></head><body><h1 style="text-align:center; border:2px solid #000; padding:10px;">لواء 306 - العديد المركزي</h1><div class="grid">`);
+        for(let k in item) win.document.write(`<div><b>${labels[k]}:</b> ${item[k]}</div>`);
+        win.document.write(`</div></body></html>`);
+        win.document.close();
+        setTimeout(() => win.print(), 500);
+    }
+
+    function searchData() {
+        const v = document.getElementById('searchInput').value.toLowerCase();
+        const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
+        renderTable(data.filter(i => i.fullName.toLowerCase().includes(v) || i.idNo.includes(v)));
+    }
+
+    // 5. تهيئة الألوان والسرايا
+    const colors = ['#1b5e20', '#2e7d32', '#4b5320', '#1a237e', '#0d47a1', '#01579b', '#006064', '#004d40', '#bf360c', '#b71c1c', '#880e4f', '#4a148c', '#311b92', '#212121', '#37474f', '#4e342e', '#b8860b', '#d4af37', '#795548', '#263238'];
+    const colorGrid = document.getElementById('colorGrid');
+    colors.forEach(c => {
+        let d = document.createElement('div'); d.className = 'color-box'; d.style.background = c;
+        d.onclick = () => { document.documentElement.style.setProperty('--main-color', c); localStorage.setItem('306_color', c); };
+        colorGrid.appendChild(d);
+    });
+
+    const compSel = document.getElementById('companyNo');
+    for(let i=1; i<=40; i++) {
+        let opt = document.createElement('option'); opt.value = "السرية " + i; opt.text = "السرية " + i;
+        compSel.appendChild(opt);
     }
 
     function updateSecurity() {
-        const oldP = document.getElementById('oldPass').value;
-        if(oldP !== (localStorage.getItem('306_pass') || '1234')) return alert("كلمة المرور القديمة خاطئة!");
+        const op = document.getElementById('oldPass').value;
+        if(op !== (localStorage.getItem('306_pass') || '1234')) return alert("الكلمة القديمة خطأ!");
         const nu = document.getElementById('newU').value;
         const np = document.getElementById('newP').value;
         if(nu) localStorage.setItem('306_user', nu);
         if(np) localStorage.setItem('306_pass', np);
-        alert("تم تحديث بيانات الحماية.");
+        alert("تم التحديث");
     }
 
-    // وظيفة الاستيراد من ملف CSV
-    function importCSV(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            const text = e.target.result;
-            const rows = text.split('\n');
-            const data = JSON.parse(localStorage.getItem('army_db_306') || '[]');
-            const keys = Object.keys(labelsAR);
-            let importCount = 0;
+    function openSettings() { document.getElementById('settingsPanel').style.display = 'block'; }
+    function closeSettings() { document.getElementById('settingsPanel').style.display = 'none'; }
+    function closeModal() { document.getElementById('viewModal').style.display = 'none'; }
+    function deleteRecord(i) { if(confirm("حذف؟")) { let d = JSON.parse(localStorage.getItem('army_db_306')); d.splice(i, 1); localStorage.setItem('army_db_306', JSON.stringify(d)); renderTable(); } }
 
-            // نبدأ من 1 لتخطي سطر العناوين
-            for (let i = 1; i < rows.length; i++) {
-                if (!rows[i].trim()) continue;
-                // معالجة القيم المحاطة بعلامات تنصيص
-                const values = rows[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || [];
-                let record = {};
-                keys.forEach((key, index) => {
-                    let val = values[index] ? values[index].replace(/"/g, '') : "";
-                    record[key] = val;
-                });
-                data.push(record);
-                importCount++;
-            }
-            localStorage.setItem('army_db_306', JSON.stringify(data));
-            renderTable();
+    function handleImageUpload(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                document.body.style.backgroundImage = `url('${e.target.result}')`;
+                localStorage.setItem('306_custom_img', e.target.result);
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    window.onload = function() {
+        if(localStorage.getItem('306_color')) document.documentElement.style.setProperty('--main-color', localStorage.getItem('306_color'));
+        if(localStorage.getItem('306_custom_img')) document.body.style.backgroundImage = `url('${localStorage.getItem('306_custom_img')}')`;
+        if(localStorage.getItem('306_session') === 'active') showMain();
+    };
+</script>
+</body>
+</html>
