@@ -7,7 +7,6 @@
         :root { --main-color: #1b5e20; --pen-color: #c62828; --db-color: #0277bd; --dup-color: #ff0000; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
         
-        /* التنسيقات العامة */
         .container { max-width: 1350px; margin: 20px auto; background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; }
         .header-section { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; }
         .logo-area { display: flex; align-items: center; gap: 15px; }
@@ -18,21 +17,22 @@
         input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; text-align: center; background: white; }
         
         .duplicate-highlight { background-color: var(--dup-color) !important; color: white !important; }
-        
         .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-main { background: var(--main-color); width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; }
-        
-        /* واجهة قاعدة البيانات */
+
+        /* واجهة الجدول */
         #dbView { display: none; }
-        .db-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: white; font-size: 13px; }
+        .table-controls { display: flex; gap: 10px; background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 15px; flex-wrap: wrap; }
+        .table-wrapper { width: 100%; overflow-x: auto; border: 1px solid #ccc; border-radius: 8px; background: white; }
+        .db-table { width: 100%; border-collapse: collapse; min-width: 3000px; text-align: center; direction: rtl; }
         .db-table th { background: var(--db-color); color: white; padding: 12px; border: 1px solid #ddd; position: sticky; top: 0; }
-        .db-table td { padding: 10px; border: 1px solid #ddd; text-align: center; }
-        .db-table tr:nth-child(even) { background-color: #f2f2f2; }
-        .table-wrapper { max-height: 600px; overflow-x: auto; overflow-y: auto; border: 1px solid #ddd; }
+        .db-table td { padding: 10px; border: 1px solid #ddd; font-size: 13px; }
+        .db-table tr:hover { background: #f1f1f1; }
+        .action-btns { display: flex; gap: 5px; justify-content: center; }
+        .btn-small { padding: 5px 10px; font-size: 11px; }
 
         #loginPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--main-color), #000); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 15px; width: 340px; text-align: center; }
-
         @media print { .no-print { display: none !important; } .watermark-img { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70%; opacity: 0.1; z-index: -1; } }
     </style>
 </head>
@@ -54,7 +54,6 @@
                 <img src="https://i.ibb.co/pPHR7S7/1000190031.jpg" class="logo-img" alt="Logo">
                 <div>
                     <h2 id="viewTitle" style="margin:0; color:var(--main-color);">العديد المركزي - عديد لواء 306/ذي قار</h2>
-                    <small style="color:#666">إدارة البيانات والمطابقة الذكية</small>
                 </div>
             </div>
             <button onclick="logout()" class="btn" style="background:#c62828">تسجيل خروج</button>
@@ -94,9 +93,19 @@
 
     <div class="container" id="dbView">
         <div class="header-section">
-            <h2 style="color:var(--db-color)">قاعدة البيانات المركزية - لواء 306</h2>
-            <button onclick="toggleView('form')" class="btn" style="background:#333">العودة للواجهة الرئيسية ↩️</button>
+            <h2 style="color:var(--db-color)">قاعدة البيانات الشاملة - لواء 306</h2>
+            <button onclick="toggleView('form')" class="btn" style="background:#333">العودة للرئيسية ↩️</button>
         </div>
+        
+        <div class="table-controls no-print">
+            <label>فرز حسب الفوج:</label>
+            <select id="filterFowj" onchange="renderTable()"><option value="">الكل</option></select>
+            <label>رقم السرية:</label>
+            <select id="filterSariyaNum" onchange="renderTable()"><option value="">الكل</option></select>
+            <label>اسم السرية:</label>
+            <select id="filterSariyaName" onchange="renderTable()"><option value="">الكل</option></select>
+        </div>
+
         <div class="table-wrapper">
             <table class="db-table">
                 <thead><tr id="tableHeaders"></tr></thead>
@@ -107,11 +116,11 @@
 </div>
 
 <div id="settMod" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:20000;">
-    <div style="background:white; width:40%; margin:5% auto; padding:25px; border-radius:15px; position:relative;">
-        <span onclick="closeMod('settMod')" style="float:left; cursor:pointer; font-weight:bold;">X</span>
-        <h3>⚙️ إعدادات النظام</h3>
-        <label>لون الواجهة:</label><input type="color" onchange="changeColor(this.value)" style="width:100%"><br><br>
-        <label>صورة الخلفية / العلامة المائية:</label><input type="file" onchange="updateBg(this)" style="width:100%">
+    <div style="background:white; width:40%; margin:5% auto; padding:25px; border-radius:15px;">
+        <span onclick="closeMod('settMod')" style="float:left; cursor:pointer;">X</span>
+        <h3>⚙️ الإعدادات</h3>
+        <label>اللون الرئيسي:</label><input type="color" onchange="changeColor(this.value)" style="width:100%"><br><br>
+        <label>خلفية البرنامج / علامة مائية:</label><input type="file" onchange="updateBg(this)" style="width:100%">
     </div>
 </div>
 
@@ -121,7 +130,6 @@
     const fNames = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","cat","exp","refN","refP","sariyaName","notes"];
     const fLabels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرات العسكرية","المعرف","هاتف المعرف","اسم السرية","ملاحظات"];
 
-    // توليد الحقول
     const cont = document.getElementById('fieldsContainer');
     fNames.forEach((f, i) => {
         let extra = f === "fullName" ? 'onkeyup="checkDuplicate()"' : '';
@@ -133,44 +141,88 @@
     function checkDuplicate() {
         const val = document.getElementById('fullName').value.trim();
         const editIdx = document.getElementById('editIdx').value;
-        if(val === "") { document.getElementById('fullName').classList.remove('duplicate-highlight'); return; }
-        
         let db = JSON.parse(localStorage.getItem('db_306') || '[]');
-        let isDup = db.some((item, index) => index.toString() !== editIdx && item.fullName === val);
+        let isDup = db.some((item, index) => index.toString() !== editIdx && item.fullName === val && val !== "");
         document.getElementById('fullName').classList.toggle('duplicate-highlight', isDup);
     }
 
     function toggleView(v) {
-        if(v === 'db') {
-            document.getElementById('formView').style.display = 'none';
-            document.getElementById('dbView').style.display = 'block';
-            renderTable();
-        } else {
-            document.getElementById('formView').style.display = 'block';
-            document.getElementById('dbView').style.display = 'none';
-        }
+        document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
+        document.getElementById('dbView').style.display = v === 'db' ? 'block' : 'none';
+        if(v === 'db') { populateFilters(); renderTable(); }
+    }
+
+    function populateFilters() {
+        const db = JSON.parse(localStorage.getItem('db_306') || '[]');
+        const getUnique = (key) => [...new Set(db.map(item => item[key]))].filter(Boolean);
+        
+        ['fowj', 'sariyaNum', 'sariyaName'].forEach(f => {
+            let select = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
+            let currentVal = select.value;
+            select.innerHTML = '<option value="">الكل</option>' + getUnique(f).map(v => `<option value="${v}">${v}</option>`).join('');
+            select.value = currentVal;
+        });
     }
 
     function renderTable() {
         const db = JSON.parse(localStorage.getItem('db_306') || '[]');
-        const head = document.getElementById('tableHeaders');
-        const body = document.getElementById('tableBody');
-        
-        head.innerHTML = fLabels.map(l => `<th>${l}</th>`).join('');
-        body.innerHTML = db.map(row => `<tr>${fNames.map(f => `<td>${row[f]||''}</td>`).join('')}</tr>`).join('');
+        const fFowj = document.getElementById('filterFowj').value;
+        const fSariyaNum = document.getElementById('filterSariyaNum').value;
+        const fSariyaName = document.getElementById('filterSariyaName').value;
+
+        const filtered = db.filter(item => {
+            return (!fFowj || item.fowj === fFowj) && 
+                   (!fSariyaNum || item.sariyaNum === fSariyaNum) &&
+                   (!fSariyaName || item.sariyaName === fSariyaName);
+        });
+
+        document.getElementById('tableHeaders').innerHTML = '<th>إجراءات</th>' + fLabels.map(l => `<th>${l}</th>`).join('');
+        document.getElementById('tableBody').innerHTML = filtered.map((row, idx) => `
+            <tr>
+                <td class="action-btns">
+                    <button onclick="editFromTable(${idx})" class="btn btn-small" style="background:green">تعديل</button>
+                    <button onclick="copyFromTable(${idx})" class="btn btn-small" style="background:blue">نسخ</button>
+                    <button onclick="deleteFromTable(${idx})" class="btn btn-small" style="background:red">حذف</button>
+                </td>
+                ${fNames.map(f => `<td>${row[f]||''}</td>`).join('')}
+            </tr>
+        `).join('');
     }
 
-    // دوال النظام الأساسية (مختصرة للحفاظ على الحجم)
-    function login() { 
-        const u = document.getElementById('uInp').value;
-        const p = document.getElementById('pInp').value;
-        if(p === 'RESET306' || (u === 'admin' && p === '1234')) {
-            sessionStorage.setItem('isLoggedIn', 'true');
-            document.getElementById('loginPage').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-            applySavedStyles();
+    function editFromTable(idx) {
+        const db = JSON.parse(localStorage.getItem('db_306'));
+        const item = db[idx];
+        fNames.forEach(f => document.getElementById(f).value = item[f] || '');
+        document.getElementById('editIdx').value = idx;
+        toggleView('form');
+        document.getElementById('tools').style.display = 'flex';
+    }
+
+    function copyFromTable(idx) {
+        const db = JSON.parse(localStorage.getItem('db_306'));
+        const newItem = {...db[idx]};
+        db.push(newItem);
+        localStorage.setItem('db_306', JSON.stringify(db));
+        renderTable();
+    }
+
+    function deleteFromTable(idx) {
+        if(confirm("هل أنت متأكد من الحذف؟")) {
+            const db = JSON.parse(localStorage.getItem('db_306'));
+            db.splice(idx, 1);
+            localStorage.setItem('db_306', JSON.stringify(db));
+            renderTable();
         }
     }
+
+    // دوال النظام الأساسية
+    function login() { 
+        if(document.getElementById('pInp').value === '1234') { 
+            sessionStorage.setItem('isLoggedIn', 'true'); toggleLogin(false); applySavedStyles();
+        } 
+    }
+    function toggleLogin(show) { document.getElementById('loginPage').style.display = show ? 'flex' : 'none'; document.getElementById('mainContent').style.display = show ? 'none' : 'block'; }
+    window.onload = () => { if(sessionStorage.getItem('isLoggedIn') === 'true') toggleLogin(false); };
 
     function saveData(e) {
         e.preventDefault();
@@ -180,8 +232,7 @@
         let idx = document.getElementById('editIdx').value;
         if(idx === "-1") db.push(data); else db[idx] = data;
         localStorage.setItem(key, JSON.stringify(db));
-        alert("تم الحفظ"); document.getElementById('mainForm').reset();
-        document.getElementById('editIdx').value = "-1";
+        alert("تم الحفظ"); document.getElementById('mainForm').reset(); document.getElementById('editIdx').value = "-1";
     }
 
     function importCSV(input) {
@@ -196,7 +247,7 @@
                 }
             });
             localStorage.setItem('db_306', JSON.stringify(db));
-            alert("تم الاستيراد بنجاح لجميع السجلات"); renderTable();
+            alert("تم الاستيراد بنجاح"); renderTable();
         };
         r.readAsText(input.files[0]);
     }
@@ -206,13 +257,7 @@
         let csv = "\uFEFF" + fLabels.join(",") + "\n";
         db.forEach(r => { csv += fNames.map(f => `"${r[f]||''}"`).join(",") + "\n"; });
         let blob = new Blob([csv], {type: 'text/csv;charset=utf-8'});
-        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "قاعدة_بيانات_306.csv"; a.click();
-    }
-
-    function switchMode() {
-        currentMode = currentMode === 'active' ? 'pen' : 'active';
-        document.getElementById('viewTitle').innerText = currentMode === 'active' ? "العديد المركزي - لواء 306" : "سجل العقوبات";
-        document.getElementById('mainForm').reset();
+        let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = "بيانات_306.csv"; a.click();
     }
 
     function changeColor(v) { document.documentElement.style.setProperty('--main-color', v); localStorage.setItem('306_c', v); }
@@ -225,11 +270,13 @@
         const c = localStorage.getItem('306_c'); if(c) changeColor(c);
         const bg = localStorage.getItem('306_bg'); if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('printWM').src = bg; }
     }
+    function logout() { sessionStorage.clear(); location.reload(); }
     function openMod(id) { document.getElementById(id).style.display = 'block'; }
     function closeMod(id) { document.getElementById(id).style.display = 'none'; }
-    function logout() { sessionStorage.clear(); location.reload(); }
-    window.onload = () => { if(sessionStorage.getItem('isLoggedIn') === 'true') { document.getElementById('loginPage').style.display = 'none'; document.getElementById('mainContent').style.display = 'block'; applySavedStyles(); } };
+    function switchMode() {
+        currentMode = currentMode === 'active' ? 'pen' : 'active';
+        document.getElementById('viewTitle').innerText = currentMode === 'active' ? "العديد المركزي - لواء 306" : "سجل العقوبات";
+    }
 </script>
-
 </body>
 </html>
