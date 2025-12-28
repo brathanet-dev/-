@@ -1,209 +1,30 @@
-<th>الفوج</th><th>رقم السرية</th><th>الصنف</th><th>الخبرات</th>
-        <th>المعرف</th><th>هاتف المعرف</th><th>الملاحظات</th><th>اسم السرية</th>
-        <th>إجراءات</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>العديد المركزي - لواء 306 ذي قار</title>
+  <style>
+    :root { --main-color:#1b5e20; }
+    body { font-family: Tahoma, sans-serif; margin:0; padding:0; background:#f4f4f9; }
+    .page { max-width:1100px; margin:30px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+    h1 { text-align:center; color:var(--main-color); }
+    .btn { background:var(--main-color); color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; margin:5px; font-size:12px; }
+    .hidden { display:none; }
+  </style>
+</head>
+<body>
+
+<!-- صفحة تسجيل الدخول -->
+<div class="page" id="loginPage">
+  <h1>تسجيل الدخول</h1>
+  <label>اسم المستخدم</label>
+  <input type="text" id="username"><br>
+  <label>كلمة المرور</label>
+  <input type="password" id="password"><br><br>
+  <button class="btn" onclick="login()">دخول</button>
 </div>
 
-<!-- قاعدة العقوبات -->
-<div class="page hidden" id="punishmentPage">
-  <h1>قاعدة العقوبات</h1>
-  <table id="punishmentTable">
-    <thead>
-      <tr>
-        <th>ID</th><th>الاسم</th><th>الفوج</th><th>رقم السرية</th><th>اسم السرية</th><th>إجراءات</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-  <button class="btn no-print" onclick="backToMain()">رجوع للقاعدة الرئيسية</button>
-</div>
-
-<!-- صفحة الإعدادات -->
-<div class="page hidden" id="settingsPage">
-  <h1>الإعدادات والسمات</h1>
-  <h3>تغيير بيانات الدخول</h3>
-  <label>اسم المستخدم القديم</label><input type="text" id="oldUser"><br>
-  <label>كلمة المرور القديمة</label><input type="password" id="oldPass"><br>
-  <label>اسم المستخدم الجديد</label><input type="text" id="newUser"><br>
-  <label>كلمة المرور الجديدة</label><input type="password" id="newPass"><br>
-  <button class="btn" onclick="changeLogin()">تغيير</button>
-
-  <h3>تغيير اللون الرئيسي</h3>
-  <input type="color" id="colorPicker" onchange="changeColor()">
-
-  <h3>إضافة صورة خلفية</h3>
-  <input type="file" id="bgUpload" accept="image/*" onchange="setBackground(event)">
-
-  <h3>إضافة علامة مائية للطباعة</h3>
-  <input type="file" id="wmUpload" accept="image/*" onchange="setWatermark(event)">
-  <button class="btn no-print" onclick="backToMain()">رجوع</button>
-</div>
-
-<script>
-  let currentUser = "admin";
-  let currentPass = "1234";
-
-  function login(){
-    const user=document.getElementById("username").value;
-    const pass=document.getElementById("password").value;
-    if(user===currentUser && pass===currentPass){
-      document.getElementById("loginPage").classList.add("hidden");
-      document.getElementById("dataPage").classList.remove("hidden");
-    } else { alert("بيانات الدخول غير صحيحة"); }
-  }
-
-  function saveData(){
-    const fields=["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
-      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
-      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"];
-    const row=document.createElement("tr");
-    fields.forEach(f=>{
-      const td=document.createElement("td");
-      td.textContent=document.getElementById(f).value;
-      row.appendChild(td);
-    });
-    const actionTd=document.createElement("td");
-    const punishBtn=document.createElement("button");
-    punishBtn.textContent="إرسال للعقوبات";
-    punishBtn.className="btn";
-    punishBtn.onclick=()=>moveToPunishments(row);
-    actionTd.appendChild(punishBtn);
-    row.appendChild(actionTd);
-    document.querySelector("#mainTable tbody").appendChild(row);
-    highlightDuplicates();
-    alert("تم حفظ البيانات ✅");
-  }
-
-  function moveToPunishments(row){
-    const clone=row.cloneNode(true);
-    const actionTd=clone.lastChild;
-    actionTd.innerHTML="";
-    const liftBtn=document.createElement("button");
-    liftBtn.textContent="رفع العقوبة";
-    liftBtn.className="btn";
-    liftBtn.onclick=()=>moveBackToMain(clone);
-    actionTd.appendChild(liftBtn);
-    document.querySelector("#punishmentTable tbody").appendChild(clone);
-    row.remove();
-  }
-
-  function moveBackToMain(row){
-    const clone=row.cloneNode(true);
-    const actionTd=clone.lastChild;
-    actionTd.innerHTML="";
-    const punishBtn=document.createElement("button");
-    punishBtn.textContent="إرسال للعقوبات";
-    punishBtn.className="btn";
-    punishBtn.onclick=()=>moveToPunishments(clone);
-    actionTd.appendChild(punishBtn);
-    document.querySelector("#mainTable tbody").appendChild(clone);
-    row.remove();
-  }
-
-  function showPunishments(){
-    document.getElementById("dataPage").classList.add("hidden");
-    document.getElementById("punishmentPage").classList.remove("hidden");
-  }
-  function backToMain(){
-    document.getElementById("punishmentPage").classList.add("hidden");
-    document.getElementById("settingsPage").classList.add("hidden");
-    document.getElementById("dataPage").classList.remove("hidden");
-  }
-  function showSettings(){
-    document.getElementById("dataPage").classList.add("hidden");
-    document.getElementById("settingsPage").classList.remove("hidden");
-  }
-
-  function filterTable(field){
-    const input=document.getElementById("filter"+field.charAt(0).toUpperCase()+field.slice(1)).value.toLowerCase();
-    const rows=document.querySelectorAll("#mainTable tbody tr");
-    rows.forEach(r=>{
-      let match=false;
-      r.querySelectorAll("td").forEach(c=>{
-        if(c.textContent.toLowerCase().includes(input)) match=true;
-      });
-      r.style.display=match?"":"none";
-    });
-  }
-
-  function highlightDuplicates(){
-    const names={};
-    const rows=document.querySelectorAll("#mainTable tbody tr");
-    rows.forEach(r=>{
-      const name=r.children[1].textContent.trim();
-      if(names[name]){
-        r.style.backgroundColor="#ffebee";
-        r.style.color="#c62828";
-        names[name].style.backgroundColor="#ffebee";
-        names[name].style.color="#c62828";
-      } else { names[name]=r; }
-    });
-  }
-
-  function searchNames(){
-    const input=document.getElementById("searchInput").value.toLowerCase();
-    const dropdown=document.getElementById("searchDropdown");
-    dropdown.innerHTML="";
-    if(input===""){ dropdown.style.display="none"; return; }
-    const rows=document.querySelectorAll("#mainTable tbody tr");
-    rows.forEach(r=>{
-      const name=r.children[1].textContent.toLowerCase();
-      if(name.includes(input)){
-        const item=document.createElement("div");
-        item.textContent=r.children[1].textContent;
-        item.style.padding="5px"; item.style.cursor="pointer";
-        item.onclick=()=>fillForm(r);
-        dropdown.appendChild(item);
-      }
-    });
-    dropdown.style.display=dropdown.innerHTML===""?"none":"block";
-  }
-
-  function fillForm(row){
-    const fields=["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
-      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
-      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"];
-    fields.forEach((f,i)=>{ document.getElementById(f).value=row.children[i].textContent; });
-    document.getElementById("searchDropdown").style.display="none";
-  }
-
-  function changeLogin(){
-    const oldU=document.getElementById("oldUser").value;
-    const oldP=document.getElementById("oldPass").value;
-    const newU=document.getElementById("newUser").value;
-    const newP=document.getElementById("newPass").value;
-    if(oldU===currentUser && oldP===currentPass){
-      currentUser=newU; currentPass=newP;
-      alert("تم تغيير بيانات الدخول ✅");
-    } else { alert("البيانات القديمة غير صحيحة ❌"); }
-  }
-
-  function changeColor(){
-    const color=document.getElementById("colorPicker").value;
-    document.documentElement.style.setProperty("--main-color",color);
-    alert("تم تغيير اللون الرئيسي 🎨");
-  }
-
-  function setBackground(event){
-    const file=event.target.files[0];
-    if(file){
-      const reader=new FileReader();
-      reader.onload=function(e){
-        document.body.style.backgroundImage=`url(${e.target.result})`;
-        document.body.style.backgroundSize="cover";
-      }
-      reader.readAsDataURL(file);
-    }
-  }
-
-  function setWatermark(event){
-    const file=event.target.files[0];
-    if(file){
-      const reader=new FileReader();
-      reader.onload=function(e){
-        const wm=document.createElement("img");
-        wm.src=e.target.result;
-        wm.className="print-watermark
+<!-- واجهة البيانات -->
+<div class="page hidden" id="dataPage">
+  <h1>العديد المركزي - عديد لواء 306 ذي قار</h1>
+  <button class="btn" onclick="showSettings()">إعدادات</button>
