@@ -6,9 +6,9 @@
 <title>نظام العديد المركزي - لواء 306</title>
 <style>
 :root{--main:#1b5e20}
-body{font-family:'Segoe UI',Tahoma;background:#0d1b16;margin:0;direction:rtl}
+body{font-family:'Segoe UI',Tahoma;background:#0d1b16;margin:0;direction:rtl;color:#000}
 .container{max-width:1200px;margin:20px auto;background:#fff;padding:25px;border-radius:15px}
-.btn{padding:10px;border:none;border-radius:6px;cursor:pointer;color:#fff;font-weight:bold}
+.btn{padding:10px;border:none;border-radius:6px;cursor:pointer;color:#fff;font-weight:bold;transition:0.3s}
 .btn-main{background:var(--main);width:100%}
 .hidden{display:none}
 input{padding:10px;width:100%;border:1px solid #ccc;border-radius:6px;margin-bottom:10px}
@@ -18,9 +18,17 @@ input{padding:10px;width:100%;border:1px solid #ccc;border-radius:6px;margin-bot
 .login-box{background:#fff;width:100%;max-width:360px;padding:25px;border-radius:15px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
 .login-box h3{margin-bottom:15px;color:var(--main)}
 #loginErr{display:none;background:#c62828;color:#fff;padding:8px;border-radius:6px;margin-top:10px;font-size:14px}
+
+/* TABLE */
 table{width:100%;border-collapse:collapse;margin-top:15px}
 th,td{border:1px solid #ccc;padding:6px;text-align:center;font-size:13px}
 th{background:#2e7d32;color:#fff}
+
+/* MODALS */
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:9999;padding:15px}
+.modal-content{background:#fff;padding:20px;border-radius:12px;width:100%;max-width:400px}
+.modal-content h3{margin-top:0}
+.modal-close{background:#555;width:100%;margin-top:10px;border-radius:6px}
 </style>
 </head>
 <body>
@@ -48,17 +56,17 @@ th{background:#2e7d32;color:#fff}
     <button class="btn btn-main">💾 حفظ</button>
   </form>
   <div style="margin-top:15px">
-    <button onclick="showStats()" class="btn" style="background:#6a1b9a">📊 إحصائيات</button>
-    <button onclick="logout()" class="btn" style="background:#444">🚪 تسجيل خروج</button>
+    <button onclick="showStats()" class="btn btn-main" style="background:#6a1b9a">📊 إحصائيات</button>
+    <button onclick="logout()" class="btn btn-main" style="background:#444">🚪 تسجيل خروج</button>
   </div>
   <table id="tbl"></table>
 </div>
 
-<!-- STATS -->
-<div id="stats" class="hidden" style="position:fixed;inset:0;background:#0008;display:flex;justify-content:center;align-items:center">
-  <div style="background:#fff;padding:20px;border-radius:12px;width:400px">
+<!-- STATS MODAL -->
+<div id="stats" class="modal hidden">
+  <div class="modal-content">
     <div id="statsContent"></div>
-    <button onclick="stats.classList.add('hidden')" class="btn" style="background:red;width:100%">إغلاق</button>
+    <button onclick="stats.classList.add('hidden')" class="btn modal-close">إغلاق</button>
   </div>
 </div>
 
