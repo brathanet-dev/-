@@ -45,16 +45,17 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 
 <!-- تبويب إدخال البيانات -->
 <div id="tabForm" class="tab-content active">
-<div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
+<div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap; position:relative;">
     <button class="btn btn-main" onclick="document.getElementById('settingsModal').style.display='block'">⚙️ إعدادات</button>
-    <input type="text" id="mainSearch" placeholder="🔍 بحث سريع بالاسم..." onkeyup="liveSearch(this.value)" style="flex:1; padding:8px; border-radius:5px; border:1px solid #ccc; text-align:center;">
+    <input type="text" id="mainSearch" placeholder="🔍 بحث سريع بالاسم..." style="flex:1; padding:8px; border-radius:5px; border:1px solid #ccc; text-align:center;" onkeyup="liveSearch(this.value)">
     <button class="btn btn-main" onclick="window.print()">🖨️ طباعة</button>
     <button class="btn btn-export" onclick="exportCSV('DB')">تصدير CSV</button>
     <input type="file" id="importFile" style="display:none" accept=".csv" onchange="importCSV(this,'DB')">
     <button class="btn btn-import" onclick="document.getElementById('importFile').click()">استيراد CSV</button>
+    <div id="searchDropdown" class="dropdown"></div>
 </div>
 
-<form id="mainForm" onsubmit="saveData(event); return false;">
+<form id="mainForm" onsubmit="saveData(event)">
 <div class="form-grid">
   <!-- جميع الحقول 31 كما في النسخة السابقة -->
   <div><label>ID</label><input type="text" id="idNo"></div>
@@ -91,12 +92,12 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 </div>
 <button type="submit" class="btn btn-main">💾 حفظ البيانات</button>
 </form>
-<div id="searchDropdown" class="dropdown"></div>
 </div>
 
 <!-- تبويب القاعدة الأساسية -->
 <div id="tabDB" class="tab-content">
 <div class="stats" id="statsDB">📊 الإحصائيات</div>
+<div style="display:flex; gap:5px; flex-wrap:wrap;">
 <input type="text" id="searchDB" placeholder="بحث سريع" onkeyup="renderTable('DB')">
 <select id="filterFowjDB" onchange="renderTable('DB')"><option value="">كل الأفواج</option></select>
 <select id="filterSNumDB" onchange="renderTable('DB')"><option value="">كل السرايا</option></select>
@@ -104,6 +105,7 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 <button onclick="exportCSV('DB')" class="btn btn-export">تصدير CSV</button>
 <input type="file" id="importFileDB" style="display:none" accept=".csv" onchange="importCSV(this,'DB')">
 <button onclick="document.getElementById('importFileDB').click()" class="btn btn-import">استيراد CSV</button>
+</div>
 <div class="table-wrapper">
 <table class="db-table" id="tableDB"><thead></thead><tbody></tbody></table>
 </div>
@@ -112,6 +114,7 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 <!-- تبويب العقوبات -->
 <div id="tabPen" class="tab-content">
 <div class="stats" id="statsPEN">📊 الإحصائيات</div>
+<div style="display:flex; gap:5px; flex-wrap:wrap;">
 <input type="text" id="searchPen" placeholder="بحث سريع" onkeyup="renderTable('PEN')">
 <select id="filterFowjPen" onchange="renderTable('PEN')"><option value="">كل الأفواج</option></select>
 <select id="filterSNumPen" onchange="renderTable('PEN')"><option value="">كل السرايا</option></select>
@@ -119,6 +122,7 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 <button onclick="exportCSV('PEN')" class="btn btn-export">تصدير CSV</button>
 <input type="file" id="importFilePen" style="display:none" accept=".csv" onchange="importCSV(this,'PEN')">
 <button onclick="document.getElementById('importFilePen').click()" class="btn btn-import">استيراد CSV</button>
+</div>
 <div class="table-wrapper">
 <table class="db-table" id="tablePEN"><thead></thead><tbody></tbody></table>
 </div>
@@ -148,6 +152,7 @@ function showTab(id,btn){
   btn.classList.add('active');
 }
 
+// حفظ البيانات
 function saveData(e){
   e.preventDefault();
   let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
@@ -159,21 +164,22 @@ function saveData(e){
   renderTable('DB');
 }
 
+// البحث السريع مع قائمة منسدلة
 function liveSearch(val){
   const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
   const drop=document.getElementById('searchDropdown');
   if(!val){ drop.style.display='none'; return; }
-  let matches=db.filter(x=>x.fullName.includes(val));
-  drop.innerHTML = matches.map((m,i)=>`<div onclick="fillForm(${i})">${m.fullName}</div>`).join('');
+  const matches=db.filter(x=>x.fullName.toLowerCase().includes(val.toLowerCase()));
+  drop.innerHTML = matches.map((m,i)=>`<div onclick="fillForm(${db.indexOf(m)})">${m.fullName}</div>`).join('');
   drop.style.display = matches.length?'block':'none';
 }
-
 function fillForm(i){
   const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
   fields.forEach(f=>document.getElementById(f).value=db[i][f]||'');
   document.getElementById('searchDropdown').style.display='none';
 }
 
+// عرض الجداول
 function renderTable(type){
   const key=type==='PEN'?PEN_KEY:DB_KEY;
   const table=document.getElementById(type==='PEN'?'tablePEN':'tableDB');
@@ -200,6 +206,7 @@ function renderTable(type){
   }).join('');
 }
 
+// تصدير CSV
 function exportCSV(type){
   const key=type==='PEN'?PEN_KEY:DB_KEY;
   const db=JSON.parse(localStorage.getItem(key)||'[]');
@@ -207,13 +214,14 @@ function exportCSV(type){
   let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=(type==='PEN'?'العقوبات':'القاعدة_الكاملة')+".csv"; a.click();
 }
 
+// استيراد CSV
 function importCSV(input,type){
   if(!input.files[0]) return;
   let reader=new FileReader();
   reader.onload=function(e){
     let lines=e.target.result.split("\n");
-    let key = type==='PEN'?PEN_KEY:DB_KEY;
-    let db = JSON.parse(localStorage.getItem(key)||'[]');
+    let key=type==='PEN'?PEN_KEY:DB_KEY;
+    let db=JSON.parse(localStorage.getItem(key)||'[]');
     lines.slice(1).forEach(line=>{
       let cols=line.split(",");
       if(cols.length>=fields.length){
@@ -222,20 +230,17 @@ function importCSV(input,type){
         db.push(obj);
       }
     });
-    localStorage.setItem(key, JSON.stringify(db));
-    alert("تم استيراد البيانات بنجاح إلى "+(type==='PEN'?'العقوبات':''+'القاعدة الأساسية'));
+    localStorage.setItem(key,JSON.stringify(db));
+    alert("تم استيراد البيانات بنجاح");
     renderTable(type);
   };
   reader.readAsText(input.files[0]);
 }
 
-// الإعدادات
-function changeTheme(c){document.documentElement.style.setProperty('--main-color',c);localStorage.setItem('306_theme',c);}
-function updateBackground(input){if(!input.files[0])return;let reader=new FileReader();reader.onload=e=>{document.body.style.backgroundImage=`url(${e.target.result})`;localStorage.setItem('306_bg',e.target.result)};reader.readAsDataURL(input.files[0]);}
-
-window.onload=()=>{
-  let c=localStorage.getItem('306_theme'); if(c) changeTheme(c);
-  let bg=localStorage.getItem('306_bg'); if(bg)document.body.style.backgroundImage=`url(${bg})`;
-  renderTable('DB'); renderTable('PEN');
-};
-</
+// رفع العقوبة
+function undoPen(i){
+  let pen=JSON.parse(localStorage.getItem(PEN_KEY)||'[]');
+  let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
+  db.push(pen[i]);
+  pen.splice(i,1);
+  localStorage.set
