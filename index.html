@@ -5,139 +5,147 @@
 <title>نظام العديد المركزي - لواء 306</title>
 
 <style>
-:root { --main-color:#1b5e20; --db-color:#0277bd; --pen-color:#c62828; }
-body{
-    font-family:'Segoe UI',Tahoma;
-    background:#f4f4f9;
-    margin:0;
-    direction:rtl;
-    background-size:cover;
-    background-attachment:fixed;
-}
-.container{
-    max-width:1350px;
-    margin:20px auto;
-    background:rgba(255,255,255,.95);
-    padding:25px;
-    border-radius:15px;
-    box-shadow:0 5px 25px rgba(0,0,0,.1)
-}
-.btn{border:none;padding:10px 15px;border-radius:5px;cursor:pointer;color:#fff;font-weight:bold}
-.btn-main{background:var(--main-color);width:100%;font-size:16px}
-.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
-.form-grid div{display:flex;flex-direction:column}
-label{font-size:13px;font-weight:bold}
-input,select{padding:9px;border:1px solid #ccc;border-radius:5px;text-align:center}
-.no-print{display:block}
-@media print{.no-print{display:none}}
+:root{--main:#1b5e20}
+body{font-family:Segoe UI;background:#f4f4f9;margin:0;direction:rtl}
+.container{max-width:1300px;margin:20px auto;background:#fff;padding:25px;border-radius:15px}
+.btn{padding:8px 14px;border:none;border-radius:5px;color:#fff;cursor:pointer}
+.btn-main{background:var(--main);width:100%}
+.hidden{display:none}
+input,select{padding:8px;border:1px solid #ccc;border-radius:5px;width:100%}
+table{width:100%;border-collapse:collapse;margin-top:15px}
+th,td{border:1px solid #ccc;padding:6px;text-align:center;font-size:13px}
+th{background:#2e7d32;color:#fff}
 </style>
 </head>
 
 <body>
 
-<!-- ========== شاشة تسجيل الدخول ========== -->
-<div id="loginScreen" style="
-position:fixed;inset:0;
-background:#0d1b16;
-display:flex;
-align-items:center;
-justify-content:center;
-z-index:9999">
-
-<div style="
-background:#fff;
-padding:30px;
-border-radius:15px;
-width:320px;
-text-align:center;
-box-shadow:0 10px 30px rgba(0,0,0,.4)">
-
-<h3 style="color:#1b5e20;margin-bottom:15px">🔐 تسجيل الدخول</h3>
-<input id="loginUser" placeholder="اسم المستخدم" style="width:100%;margin-bottom:10px">
-<input id="loginPass" type="password" placeholder="كلمة المرور" style="width:100%;margin-bottom:15px">
+<!-- LOGIN -->
+<div id="login" style="position:fixed;inset:0;background:#0d1b16;display:flex;justify-content:center;align-items:center">
+<div style="background:#fff;padding:25px;border-radius:12px;width:300px;text-align:center">
+<h3>🔐 تسجيل الدخول</h3>
+<input id="lu" placeholder="المستخدم">
+<input id="lp" type="password" placeholder="كلمة المرور">
 <button class="btn btn-main" onclick="login()">دخول</button>
-<p id="loginErr" style="color:red;display:none;margin-top:10px">❌ بيانات الدخول غير صحيحة</p>
+<p id="le" style="color:red;display:none">خطأ بالبيانات</p>
 </div>
 </div>
 
-<!-- ========== النظام ========== -->
-<div class="container" id="formView" style="display:none">
+<!-- APP -->
+<div class="container hidden" id="app">
 
-<h2 style="text-align:center;color:var(--main-color)">نظام العديد المركزي - لواء 306</h2>
+<h2>نظام العديد المركزي</h2>
+<p id="who"></p>
 
 <form onsubmit="saveData(event)">
-<input type="hidden" id="editIdx" value="-1">
-
-<div class="form-grid">
-<div><label>ID</label><input id="idNo"></div>
-<div><label>الاسم الكامل</label><input id="fullName" required></div>
-<div><label>المواليد</label><input id="birthDate"></div>
-<div><label>محل التولد</label><input id="birthPlace"></div>
-<div><label>الجنس</label><input id="gender"></div>
-<div><label>اسم الأم</label><input id="motherName"></div>
-<div><label>رقم الهوية</label><input id="natId"></div>
-<div><label>الحالة الاجتماعية</label><input id="marital"></div>
-<div><label>اسم الزوجة</label><input id="spouse"></div>
-<div><label>عدد الأطفال</label><input id="kids"></div>
-<div><label>التحصيل الدراسي</label><input id="edu"></div>
-<div><label>التخصص</label><input id="spec"></div>
-<div><label>العمل</label><input id="job"></div>
-<div><label>المحافظة</label><input id="prov"></div>
-<div><label>القضاء</label><input id="dist"></div>
-<div><label>الناحية</label><input id="subDist"></div>
-<div><label>المنطقة</label><input id="region"></div>
-<div><label>المحلة</label><input id="mahala"></div>
-<div><label>الزقاق</label><input id="zuqaq"></div>
-<div><label>الدار</label><input id="dar"></div>
-<div><label>الهاتف</label><input id="phone"></div>
-<div><label>الفوج</label><input id="fowj"></div>
-<div><label>السرية</label><input id="sariyaNum"></div>
-<div><label>الصنف</label><input id="sanaf"></div>
-<div><label>الملاحظات</label><input id="notes"></div>
-</div>
-
-<button class="btn btn-main" type="submit">💾 حفظ</button>
+<input id="name" placeholder="الاسم الكامل" required>
+<input id="nid" placeholder="رقم الهوية">
+<input id="phone" placeholder="الهاتف">
+<input id="fowj" placeholder="الفوج">
+<button class="btn btn-main">حفظ</button>
 </form>
 
-<button onclick="logout()" class="btn" style="background:#444;margin-top:15px;width:100%">🚪 تسجيل خروج</button>
+<div style="margin-top:15px">
+<button onclick="showStats()" class="btn" style="background:#6a1b9a">📊 إحصائيات</button>
+<button onclick="logout()" class="btn" style="background:#444">🚪 خروج</button>
+</div>
 
+<table id="tbl"></table>
+
+</div>
+
+<!-- STATS -->
+<div id="stats" class="hidden" style="position:fixed;inset:0;background:#0008;display:flex;align-items:center;justify-content:center">
+<div style="background:#fff;padding:20px;border-radius:12px;width:400px">
+<div id="statsContent"></div>
+<button onclick="stats.classList.add('hidden')" class="btn" style="background:red;width:100%">إغلاق</button>
+</div>
 </div>
 
 <script>
-const fields=[
-"idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital",
-"spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala",
-"zuqaq","dar","phone","fowj","sariyaNum","sanaf","notes"
-];
-const DB_KEY="db_306_data";
+/* ====== إعدادات ====== */
+const DB="db306";
+const LOG="db306_logs";
+const USERS="db306_users";
+let currentUser=null;
+let lastActivity=Date.now();
 
-/* ===== تسجيل الدخول ===== */
-function login(){
-let u=loginUser.value;
-let p=loginPass.value;
-let su=localStorage.getItem("306_user")||"admin";
-let sp=localStorage.getItem("306_pass")||"1234";
-if(u===su && p===sp){
-loginScreen.style.display="none";
-formView.style.display="block";
-}else{
-loginErr.style.display="block";
-}
-}
-function logout(){
-location.reload();
+/* ====== تشفير ====== */
+async function hash(t){
+const e=new TextEncoder().encode(t);
+const h=await crypto.subtle.digest("SHA-256",e);
+return Array.from(new Uint8Array(h)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-/* ===== الحفظ ===== */
+/* ====== مستخدم افتراضي ====== */
+(async()=>{
+if(!localStorage.getItem(USERS)){
+localStorage.setItem(USERS,JSON.stringify([
+{u:"admin",p:await hash("1234"),r:"admin"}
+]));
+}
+})();
+
+/* ====== Login ====== */
+async function login(){
+const u=lu.value,p=lp.value;
+const users=JSON.parse(localStorage.getItem(USERS));
+const h=await hash(p);
+const f=users.find(x=>x.u===u&&x.p===h);
+if(!f){le.style.display="block";return;}
+currentUser=f;
+login.style.display="none";
+app.classList.remove("hidden");
+who.innerText=`👤 ${f.u} (${f.r})`;
+render();
+}
+
+/* ====== Logout + Timeout ====== */
+function logout(){location.reload();}
+setInterval(()=>{
+if(Date.now()-lastActivity>600000) logout();
+},10000);
+document.onclick=()=>lastActivity=Date.now();
+
+/* ====== حفظ ====== */
 function saveData(e){
 e.preventDefault();
-let db=JSON.parse(localStorage.getItem(DB_KEY)||"[]");
-let obj={};
-fields.forEach(f=>obj[f]=document.getElementById(f).value);
+if(currentUser.r==="viewer") return alert("غير مصرح");
+let db=JSON.parse(localStorage.getItem(DB)||"[]");
+if(db.some(x=>x.name===name.value&&x.nid===nid.value&&x.phone===phone.value))
+return alert("❌ سجل مكرر");
+let obj={name:name.value,nid:nid.value,phone:phone.value,fowj:fowj.value,status:"active"};
 db.push(obj);
-localStorage.setItem(DB_KEY,JSON.stringify(db));
-alert("تم الحفظ");
+localStorage.setItem(DB,JSON.stringify(db));
+log(`إضافة ${obj.name}`);
 e.target.reset();
+render();
+}
+
+/* ====== عرض ====== */
+function render(){
+let db=JSON.parse(localStorage.getItem(DB)||"[]");
+tbl.innerHTML="<tr><th>الاسم</th><th>الهوية</th><th>الهاتف</th><th>الفوج</th></tr>"+
+db.map(x=>`<tr><td>${x.name}</td><td>${x.nid}</td><td>${x.phone}</td><td>${x.fowj}</td></tr>`).join("");
+}
+
+/* ====== Logs ====== */
+function log(txt){
+let l=JSON.parse(localStorage.getItem(LOG)||"[]");
+l.push({u:currentUser.u,t:new Date().toLocaleString(),a:txt});
+localStorage.setItem(LOG,JSON.stringify(l));
+}
+
+/* ====== Stats ====== */
+function showStats(){
+let db=JSON.parse(localStorage.getItem(DB)||"[]");
+let byF={};
+db.forEach(x=>byF[x.fowj]=(byF[x.fowj]||0)+1);
+let h=`<h3>📊 الإحصائيات</h3><p>الكل: ${db.length}</p><ul>`;
+for(let k in byF) h+=`<li>${k||"غير محدد"}: ${byF[k]}</li>`;
+h+="</ul>";
+statsContent.innerHTML=h;
+stats.classList.remove("hidden");
 }
 </script>
 
