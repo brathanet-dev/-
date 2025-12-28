@@ -8,8 +8,21 @@
     body { font-family: Tahoma, sans-serif; margin:0; padding:0; background:#f4f4f9; }
     .page { max-width:1100px; margin:30px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
     h1 { text-align:center; color:var(--main-color); }
+    .form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+    label { font-weight:bold; font-size:13px; }
+    input { padding:6px; border:1px solid #ccc; border-radius:5px; }
     .btn { background:var(--main-color); color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; margin:5px; font-size:12px; }
     .hidden { display:none; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:6px; text-align:center; font-size:12px; }
+    th { background:#0277bd; color:#fff; }
+    @media print {
+      .no-print { display:none !important; }
+      input { display:none !important; }
+      .print-only { display:block !important; border-bottom:1px dashed #666; font-size:14px; font-weight:bold; color:#000; padding:5px 0; }
+      .print-watermark { display:block !important; position:fixed; top:30%; left:20%; width:60%; opacity:0.1; z-index:-1; }
+    }
+    .print-watermark { display:none; }
   </style>
 </head>
 <body>
@@ -27,4 +40,71 @@
 <!-- واجهة البيانات -->
 <div class="page hidden" id="dataPage">
   <h1>العديد المركزي - عديد لواء 306 ذي قار</h1>
-  <button class="btn" onclick="showSettings()">إعدادات</button>
+  <!-- بحث -->
+  <div class="no-print">
+    <label>بحث بالاسم:</label>
+    <input type="text" id="searchInput" onkeyup="searchNames()">
+    <div id="searchDropdown" style="border:1px solid #ccc; max-height:150px; overflow-y:auto; display:none; background:#fff; position:absolute;"></div>
+  </div>
+
+  <form id="mainForm">
+    <div class="form-grid">
+      <!-- جميع الحقول الـ 31 -->
+      <div><label>ID</label><input type="text" id="id"></div>
+      <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName"></div>
+      <div><label>المواليد</label><input type="date" id="birthDate"></div>
+      <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
+      <div><label>الجنس</label><input type="text" id="gender"></div>
+      <div><label>اسم الأم</label><input type="text" id="motherName"></div>
+      <div><label>رقم الهوية</label><input type="text" id="natId"></div>
+      <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
+      <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
+      <div><label>عدد الأطفال</label><input type="number" id="kids"></div>
+      <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
+      <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
+      <div><label>العمل/الوظيفة</label><input type="text" id="job"></div>
+      <div><label>المحافظة</label><input type="text" id="prov"></div>
+      <div><label>القضاء</label><input type="text" id="dist"></div>
+      <div><label>الناحية</label><input type="text" id="subDist"></div>
+      <div><label>المنطقة</label><input type="text" id="region"></div>
+      <div><label>المحلة</label><input type="text" id="mahala"></div>
+      <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
+      <div><label>الدار</label><input type="text" id="dar"></div>
+      <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
+      <div><label>رقم الهاتف</label><input type="text" id="phone"></div>
+      <div><label>اللواء</label><input type="text" id="brigade"></div>
+      <div><label>الفوج</label><input type="text" id="regiment"></div>
+      <div><label>رقم السرية</label><input type="text" id="companyNo"></div>
+      <div><label>الصنف</label><input type="text" id="class"></div>
+      <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
+      <div><label>المعرف</label><input type="text" id="ref"></div>
+      <div><label>هاتف المعرف</label><input type="text" id="refPhone"></div>
+      <div><label>الملاحظات</label><input type="text" id="notes"></div>
+      <div><label>اسم السرية</label><input type="text" id="companyName"></div>
+    </div>
+    <button type="button" class="btn no-print" onclick="saveData()">حفظ البيانات</button>
+    <button type="button" class="btn no-print" onclick="window.print()">طباعة</button>
+    <button type="button" class="btn no-print" onclick="showPunishments()">عقوبة</button>
+    <button type="button" class="btn no-print" onclick="showSettings()">إعدادات</button>
+  </form>
+
+  <!-- أدوات الفرز -->
+  <div class="no-print">
+    <label>فرز حسب الفوج:</label><input type="text" id="filterRegiment" onkeyup="filterTable('regiment')">
+    <label>فرز حسب رقم السرية:</label><input type="text" id="filterCompanyNo" onkeyup="filterTable('companyNo')">
+    <label>فرز حسب اسم السرية:</label><input type="text" id="filterCompanyName" onkeyup="filterTable('companyName')">
+  </div>
+
+  <!-- جدول القاعدة الرئيسية -->
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>ID</th><th>الاسم</th><th>المواليد</th><th>محل التولد</th><th>الجنس</th>
+        <th>اسم الأم</th><th>رقم الهوية</th><th>الحالة الاجتماعية</th><th>اسم الزوجة</th><th>عدد الأطفال</th>
+        <th>التحصيل</th><th>التخصص</th><th>الوظيفة</th><th>المحافظة</th><th>القضاء</th>
+        <th>الناحية</th><th>المنطقة</th><th>المحلة</th><th>الزقاق</th><th>الدار</th>
+        <th>النقطة الدالة</th><th>الهاتف</th><th>اللواء</th><th>الفوج</th><th>رقم السرية</th>
+        <th>الصنف</th><th>الخبرات</th><th>المعرف</th><th>هاتف المعرف</th><th>الملاحظات</th><th>اسم السرية</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
