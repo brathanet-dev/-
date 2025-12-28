@@ -118,4 +118,122 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 
 <script>
 const DB_KEY='db_306_data';
-const PEN_KEY='
+const PEN_KEY='db_306_pen';
+const fields=["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
+const labels=["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرات","المعرف","هاتف المعرف","الملاحظات","اسم السرية"];
+
+function showTab(id){
+  document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+}
+
+function saveData(e){
+  e.preventDefault();
+  let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
+  let data={}; fields.forEach(f=>data[f]=document.getElementById(f).value);
+  db.push(data);
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  e.target.reset();
+  alert("تم الحفظ بنجاح");
+  renderTable('DB');
+}
+
+function liveSearch(val){
+  const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
+  const drop=document.getElementById('searchDropdown');
+  if(!val){ drop.style.display='none'; return; }
+  let matches=db.filter(x=>x.fullName.includes(val));
+  drop.innerHTML=matches.map((m,i)=>`<div onclick="fillForm(${i})">${m.fullName}</div>`).join('');
+  drop.style.display=matches.length?'block':'none';
+}
+
+function fillForm(i){
+  const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
+  fields.forEach(f=>document.getElementById(f).value=db[i][f]||'');
+  document.getElementById('searchDropdown').style.display='none';
+}
+
+function renderTable(type){
+  const key=type==='PEN'?PEN_KEY:DB_KEY;
+  const table=document.getElementById(type==='PEN'?'tablePEN':'tableDB');
+  const search=document.getElementById(type==='PEN'?'searchPen':'searchDB').value.toLowerCase();
+  const fowj=document.getElementById(type==='PEN'?'filterFowjPen':'filterFowjDB').value;
+  const sNum=document.getElementById(type==='PEN'?'filterSNumPen':'filterSNumDB').value;
+  const sName=document.getElementById(type==='PEN'?'filterSNamePen':'filterSNameDB').value;
+  let db=JSON.parse(localStorage.getItem(key)||'[]');
+  db=db.filter(r=>{
+    return (!search||r.fullName.toLowerCase().includes(search)) &&
+           (!fowj||r.fowj===fowj) &&
+           (!sNum||r.sariyaNum===sNum) &&
+           (!sName||r.sariyaName===sName);
+  });
+  // الإحصائيات
+  const names=db.map(r=>r.fullName);
+  const dupNames=names.filter((v,i,a)=>a.indexOf(v)!==i);
+  document.getElementById(type==='PEN'?'statsPEN':'statsDB').innerText=`📊 الإحصائيات: إجمالي ${type==='PEN'?'المعاقبين':'الأفراد'}: ${db.length} | المكررات: ${dupNames.length}`;
+
+  table.querySelector('thead').innerHTML='<tr>'+labels.map(l=>`<th>${l}</th>`).join('')+(type==='PEN'?'<th>رفع العقوبة</th>':'')+'</tr>';
+  table.querySelector('tbody').innerHTML=db.map((r,i)=>{
+    let tds=fields.map(f=>`<td${dupNames.includes(r.fullName)?' class="duplicate"':''}>${r[f]||''}</td>`).join('');
+    if(type==='PEN') tds+=`<td><button class="btn btn-undo" onclick="undoPen(${i})">رفع العقوبة</button></td>`;
+    return `<tr>${tds}</tr>`;
+  }).join('');
+  populateFilters(type);
+}
+
+function populateFilters(type){
+  const key=type==='PEN'?PEN_KEY:DB_KEY;
+  const db=JSON.parse(localStorage.getItem(key)||'[]');
+  const fSet=[...new Set(db.map(r=>r.fowj).filter(x=>x))];
+  const sSet=[...new Set(db.map(r=>r.sariyaNum).filter(x=>x))];
+  const nSet=[...new Set(db.map(r=>r.sariyaName).filter(x=>x))];
+  document.getElementById(type==='PEN'?'filterFowjPen':'filterFowjDB').innerHTML='<option value="">كل الأفواج</option>'+fSet.map(x=>`<option>${x}</option>`).join('');
+  document.getElementById(type==='PEN'?'filterSNumPen':'filterSNumDB').innerHTML='<option value="">كل السرايا</option>'+sSet.map(x=>`<option>${x}</option>`).join('');
+  document.getElementById(type==='PEN'?'filterSNamePen':'filterSNameDB').innerHTML='<option value="">كل أسماء السرايا</option>'+nSet.map(x=>`<option>${x}</option>`).join('');
+}
+
+function exportCSV(type){
+  const key=type==='PEN'?PEN_KEY:DB_KEY;
+  const db=JSON.parse(localStorage.getItem(key)||'[]');
+  let csv="\uFEFF"+labels.join(",")+"\n"+db.map(r=>fields.map(f=>`"${r[f]||''}"`).join(",")).join("\n");
+  let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=(type==='PEN'?'العقوبات':'القاعدة_الكاملة')+".csv"; a.click();
+}
+
+function importCSV(input,type){
+  if(!input.files[0]) return;
+  let reader=new FileReader();
+  reader.onload=function(e){
+    let lines=e.target.result.split("\n");
+    let key=type==='PEN'?PEN_KEY:DB_KEY;
+    let db=JSON.parse(localStorage.getItem(key)||'[]');
+    lines.slice(1).forEach(line=>{
+      let cols=line.split(",");
+      if(cols.length>=fields.length){
+        let obj={};
+        fields.forEach((f,i)=>obj[f]=cols[i]?.replace(/"/g,'').trim());
+        db.push(obj);
+      }
+    });
+    localStorage.setItem(key,JSON.stringify(db));
+    renderTable(type);
+  };
+  reader.readAsText(input.files[0]);
+}
+
+function undoPen(i){
+  let pen=JSON.parse(localStorage.getItem(PEN_KEY)||'[]');
+  let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
+  db.push(pen[i]);
+  pen.splice(i,1);
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  localStorage.setItem(PEN_KEY,JSON.stringify(pen));
+  renderTable('PEN');
+  renderTable('DB');
+}
+
+window.onload=()=>{renderTable('DB');renderTable('PEN');};
+</script>
+</body>
+</html>
