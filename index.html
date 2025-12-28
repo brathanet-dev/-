@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <title>العديد المركزي - لواء 306</title>
     <style>
-        :root { --main-color: #1b5e20; --pen-color: #c62828; }
+        :root { --main-color: #1b5e20; --pen-color: #c62828; --dup-color: #ff0000; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
         
         #loginPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--main-color), #000); display: flex; justify-content: center; align-items: center; z-index: 10000; }
@@ -15,14 +15,18 @@
         
         .header-section { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; }
         .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { width: 80px; height: 80px; object-fit: contain; border-radius: 5px; }
+        .logo-img { width: 90px; height: 90px; object-fit: contain; }
         
         .form-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
         .form-grid div { display: flex; flex-direction: column; }
         label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #444; text-align: center; }
-        input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; text-align: center; background: white; }
-        textarea { grid-column: span 5; height: 60px; }
+        input, select, textarea { padding: 10px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; text-align: center; background: white; transition: background 0.3s; }
+        
+        /* تلوين الحقول المتكررة */
+        .duplicate-highlight { background-color: var(--dup-color) !important; color: white !important; }
+        .duplicate-highlight::placeholder { color: #eee; }
 
+        textarea { grid-column: span 5; height: 60px; }
         .btn { border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 5px; }
         .btn-main { background: var(--main-color); width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; }
         
@@ -75,7 +79,7 @@
         <form id="mainForm" onsubmit="saveData(event)">
             <input type="hidden" id="editIdx" value="-1">
             <div class="form-grid" id="fieldsContainer"></div>
-            <button type="submit" class="btn btn-main no-print">حفظ البيانات</button>
+            <button type="submit" id="saveBtn" class="btn btn-main no-print">حفظ البيانات</button>
         </form>
 
         <div class="action-bar no-print">
@@ -146,11 +150,45 @@
 
     const cont = document.getElementById('fieldsContainer');
     fNames.forEach((f, i) => {
-        cont.innerHTML += `<div><label>${fLabels[i]}</label><input type="text" id="${f}"></div>`;
+        let inputHTML = `<input type="text" id="${f}" onkeyup="checkDuplicate()">`;
+        if (f === "fullName" || f === "natId") {
+            inputHTML = `<input type="text" id="${f}" onkeyup="checkDuplicate()" placeholder="مطلوب للمطابقة">`;
+        }
+        cont.innerHTML += `<div><label>${fLabels[i]}</label>${inputHTML}</div>`;
     });
 
     let currentMode = 'active';
     let currentIdx = -1;
+
+    // وظيفة التحقق من التكرار
+    function checkDuplicate() {
+        const nameVal = document.getElementById('fullName').value.trim();
+        const idVal = document.getElementById('natId').value.trim();
+        const editIdx = document.getElementById('editIdx').value;
+        
+        if (nameVal === "" && idVal === "") {
+            clearDuplicateUI();
+            return;
+        }
+
+        let db = JSON.parse(localStorage.getItem('db_306') || '[]');
+        let isDup = db.some((item, index) => {
+            if (index.toString() === editIdx) return false;
+            return (nameVal !== "" && item.fullName === nameVal) || (idVal !== "" && item.natId === idVal);
+        });
+
+        if (isDup) {
+            document.getElementById('fullName').classList.add('duplicate-highlight');
+            document.getElementById('natId').classList.add('duplicate-highlight');
+        } else {
+            clearDuplicateUI();
+        }
+    }
+
+    function clearDuplicateUI() {
+        document.getElementById('fullName').classList.remove('duplicate-highlight');
+        document.getElementById('natId').classList.remove('duplicate-highlight');
+    }
 
     function login() {
         const u = document.getElementById('uInp').value;
@@ -182,13 +220,14 @@
         document.getElementById('mainForm').reset();
         document.getElementById('editIdx').value = "-1";
         document.getElementById('tools').style.display = 'none';
+        clearDuplicateUI();
     }
 
     function liveSearch(val) {
         const drop = document.getElementById('searchDropdown');
         if(val.length < 1) { drop.style.display = 'none'; return; }
         let db = JSON.parse(localStorage.getItem(currentMode === 'active' ? 'db_306' : 'pen_306') || '[]');
-        let res = db.filter(i => i.fullName.includes(val) || i.idNo.includes(val));
+        let res = db.filter(i => (i.fullName && i.fullName.includes(val)) || (i.idNo && i.idNo.includes(val)));
         drop.innerHTML = '';
         res.forEach((item) => {
             let d = document.createElement('div');
@@ -210,6 +249,7 @@
         document.getElementById('editIdx').value = idx;
         document.getElementById('tools').style.display = 'flex';
         document.getElementById('moveBtn').innerText = currentMode === 'active' ? '⚖️ ترحيل للعقوبات' : '✅ إزالة العقوبة';
+        checkDuplicate();
     }
 
     function switchMode() {
@@ -218,6 +258,7 @@
         document.getElementById('modeBtn').innerText = currentMode === 'active' ? "انتقال لسجل العقوبات ⚖️" : "العودة للنشط ✅";
         document.getElementById('mainForm').reset();
         document.getElementById('tools').style.display = 'none';
+        clearDuplicateUI();
     }
 
     function moveRecord() {
