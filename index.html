@@ -10,14 +10,7 @@ body{font-family:'Segoe UI',Tahoma;background:#0d1b16;margin:0;direction:rtl;col
 .container{max-width:1200px;margin:20px auto;background:#fff;padding:25px;border-radius:15px}
 .btn{padding:10px;border:none;border-radius:6px;cursor:pointer;color:#fff;font-weight:bold;transition:0.3s}
 .btn-main{background:var(--main);width:100%}
-.hidden{display:none}
 input{padding:10px;width:100%;border:1px solid #ccc;border-radius:6px;margin-bottom:10px}
-
-/* LOGIN */
-#loginScreen{position:fixed;inset:0;background:rgba(0,0,0,.9);display:flex;justify-content:center;align-items:center;z-index:9999;padding:15px}
-.login-box{background:#fff;width:100%;max-width:360px;padding:25px;border-radius:15px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.4)}
-.login-box h3{margin-bottom:15px;color:var(--main)}
-#loginErr{display:none;background:#c62828;color:#fff;padding:8px;border-radius:6px;margin-top:10px;font-size:14px}
 
 /* TABLE */
 table{width:100%;border-collapse:collapse;margin-top:15px}
@@ -27,27 +20,14 @@ th{background:#2e7d32;color:#fff}
 /* MODALS */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:flex;justify-content:center;align-items:center;z-index:9999;padding:15px}
 .modal-content{background:#fff;padding:20px;border-radius:12px;width:100%;max-width:400px}
-.modal-content h3{margin-top:0}
 .modal-close{background:#555;width:100%;margin-top:10px;border-radius:6px}
 </style>
 </head>
 <body>
 
-<!-- LOGIN SCREEN -->
-<div id="loginScreen">
-  <div class="login-box">
-    <h3>🔐 تسجيل الدخول</h3>
-    <input id="loginUser" placeholder="اسم المستخدم">
-    <input id="loginPass" type="password" placeholder="كلمة المرور">
-    <button class="btn btn-main" onclick="login()">دخول</button>
-    <div id="loginErr"></div>
-  </div>
-</div>
-
 <!-- SYSTEM -->
-<div class="container hidden" id="app">
+<div class="container" id="app">
   <h2 style="color:var(--main)">نظام العديد المركزي - لواء 306</h2>
-  <p id="who"></p>
   <form onsubmit="saveData(event)">
     <input id="name" placeholder="الاسم الكامل" required>
     <input id="nid" placeholder="رقم الهوية">
@@ -57,7 +37,6 @@ th{background:#2e7d32;color:#fff}
   </form>
   <div style="margin-top:15px">
     <button onclick="showStats()" class="btn btn-main" style="background:#6a1b9a">📊 إحصائيات</button>
-    <button onclick="logout()" class="btn btn-main" style="background:#444">🚪 تسجيل خروج</button>
   </div>
   <table id="tbl"></table>
 </div>
@@ -71,47 +50,9 @@ th{background:#2e7d32;color:#fff}
 </div>
 
 <script>
-/* ===== USERS & PERMISSIONS ===== */
-const USERS = [
-  { u: "admin", p: "1234", r: "admin" },
-  { u: "editor", p: "123", r: "editor" },
-  { u: "viewer", p: "111", r: "viewer" }
-];
-let currentUser=null;
-
-/* ===== LOGIN ===== */
-function login() {
-  const u = loginUser.value.trim();
-  const p = loginPass.value.trim();
-  const err = document.getElementById("loginErr");
-  err.style.display = "none";
-
-  if(!u||!p){
-    err.innerText="يرجى إدخال اسم المستخدم وكلمة المرور";
-    err.style.display="block"; return;
-  }
-
-  const f = USERS.find(x => x.u === u && x.p === p);
-  if(!f){
-    err.innerText="❌ بيانات الدخول غير صحيحة";
-    err.style.display="block"; return;
-  }
-
-  currentUser=f;
-  document.getElementById("loginScreen").style.display="none";
-  document.getElementById("app").classList.remove("hidden");
-  document.getElementById("who").innerText=`👤 ${f.u} (${f.r})`;
-  render();
-}
-
-/* ===== LOGOUT ===== */
-function logout(){location.reload();}
-
-/* ===== SAVE ===== */
+/* ===== SAVE DATA ===== */
 function saveData(e){
   e.preventDefault();
-  if(currentUser.r==="viewer"){alert("غير مصرح"); return;}
-
   let db=JSON.parse(localStorage.getItem("db306")||"[]");
 
   // منع التكرار
@@ -131,7 +72,7 @@ function saveData(e){
   render();
 }
 
-/* ===== RENDER ===== */
+/* ===== RENDER TABLE ===== */
 function render(){
   let db=JSON.parse(localStorage.getItem("db306")||"[]");
   tbl.innerHTML=
@@ -144,7 +85,7 @@ function render(){
     </tr>`).join("");
 }
 
-/* ===== STATS ===== */
+/* ===== SHOW STATS ===== */
 function showStats(){
   let db=JSON.parse(localStorage.getItem("db306")||"[]");
   let byF={};
@@ -155,6 +96,9 @@ function showStats(){
   statsContent.innerHTML=h;
   stats.classList.remove("hidden");
 }
+
+// تهيئة الجدول عند فتح الصفحة
+render();
 </script>
 
 </body>
