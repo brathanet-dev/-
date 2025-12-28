@@ -7,19 +7,16 @@
         :root { --main-color: #1b5e20; --pen-color: #c62828; }
         body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
         
-        /* واجهة الدخول */
         #loginPage { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, var(--main-color), #000); display: flex; justify-content: center; align-items: center; z-index: 10000; }
         .login-card { background: white; padding: 35px; border-radius: 15px; width: 340px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .login-card input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
 
         .container { max-width: 1300px; margin: 20px auto; background: rgba(255, 255, 255, 0.95); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; }
         
-        /* الهيدر الجديد */
         .header-section { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; }
         .logo-area { display: flex; align-items: center; gap: 15px; }
-        .logo-img { width: 60px; height: 60px; object-fit: contain; border-radius: 5px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .logo-img { width: 80px; height: 80px; object-fit: contain; border-radius: 5px; }
         
-        /* شبكة الحقول */
         .form-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; margin-bottom: 20px; }
         .form-grid div { display: flex; flex-direction: column; }
         label { font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #444; text-align: center; }
@@ -32,7 +29,6 @@
         .action-bar { background: #f8f9fa; padding: 20px; border-radius: 10px; margin-top: 20px; border: 1px solid #ddd; }
         .button-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
 
-        /* المودالات */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 20000; overflow-y: auto; }
         .modal-content { background: white; margin: 3% auto; padding: 25px; width: 50%; border-radius: 15px; position: relative; }
         .close-btn { position: absolute; left: 20px; top: 20px; cursor: pointer; font-size: 20px; font-weight: bold; }
@@ -48,7 +44,7 @@
             .form-grid { grid-template-columns: repeat(4, 1fr); border: 1px solid #000; }
             .form-grid div { border: 0.5px solid #000; padding: 5px; }
             input { border: none !important; font-weight: bold; }
-            .watermark-print { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) rotate(-30deg); font-size: 70px; color: rgba(0,0,0,0.05); z-index: -1; pointer-events: none; white-space: nowrap; }
+            .watermark-img { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 70%; opacity: 0.1; z-index: -1; pointer-events: none; }
         }
     </style>
 </head>
@@ -114,28 +110,21 @@
     <div class="modal-content">
         <span class="close-btn" onclick="closeMod('settMod')">×</span>
         <h3 style="border-bottom:2px solid var(--main-color); padding-bottom:10px;">⚙️ إعدادات النظام المتقدمة</h3>
-        
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px; text-align:right; margin-top:15px;">
             <div style="border:1px solid #eee; padding:15px; border-radius:10px;">
                 <h4>تغيير بيانات الدخول</h4>
-                <input type="text" id="oldUser" placeholder="اسم المستخدم الحالي" style="width:100%">
-                <input type="password" id="oldPass" placeholder="كلمة المرور الحالية" style="width:100%">
-                <hr>
-                <input type="text" id="newUser" placeholder="اسم المستخدم الجديد" style="width:100%">
+                <input type="text" id="oldUser" placeholder="اسم المستخدم الحالي" style="width:100%"><br>
+                <input type="password" id="oldPass" placeholder="كلمة المرور الحالية" style="width:100%"><hr>
+                <input type="text" id="newUser" placeholder="اسم المستخدم الجديد" style="width:100%"><br>
                 <input type="password" id="newPass" placeholder="كلمة المرور الجديدة" style="width:100%">
                 <button onclick="updateAuth()" class="btn" style="background:var(--main-color); width:100%; margin-top:10px;">تحديث بيانات الحساب</button>
             </div>
-            
             <div style="border:1px solid #eee; padding:15px; border-radius:10px;">
-                <h4>المظهر والطباعة</h4>
+                <h4>المظهر والعلامة المائية</h4>
                 <label>لون النظام الرئيسي:</label>
-                <input type="color" id="colorPicker" onchange="changeColor(this.value)" style="width:100%; height:40px; cursor:pointer">
-                <br><br>
-                <label>صورة الخلفية:</label>
+                <input type="color" id="colorPicker" onchange="changeColor(this.value)" style="width:100%; height:40px; cursor:pointer"><br><br>
+                <label>صورة الخلفية (والعلامة المائية):</label>
                 <input type="file" onchange="updateBg(this)" style="width:100%">
-                <br><br>
-                <label>العلامة المائية للطباعة:</label>
-                <input type="text" id="wmInput" placeholder="اكتب نص العلامة المائية" onkeyup="updateWM(this.value)" style="width:100%">
             </div>
         </div>
     </div>
@@ -149,11 +138,11 @@
     </div>
 </div>
 
-<div id="watermarkArea" class="watermark-print">لواء 306 - شؤون المنتسبين</div>
+<img id="printWM" class="watermark-img" src="" alt="">
 
 <script>
     const fNames = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","cat","exp","refN","refP","sariyaName","notes"];
-    const fLabels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة","الزوج/ة","الأطفال","التحصيل","التخصص","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","الدالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرة","المعرف","هاتف المعرف","السرية2","ملاحظات"];
+    const fLabels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرات العسكرية","المعرف","هاتف المعرف","اسم السرية","ملاحظات"];
 
     const cont = document.getElementById('fieldsContainer');
     fNames.forEach((f, i) => {
@@ -167,7 +156,6 @@
         const u = document.getElementById('uInp').value;
         const p = document.getElementById('pInp').value;
         const auth = JSON.parse(localStorage.getItem('306_auth')) || {u:'admin', p:'1234'};
-        
         if (p === 'RESET306' || (u === auth.u && p === auth.p)) {
             sessionStorage.setItem('isLoggedIn', 'true');
             showMain();
@@ -187,10 +175,8 @@
         let key = currentMode === 'active' ? 'db_306' : 'pen_306';
         let db = JSON.parse(localStorage.getItem(key) || '[]');
         let data = {}; fNames.forEach(f => data[f] = document.getElementById(f).value);
-        
         let idx = document.getElementById('editIdx').value;
         if(idx === "-1") db.push(data); else db[idx] = data;
-
         localStorage.setItem(key, JSON.stringify(db));
         alert("تم حفظ البيانات");
         document.getElementById('mainForm').reset();
@@ -277,21 +263,21 @@
     function updateBg(input) {
         let r = new FileReader();
         r.onload = (e) => {
-            document.body.style.backgroundImage = `url(${e.target.result})`;
-            localStorage.setItem('306_theme_bg', e.target.result);
+            const imgData = e.target.result;
+            document.body.style.backgroundImage = `url(${imgData})`;
+            document.getElementById('printWM').src = imgData;
+            localStorage.setItem('306_theme_bg', imgData);
         };
         r.readAsDataURL(input.files[0]);
     }
 
-    function updateWM(val) {
-        document.getElementById('watermarkArea').innerText = val;
-        localStorage.setItem('306_wm', val);
-    }
-
     function applySavedStyles() {
         const c = localStorage.getItem('306_theme_color'); if(c) changeColor(c);
-        const bg = localStorage.getItem('306_theme_bg'); if(bg) document.body.style.backgroundImage = `url(${bg})`;
-        const wm = localStorage.getItem('306_wm'); if(wm) updateWM(wm);
+        const bg = localStorage.getItem('306_theme_bg'); 
+        if(bg) {
+            document.body.style.backgroundImage = `url(${bg})`;
+            document.getElementById('printWM').src = bg;
+        }
     }
 
     function exportData() {
