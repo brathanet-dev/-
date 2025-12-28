@@ -2,215 +2,120 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>نظام العديد المركزي - لواء 306</title>
 <style>
-:root { --main-color: #1b5e20; --db-color: #0277bd; --pen-color: #c62828; }
-body { font-family:'Segoe UI', Tahoma, sans-serif; margin:0; padding:0; background:#f4f4f9; direction:rtl; }
-.container { max-width:1350px; margin:20px auto; background:rgba(255,255,255,0.95); padding:25px; border-radius:15px; box-shadow:0 5px 25px rgba(0,0,0,0.1); }
-h2 { text-align:center; color:var(--main-color); margin:0 0 20px 0; }
-.form-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px; }
-.form-grid div { display:flex; flex-direction:column; }
-label { font-size:13px; font-weight:bold; margin-bottom:4px; color:#333; }
-input, select { padding:10px; border:1px solid #ccc; border-radius:5px; text-align:center; font-size:14px; }
-.btn { border:none; padding:10px 15px; border-radius:5px; cursor:pointer; color:white; font-weight:bold; transition:0.3s; font-size:13px; }
-.btn-main { background:var(--main-color); width:100%; font-size:16px; padding:12px; }
-.search-item { padding:10px; cursor:pointer; border-bottom:1px solid #eee; text-align:right; }
-.search-item:hover { background:#f0f0f0; }
-.table-wrapper { width:100%; overflow-x:auto; margin-top:15px; border:1px solid #ddd; }
-.db-table { width:100%; border-collapse:collapse; min-width:1400px; }
-.db-table th { background:var(--db-color); color:white; padding:10px; border:1px solid #ddd; position:sticky; top:0; }
-.db-table td { padding:8px; border:1px solid #ddd; text-align:center; font-size:13px; }
-.modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:2000; }
-.modal-content { background:white; margin:5% auto; padding:25px; width:45%; border-radius:15px; max-height:85vh; overflow-y:auto; }
-.dropdown { position:absolute; background:white; border:1px solid #ddd; max-height:200px; overflow-y:auto; display:none; z-index:1000; width:100%; }
-.dropdown div { padding:10px; cursor:pointer; border-bottom:1px solid #eee; }
-.dropdown div:hover { background:#f0f0f0; }
-@media print {
-  .no-print { display:none !important; }
-  .container { width:100%; box-shadow:none; border:none; margin:0; padding:0; }
-  .form-grid { grid-template-columns:1fr 1fr !important; gap:5px; }
-  .form-grid div { border-bottom:1px solid #eee; }
-  input { border:none !important; background:transparent !important; text-align:right !important; font-weight:bold; }
-}
+body{font-family:'Segoe UI',Tahoma,sans-serif;margin:0;padding:0;background:#f4f4f9;direction:rtl;}
+.container{max-width:1400px;margin:20px auto;background:rgba(255,255,255,0.95);padding:25px;border-radius:15px;box-shadow:0 5px 25px rgba(0,0,0,0.1);}
+h2{text-align:center;color:#1b5e20;margin:0 0 20px 0;}
+.tabs{display:flex;gap:10px;margin-bottom:20px;}
+.tab-btn{padding:10px 15px;border:none;border-radius:5px;background:#333;color:white;cursor:pointer;font-weight:bold;transition:.3s;}
+.tab-btn.active{background:#1b5e20;}
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+.form-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.form-grid div{display:flex;flex-direction:column;}
+label{font-size:13px;font-weight:bold;margin-bottom:4px;color:#333;}
+input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:center;font-size:14px;}
+.btn{border:none;padding:8px 12px;border-radius:5px;cursor:pointer;color:white;font-weight:bold;margin:0 5px 10px 0;}
+.btn-main{background:#1b5e20;}
+.btn-export{background:#2e7d32;}
+.btn-import{background:#1565c0;}
+.btn-pen{background:#c62828;}
+.btn-undo{background:#6a1b9a;}
+.dropdown{position:absolute;background:white;border:1px solid #ddd;max-height:200px;overflow-y:auto;display:none;width:100%;z-index:1000;}
+.dropdown div{padding:10px;cursor:pointer;border-bottom:1px solid #eee;}
+.dropdown div:hover{background:#f0f0f0;}
+.table-wrapper{width:100%;overflow-x:auto;margin-top:15px;border:1px solid #ddd;}
+.db-table{width:100%;border-collapse:collapse;min-width:1200px;}
+.db-table th{background:#0277bd;color:white;padding:10px;border:1px solid #ddd;position:sticky;top:0;}
+.db-table td{padding:6px;border:1px solid #ddd;text-align:center;font-size:13px;}
+.duplicate{color:red;font-weight:bold;}
+.stats{margin-bottom:10px;padding:10px;background:#eee;border-radius:8px;font-weight:bold;}
 </style>
 </head>
 <body>
-
 <div class="container">
-  <h2>نظام العديد المركزي - لواء 306</h2>
+<h2>نظام العديد المركزي - لواء 306</h2>
 
-  <!-- FORM -->
-  <form id="mainForm" onsubmit="saveData(event); return false;">
-    <div class="form-grid" id="formFields">
-      <div><label>ID</label><input type="text" id="idNo"></div>
-      <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" onkeyup="liveSearch(this.value)" required></div>
-      <div><label>المواليد</label><input type="text" id="birthDate"></div>
-      <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
-      <div><label>الجنس</label><input type="text" id="gender"></div>
-      <div><label>اسم الأم</label><input type="text" id="motherName"></div>
-      <div><label>رقم الهوية</label><input type="text" id="natId"></div>
-      <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
-      <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
-      <div><label>عدد الاطفال</label><input type="text" id="kids"></div>
-      <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
-      <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
-      <div><label>العمل</label><input type="text" id="job"></div>
-      <div><label>المحافظة</label><input type="text" id="prov"></div>
-      <div><label>القضاء</label><input type="text" id="dist"></div>
-      <div><label>الناحية</label><input type="text" id="subDist"></div>
-      <div><label>المنطقة</label><input type="text" id="region"></div>
-      <div><label>المحلة</label><input type="text" id="mahala"></div>
-      <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
-      <div><label>الدار</label><input type="text" id="dar"></div>
-      <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
-      <div><label>الهاتف</label><input type="text" id="phone"></div>
-      <div><label>اللواء</label><input type="text" id="brigade"></div>
-      <div><label>الفوج</label><input type="text" id="fowj"></div>
-      <div><label>السرية (رقم)</label><input type="text" id="sariyaNum"></div>
-      <div><label>الصنف</label><input type="text" id="sanaf"></div>
-      <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
-      <div><label>المعرف</label><input type="text" id="refN"></div>
-      <div><label>هاتف المعرف</label><input type="text" id="refP"></div>
-      <div style="grid-column: span 2;"><label>الملاحظات</label><input type="text" id="notes"></div>
-      <div style="grid-column: span 2;"><label>اسم السرية</label><input type="text" id="sariyaName"></div>
-    </div>
-    <button type="submit" class="btn btn-main">💾 حفظ البيانات</button>
-  </form>
+<div class="tabs">
+<button class="tab-btn active" onclick="showTab('tabForm')">📝 إدخال البيانات</button>
+<button class="tab-btn" onclick="showTab('tabDB')">📋 القاعدة الأساسية</button>
+<button class="tab-btn" onclick="showTab('tabPen')">⚖️ العقوبات</button>
+</div>
 
-  <!-- DROPDOWN SEARCH -->
-  <div id="searchDropdown" class="dropdown"></div>
+<!-- تبويب إدخال البيانات -->
+<div id="tabForm" class="tab-content active">
+<form id="mainForm" onsubmit="saveData(event); return false;">
+<div class="form-grid">
+  <div><label>ID</label><input type="text" id="idNo"></div>
+  <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required onkeyup="liveSearch(this.value)"></div>
+  <div><label>المواليد</label><input type="text" id="birthDate"></div>
+  <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
+  <div><label>الجنس</label><input type="text" id="gender"></div>
+  <div><label>اسم الأم</label><input type="text" id="motherName"></div>
+  <div><label>رقم الهوية</label><input type="text" id="natId"></div>
+  <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
+  <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
+  <div><label>عدد الاطفال</label><input type="text" id="kids"></div>
+  <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
+  <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
+  <div><label>العمل</label><input type="text" id="job"></div>
+  <div><label>المحافظة</label><input type="text" id="prov"></div>
+  <div><label>القضاء</label><input type="text" id="dist"></div>
+  <div><label>الناحية</label><input type="text" id="subDist"></div>
+  <div><label>المنطقة</label><input type="text" id="region"></div>
+  <div><label>المحلة</label><input type="text" id="mahala"></div>
+  <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
+  <div><label>الدار</label><input type="text" id="dar"></div>
+  <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
+  <div><label>الهاتف</label><input type="text" id="phone"></div>
+  <div><label>اللواء</label><input type="text" id="brigade"></div>
+  <div><label>الفوج</label><input type="text" id="fowj"></div>
+  <div><label>السرية (رقم)</label><input type="text" id="sariyaNum"></div>
+  <div><label>الصنف</label><input type="text" id="sanaf"></div>
+  <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
+  <div><label>المعرف</label><input type="text" id="refN"></div>
+  <div><label>هاتف المعرف</label><input type="text" id="refP"></div>
+  <div style="grid-column: span 2;"><label>الملاحظات</label><input type="text" id="notes"></div>
+  <div style="grid-column: span 2;"><label>اسم السرية</label><input type="text" id="sariyaName"></div>
+</div>
+<button type="submit" class="btn btn-main">💾 حفظ البيانات</button>
+</form>
+<div id="searchDropdown" class="dropdown"></div>
+</div>
 
-  <!-- ACTIONS -->
-  <div style="margin-top:20px; display:flex; gap:8px; flex-wrap:wrap;">
-    <button onclick="showTable('db')" class="btn btn-main">📋 القاعدة الأساسية</button>
-    <button onclick="showTable('pen')" class="btn" style="background:var(--pen-color)">⚖️ العقوبات</button>
-  </div>
+<!-- تبويب القاعدة الأساسية -->
+<div id="tabDB" class="tab-content">
+<div class="stats" id="statsDB">📊 الإحصائيات: إجمالي الأفراد: 0 | المكررات: 0</div>
+<input type="text" id="searchDB" placeholder="بحث سريع" onkeyup="renderTable('DB')">
+<select id="filterFowjDB" onchange="renderTable('DB')"><option value="">كل الأفواج</option></select>
+<select id="filterSNumDB" onchange="renderTable('DB')"><option value="">كل السرايا</option></select>
+<select id="filterSNameDB" onchange="renderTable('DB')"><option value="">كل أسماء السرايا</option></select>
+<button onclick="exportCSV('DB')" class="btn btn-export">تصدير CSV</button>
+<input type="file" id="importFileDB" style="display:none" accept=".csv" onchange="importCSV(this,'DB')">
+<button onclick="document.getElementById('importFileDB').click()" class="btn btn-import">استيراد CSV</button>
+<div class="table-wrapper">
+<table class="db-table" id="tableDB"><thead></thead><tbody></tbody></table>
+</div>
+</div>
 
-  <!-- TABLE & CONTROLS -->
-  <div id="tableControls" style="margin-top:15px; display:flex; gap:5px; flex-wrap:wrap; display:none;">
-    <input type="text" id="tableSearch" placeholder="بحث داخل الجدول..." onkeyup="tableFilter()" style="flex:1">
-    <button onclick="exportFullData()" class="btn" style="background:#2e7d32">تصدير CSV</button>
-    <input type="file" id="importFile" style="display:none" accept=".csv" onchange="importCSV(this)">
-    <button onclick="document.getElementById('importFile').click()" class="btn" style="background:#1565c0">استيراد CSV</button>
-  </div>
+<!-- تبويب العقوبات -->
+<div id="tabPen" class="tab-content">
+<div class="stats" id="statsPEN">📊 الإحصائيات: إجمالي المعاقبين: 0 | المكررات: 0</div>
+<input type="text" id="searchPen" placeholder="بحث سريع" onkeyup="renderTable('PEN')">
+<select id="filterFowjPen" onchange="renderTable('PEN')"><option value="">كل الأفواج</option></select>
+<select id="filterSNumPen" onchange="renderTable('PEN')"><option value="">كل السرايا</option></select>
+<select id="filterSNamePen" onchange="renderTable('PEN')"><option value="">كل أسماء السرايا</option></select>
+<button onclick="exportCSV('PEN')" class="btn btn-export">تصدير CSV</button>
+<input type="file" id="importFilePen" style="display:none" accept=".csv" onchange="importCSV(this,'PEN')">
+<button onclick="document.getElementById('importFilePen').click()" class="btn btn-import">استيراد CSV</button>
+<div class="table-wrapper">
+<table class="db-table" id="tablePEN"><thead></thead><tbody></tbody></table>
+</div>
+</div>
 
-  <div class="table-wrapper" style="margin-top:15px;">
-    <table class="db-table" id="dbTable"><thead></thead><tbody></tbody></table>
-  </div>
 </div>
 
 <script>
-const fields = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
-const labels = ["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرات","المعرف","هاتف المعرف","الملاحظات","اسم السرية"];
 const DB_KEY='db_306_data';
-const PEN_KEY='db_306_pen';
-let currentTable='db';
-
-// حفظ البيانات
-function saveData(e){
-  e.preventDefault();
-  let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
-  let data={};
-  fields.forEach(f=>data[f]=document.getElementById(f).value);
-  if(db.some(x=>x.fullName===data.fullName)) { alert('❌ سجل مكرر'); return; }
-  db.push(data);
-  localStorage.setItem(DB_KEY,JSON.stringify(db));
-  e.target.reset();
-  renderTable();
-}
-
-// بحث سريع مع Dropdown
-function liveSearch(val){
-  const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
-  const drop=document.getElementById('searchDropdown');
-  if(!val){ drop.style.display='none'; return; }
-  let matches=db.filter(x=>x.fullName.includes(val));
-  drop.innerHTML=matches.map((m,i)=>`<div onclick="fillForm(${i})">${m.fullName}</div>`).join('');
-  drop.style.display=matches.length? 'block':'none';
-}
-function fillForm(i){
-  const db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
-  fields.forEach(f=>document.getElementById(f).value=db[i][f]||'');
-  document.getElementById('searchDropdown').style.display='none';
-}
-
-// عرض الجدول (db أو pen)
-function showTable(type){
-  currentTable=type;
-  document.getElementById('tableControls').style.display='flex';
-  renderTable();
-}
-
-// عرض الجدول
-function renderTable(){
-  let key=currentTable==='db'?DB_KEY:PEN_KEY;
-  const db=JSON.parse(localStorage.getItem(key)||'[]');
-  let thead='<tr>';
-  if(currentTable==='pen') thead+='<th>إجراء</th>';
-  thead+=labels.map(l=>`<th>${l}</th>`).join('')+'</tr>';
-  let tbody=db.map((r,i)=>{
-    let row='';
-    if(currentTable==='pen') row+=`<td><button onclick="undoPenalty(${i})" style="background:#6a1b9a;color:white;border:none;padding:4px;">رفع العقوبة</button></td>`;
-    row+=fields.map(f=>`<td>${r[f]||''}</td>`).join('');
-    return '<tr>'+row+'</tr>';
-  }).join('');
-  document.querySelector('#dbTable thead').innerHTML=thead;
-  document.querySelector('#dbTable tbody').innerHTML=tbody;
-}
-
-// رفع العقوبة
-function undoPenalty(i){
-  let pen=JSON.parse(localStorage.getItem(PEN_KEY)||'[]');
-  let db=JSON.parse(localStorage.getItem(DB_KEY)||'[]');
-  db.push(pen[i]);
-  pen.splice(i,1);
-  localStorage.setItem(DB_KEY,JSON.stringify(db));
-  localStorage.setItem(PEN_KEY,JSON.stringify(pen));
-  renderTable();
-}
-
-// تصدير CSV
-function exportFullData(){
-  let key=currentTable==='db'?DB_KEY:PEN_KEY;
-  let db=JSON.parse(localStorage.getItem(key)||'[]');
-  let csv="\uFEFF"+labels.join(",")+"\n"+db.map(r=>fields.map(f=>`"${r[f]||''}"`).join(",")).join("\n");
-  let blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
-  let a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=(currentTable==='db'?'القاعدة_كاملة':'العقوبات')+".csv"; a.click();
-}
-
-// استيراد CSV
-function importCSV(input){
-  if(!input.files[0]) return;
-  let reader=new FileReader();
-  reader.onload=function(e){
-    let lines=e.target.result.split("\n");
-    let key=currentTable==='db'?DB_KEY:PEN_KEY;
-    let db=JSON.parse(localStorage.getItem(key)||'[]');
-    lines.slice(1).forEach(line=>{
-      let cols=line.split(",");
-      if(cols.length>=fields.length){
-        let obj={};
-        fields.forEach((f,i)=>obj[f]=cols[i]?.replace(/"/g,'').trim());
-        db.push(obj);
-      }
-    });
-    localStorage.setItem(key,JSON.stringify(db));
-    renderTable();
-  };
-  reader.readAsText(input.files[0]);
-}
-
-// فلترة الجدول
-function tableFilter(){
-  let term=document.getElementById('tableSearch').value.toLowerCase();
-  document.querySelectorAll('#dbTable tbody tr').forEach(row=>{
-    row.style.display=row.innerText.toLowerCase().includes(term)?'':'none';
-  });
-}
-
-// تهيئة الجدول عند فتح الصفحة
-renderTable();
-</script>
-</body>
-</html>
+const PEN_KEY='
