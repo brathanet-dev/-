@@ -1,275 +1,209 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <title>نظام العديد المركزي - لواء 306</title>
-    <style>
-        :root { --main-color: #1b5e20; --db-color: #0277bd; --pen-color: #c62828; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; background-size: cover; background-attachment: fixed; }
-        .container { max-width: 1350px; margin: 20px auto; background: rgba(255,255,255,0.95); padding: 25px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); position: relative; }
-        .header-section { border-bottom: 3px solid var(--main-color); padding-bottom: 15px; margin-bottom: 20px; text-align: center; }
-        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
-        .form-grid div { display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #333; }
-        input, select { padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 14px; }
-        .btn { border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; color: white; font-weight: bold; transition: 0.3s; font-size: 13px; }
-        .btn-main { background: var(--main-color); width: 100%; font-size: 16px; padding: 12px; }
-        
-        #searchWrapper { position: relative; flex: 1; min-width: 200px; }
-        #searchDropdown { position: absolute; top: 100%; left: 0; right: 0; background: white; border: 1px solid #ddd; z-index: 1000; display: none; max-height: 200px; overflow-y: auto; }
-        .search-item { padding: 10px; cursor: pointer; border-bottom: 1px solid #eee; text-align: right; }
-        .search-item:hover { background: #f0f0f0; }
-
-        .db-view { display: none; }
-        .table-wrapper { width: 100%; overflow-x: auto; margin-top: 15px; border: 1px solid #ddd; }
-        .db-table { width: 100%; border-collapse: collapse; min-width: 3400px; }
-        .db-table th { background: var(--db-color); color: white; padding: 10px; border: 1px solid #ddd; }
-        .db-table td { padding: 8px; border: 1px solid #ddd; text-align: center; }
-        .duplicate-row { color: #c62828 !important; font-weight: bold; background-color: #ffebee !important; }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 2000; }
-        .modal-content { background: white; margin: 5% auto; padding: 25px; width: 45%; border-radius: 15px; }
-
-        /* إصلاح الطباعة النهائي لـ A4 */
-        @media print {
-            .no-print { display: none !important; }
-            body { background: white !important; }
-            .container { width: 100% !important; max-width: 100% !important; box-shadow: none !important; margin: 0 !important; padding: 10px !important; }
-            .form-grid { display: grid !important; grid-template-columns: 1fr 1fr !important; gap: 10px !important; }
-            /* إخفاء صناديق الإدخال وإظهار القيم كنصوص */
-            input { display: none !important; }
-            .print-val { display: block !important; border-bottom: 1px solid #000; padding: 5px; font-weight: bold; font-size: 16px; min-height: 20px; }
-            .print-watermark { display: block !important; position: fixed; top: 25%; left: 10%; width: 80%; opacity: 0.15; z-index: -1; }
-        }
-        .print-val { display: none; }
-        .print-watermark { display: none; }
-    </style>
-</head>
-<body>
-
-<img id="wmImage" class="print-watermark" src="">
-
-<div class="container no-print" id="formView">
-    <div class="header-section">
-        <h2 style="color:var(--main-color); margin:0;">نظام العديد المركزي - لواء 306</h2>
-    </div>
-
-    <form id="mainForm" onsubmit="saveData(event); return false;">
-        <input type="hidden" id="editIdx" value="-1">
-        <div class="form-grid">
-            <div><label>ID</label><input type="text" id="idNo"><div class="print-val"></div></div>
-            <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required><div class="print-val"></div></div>
-            <div><label>المواليد</label><input type="text" id="birthDate"><div class="print-val"></div></div>
-            <div><label>محل التولد</label><input type="text" id="birthPlace"><div class="print-val"></div></div>
-            <div><label>الجنس</label><input type="text" id="gender"><div class="print-val"></div></div>
-            <div><label>اسم الأم</label><input type="text" id="motherName"><div class="print-val"></div></div>
-            <div><label>رقم الهوية</label><input type="text" id="natId"><div class="print-val"></div></div>
-            <div><label>الحالة الاجتماعية</label><input type="text" id="marital"><div class="print-val"></div></div>
-            <div><label>اسم الزوجة</label><input type="text" id="spouse"><div class="print-val"></div></div>
-            <div><label>عدد الاطفال</label><input type="text" id="kids"><div class="print-val"></div></div>
-            <div><label>التحصيل الدراسي</label><input type="text" id="edu"><div class="print-val"></div></div>
-            <div><label>التخصص الدراسي</label><input type="text" id="spec"><div class="print-val"></div></div>
-            <div><label>العمل</label><input type="text" id="job"><div class="print-val"></div></div>
-            <div><label>المحافظة</label><input type="text" id="prov"><div class="print-val"></div></div>
-            <div><label>القضاء</label><input type="text" id="dist"><div class="print-val"></div></div>
-            <div><label>الناحية</label><input type="text" id="subDist"><div class="print-val"></div></div>
-            <div><label>المنطقة</label><input type="text" id="region"><div class="print-val"></div></div>
-            <div><label>المحلة</label><input type="text" id="mahala"><div class="print-val"></div></div>
-            <div><label>الزقاق</label><input type="text" id="zuqaq"><div class="print-val"></div></div>
-            <div><label>الدار</label><input type="text" id="dar"><div class="print-val"></div></div>
-            <div><label>أقرب نقطة دالة</label><input type="text" id="point"><div class="print-val"></div></div>
-            <div><label>الهاتف</label><input type="text" id="phone"><div class="print-val"></div></div>
-            <div><label>اللواء</label><input type="text" id="brigade"><div class="print-val"></div></div>
-            <div><label>الفوج</label><input type="text" id="fowj"><div class="print-val"></div></div>
-            <div><label>السرية (رقم)</label><input type="text" id="sariyaNum"><div class="print-val"></div></div>
-            <div><label>الصنف</label><input type="text" id="sanaf"><div class="print-val"></div></div>
-            <div><label>الخبرات العسكرية</label><input type="text" id="exp"><div class="print-val"></div></div>
-            <div><label>المعرف</label><input type="text" id="refN"><div class="print-val"></div></div>
-            <div><label>هاتف المعرف</label><input type="text" id="refP"><div class="print-val"></div></div>
-            <div style="grid-column: span 2;"><label>الملاحظات</label><input type="text" id="notes"><div class="print-val"></div></div>
-            <div style="grid-column: span 2;"><label>اسم السرية</label><input type="text" id="sariyaName"><div class="print-val"></div></div>
-        </div>
-        <button type="submit" class="btn btn-main">حفظ البيانات</button>
-    </form>
-
-    <div style="margin-top:20px; background:#f0f0f0; padding:15px; border-radius:10px;">
-        <div style="display:flex; gap:8px; margin-bottom:10px; align-items: center; flex-wrap: wrap;">
-            <div id="searchWrapper">
-                <input type="text" id="mainSearch" placeholder="🔍 بحث بالاسم..." onkeyup="liveSearch(this.value)" style="width:100%">
-                <div id="searchDropdown"></div>
-            </div>
-            <button onclick="prepareAndPrint()" class="btn" style="background:#444">🖨️ طباعة A4</button>
-            <button onclick="transferToPenalty()" class="btn" style="background:var(--pen-color)">⚖️ عقوبة</button>
-            <button onclick="exportFullData()" class="btn" style="background:#2e7d32">📤 تصدير</button>
-            <button onclick="document.getElementById('impFile').click()" class="btn" style="background:#1565c0">📥 استيراد</button>
-            <input type="file" id="impFile" hidden onchange="importCSV(this)">
-        </div>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button onclick="showView('db')" class="btn" style="background:var(--db-color)">القاعدة الشاملة</button>
-            <button onclick="showView('pen')" class="btn" style="background:var(--pen-color)">قاعدة العقوبات</button>
-        </div>
-        <button onclick="document.getElementById('settMod').style.display='block'" class="btn" style="background:#333; width:100%; margin-top:10px;">⚙️ الإعدادات والسمات</button>
-    </div>
+<th>الفوج</th><th>رقم السرية</th><th>الصنف</th><th>الخبرات</th>
+        <th>المعرف</th><th>هاتف المعرف</th><th>الملاحظات</th><th>اسم السرية</th>
+        <th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
 </div>
 
-<div class="container db-view" id="tableView">
-    <div class="header-section no-print">
-        <h2 id="tableTitle">عرض البيانات</h2>
-        <button onclick="showView('form')" class="btn" style="background:#333">رجوع</button>
-    </div>
-    <div class="no-print" style="display:flex; gap:5px; background:#eee; padding:10px; border-radius:5px; margin-bottom:10px; flex-wrap: wrap;">
-        <select id="fFowj" onchange="applyFilters()"><option value="">كل الأفواج</option></select>
-        <select id="fSNum" onchange="applyFilters()"><option value="">سرية (رقم)</option></select>
-        <select id="fSName" onchange="applyFilters()"><option value="">سرية (اسم)</option></select>
-        <select id="fColor" onchange="applyFilters()"><option value="all">كل الألوان</option><option value="dup">المكرر فقط</option></select>
-        <button onclick="toggleSelectAll()" class="btn" id="selBtn" style="background:#555">تحديد الكل</button>
-        <button onclick="exportSelected()" class="btn" style="background:#2e7d32">تصدير المحدد</button>
-        <button onclick="bulkDelete()" class="btn" style="background:red">حذف المحدد</button>
-        <button id="pnlRemoveBtn" onclick="removeFromPenalty()" class="btn" style="background:orange; display:none;">رفع العقوبة 🔓</button>
-    </div>
-    <div class="table-wrapper"><table class="db-table"><thead><tr id="tableHeaders"></tr></thead><tbody id="tableBody"></tbody></table></div>
+<!-- قاعدة العقوبات -->
+<div class="page hidden" id="punishmentPage">
+  <h1>قاعدة العقوبات</h1>
+  <table id="punishmentTable">
+    <thead>
+      <tr>
+        <th>ID</th><th>الاسم</th><th>الفوج</th><th>رقم السرية</th><th>اسم السرية</th><th>إجراءات</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+  <button class="btn no-print" onclick="backToMain()">رجوع للقاعدة الرئيسية</button>
 </div>
 
-<div id="settMod" class="modal no-print">
-    <div class="modal-content">
-        <h3>⚙️ الإعدادات والسمات</h3>
-        <label>اللون الرئيسي:</label><input type="color" onchange="changeTheme(this.value)" style="width:100%; height:40px; margin-bottom:15px;">
-        <label>خلفية البرنامج / علامة مائية:</label><input type="file" onchange="updateBg(this)" style="width:100%; margin-bottom:15px;">
-        <hr>
-        <input type="text" id="oldU" placeholder="المستخدم القديم" style="width:100%; margin-bottom:5px;"><input type="password" id="oldP" placeholder="المرور القديمة" style="width:100%; margin-bottom:10px;">
-        <input type="text" id="newU" placeholder="المستخدم الجديد" style="width:100%; margin-bottom:5px;"><input type="password" id="newP" placeholder="المرور الجديدة" style="width:100%;">
-        <button onclick="updateSecurity()" class="btn" style="background:var(--main-color); width:100%; margin-top:10px;">تحديث الأمان</button>
-        <button onclick="document.getElementById('settMod').style.display='none'" class="btn" style="background:red; width:100%; margin-top:10px;">إغلاق</button>
-    </div>
+<!-- صفحة الإعدادات -->
+<div class="page hidden" id="settingsPage">
+  <h1>الإعدادات والسمات</h1>
+  <h3>تغيير بيانات الدخول</h3>
+  <label>اسم المستخدم القديم</label><input type="text" id="oldUser"><br>
+  <label>كلمة المرور القديمة</label><input type="password" id="oldPass"><br>
+  <label>اسم المستخدم الجديد</label><input type="text" id="newUser"><br>
+  <label>كلمة المرور الجديدة</label><input type="password" id="newPass"><br>
+  <button class="btn" onclick="changeLogin()">تغيير</button>
+
+  <h3>تغيير اللون الرئيسي</h3>
+  <input type="color" id="colorPicker" onchange="changeColor()">
+
+  <h3>إضافة صورة خلفية</h3>
+  <input type="file" id="bgUpload" accept="image/*" onchange="setBackground(event)">
+
+  <h3>إضافة علامة مائية للطباعة</h3>
+  <input type="file" id="wmUpload" accept="image/*" onchange="setWatermark(event)">
+  <button class="btn no-print" onclick="backToMain()">رجوع</button>
 </div>
 
 <script>
-    const fields = ["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
-    const labels = ["ID","الاسم الرباعي","المواليد","محل التولد","الجنس","الأم","الهوية","الحالة","الزوجة","أطفال","تحصيل","تخصص","عمل","محافظة","قضاء","ناحية","منطقة","محلة","زقاق","دار","دالة","هاتف","لواء","فوج","سرية","صنف","خبرات","معرف","هاتف معرف","ملاحظات","اسم سرية"];
-    let currentTable = 'db';
+  let currentUser = "admin";
+  let currentPass = "1234";
 
-    // --- نظام الطباعة المصلح ---
-    function prepareAndPrint() {
-        fields.forEach(f => {
-            const val = document.getElementById(f).value;
-            const container = document.getElementById(f).parentElement.querySelector('.print-val');
-            if(container) container.innerText = val || '---';
-        });
-        window.print();
-    }
+  function login(){
+    const user=document.getElementById("username").value;
+    const pass=document.getElementById("password").value;
+    if(user===currentUser && pass===currentPass){
+      document.getElementById("loginPage").classList.add("hidden");
+      document.getElementById("dataPage").classList.remove("hidden");
+    } else { alert("بيانات الدخول غير صحيحة"); }
+  }
 
-    // --- استيراد وتصدير ---
-    function exportFullData() {
-        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        if(!db.length) return alert("القاعدة فارغة");
-        let csv = "\uFEFF" + labels.join(",") + "\n" + db.map(r => fields.map(f => `"${r[f]||''}"`).join(",")).join("\n");
-        let b = new Blob([csv], {type: 'text/csv'});
-        let a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = "306_Full_Data.csv"; a.click();
-    }
+  function saveData(){
+    const fields=["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
+      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
+      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"];
+    const row=document.createElement("tr");
+    fields.forEach(f=>{
+      const td=document.createElement("td");
+      td.textContent=document.getElementById(f).value;
+      row.appendChild(td);
+    });
+    const actionTd=document.createElement("td");
+    const punishBtn=document.createElement("button");
+    punishBtn.textContent="إرسال للعقوبات";
+    punishBtn.className="btn";
+    punishBtn.onclick=()=>moveToPunishments(row);
+    actionTd.appendChild(punishBtn);
+    row.appendChild(actionTd);
+    document.querySelector("#mainTable tbody").appendChild(row);
+    highlightDuplicates();
+    alert("تم حفظ البيانات ✅");
+  }
 
-    function importCSV(input) {
-        let r = new FileReader();
-        r.onload = e => {
-            let lines = e.target.result.split("\n").slice(1);
-            let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-            lines.forEach(l => {
-                let c = l.split(","); if(c.length > 5) {
-                    let o = {}; fields.forEach((f, i) => o[f] = c[i]?.replace(/"/g,'').trim());
-                    db.push(o);
-                }
-            });
-            localStorage.setItem('db_306_data', JSON.stringify(db)); alert("تم الاستيراد بنجاح"); location.reload();
-        };
-        r.readAsText(input.files[0]);
-    }
+  function moveToPunishments(row){
+    const clone=row.cloneNode(true);
+    const actionTd=clone.lastChild;
+    actionTd.innerHTML="";
+    const liftBtn=document.createElement("button");
+    liftBtn.textContent="رفع العقوبة";
+    liftBtn.className="btn";
+    liftBtn.onclick=()=>moveBackToMain(clone);
+    actionTd.appendChild(liftBtn);
+    document.querySelector("#punishmentTable tbody").appendChild(clone);
+    row.remove();
+  }
 
-    // --- البحث والعمليات ---
-    function liveSearch(v) {
-        let drop = document.getElementById('searchDropdown');
-        if(!v) { drop.style.display='none'; return; }
-        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let matches = db.filter(i => i.fullName.includes(v));
-        drop.innerHTML = matches.map(m => `<div class="search-item" onclick="loadFromIdx(${db.indexOf(m)})">${m.fullName}</div>`).join('');
-        drop.style.display = matches.length ? 'block' : 'none';
-    }
+  function moveBackToMain(row){
+    const clone=row.cloneNode(true);
+    const actionTd=clone.lastChild;
+    actionTd.innerHTML="";
+    const punishBtn=document.createElement("button");
+    punishBtn.textContent="إرسال للعقوبات";
+    punishBtn.className="btn";
+    punishBtn.onclick=()=>moveToPunishments(clone);
+    actionTd.appendChild(punishBtn);
+    document.querySelector("#mainTable tbody").appendChild(clone);
+    row.remove();
+  }
 
-    function loadFromIdx(i) {
-        let db = JSON.parse(localStorage.getItem('db_306_data'));
-        fields.forEach(f => document.getElementById(f).value = db[i][f] || '');
-        document.getElementById('editIdx').value = i;
-        document.getElementById('searchDropdown').style.display='none';
-    }
+  function showPunishments(){
+    document.getElementById("dataPage").classList.add("hidden");
+    document.getElementById("punishmentPage").classList.remove("hidden");
+  }
+  function backToMain(){
+    document.getElementById("punishmentPage").classList.add("hidden");
+    document.getElementById("settingsPage").classList.add("hidden");
+    document.getElementById("dataPage").classList.remove("hidden");
+  }
+  function showSettings(){
+    document.getElementById("dataPage").classList.add("hidden");
+    document.getElementById("settingsPage").classList.remove("hidden");
+  }
 
-    function saveData(e) {
-        let db = JSON.parse(localStorage.getItem('db_306_data') || '[]');
-        let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
-        let idx = document.getElementById('editIdx').value;
-        if(idx === "-1") db.push(data); else db[idx] = data;
-        localStorage.setItem('db_306_data', JSON.stringify(db));
-        alert("تم الحفظ"); document.getElementById('mainForm').reset(); document.getElementById('editIdx').value = "-1";
-    }
+  function filterTable(field){
+    const input=document.getElementById("filter"+field.charAt(0).toUpperCase()+field.slice(1)).value.toLowerCase();
+    const rows=document.querySelectorAll("#mainTable tbody tr");
+    rows.forEach(r=>{
+      let match=false;
+      r.querySelectorAll("td").forEach(c=>{
+        if(c.textContent.toLowerCase().includes(input)) match=true;
+      });
+      r.style.display=match?"":"none";
+    });
+  }
 
-    function showView(v) {
-        document.getElementById('formView').style.display = v === 'form' ? 'block' : 'none';
-        document.getElementById('tableView').style.display = v === 'form' ? 'none' : 'block';
-        if(v !== 'form') { currentTable = v; renderTable(); }
-    }
+  function highlightDuplicates(){
+    const names={};
+    const rows=document.querySelectorAll("#mainTable tbody tr");
+    rows.forEach(r=>{
+      const name=r.children[1].textContent.trim();
+      if(names[name]){
+        r.style.backgroundColor="#ffebee";
+        r.style.color="#c62828";
+        names[name].style.backgroundColor="#ffebee";
+        names[name].style.color="#c62828";
+      } else { names[name]=r; }
+    });
+  }
 
-    function renderTable() {
-        let key = currentTable === 'db' ? 'db_306_data' : 'db_306_pen';
-        let db = JSON.parse(localStorage.getItem(key) || '[]');
-        let nC = {}; db.forEach(i => nC[i.fullName] = (nC[i.fullName] || 0) + 1);
-        document.getElementById('pnlRemoveBtn').style.display = currentTable === 'pen' ? 'block' : 'none';
-        document.getElementById('tableHeaders').innerHTML = `<th>تحديد</th><th>تعديل</th>` + labels.map(l => `<th>${l}</th>`).join('');
-        document.getElementById('tableBody').innerHTML = db.map((row, i) => {
-            let isD = currentTable === 'db' && nC[row.fullName] > 1;
-            return `<tr class="${isD ? 'duplicate-row' : ''}" data-f="${row.fowj||''}" data-sn="${row.sariyaNum||''}" data-sna="${row.sariyaName||''}">
-                <td><input type="checkbox" class="row-check" value="${i}"></td>
-                <td><button onclick="loadFromTable(${i})">تعديل</button></td>
-                ${fields.map(f => `<td>${row[f]||''}</td>`).join('')}
-            </tr>`;
-        }).join('');
-        const setO = (id, k) => {
-            let vals = [...new Set(db.map(i => i[k]))].filter(Boolean);
-            document.getElementById(id).innerHTML = '<option value="">الكل</option>' + vals.map(v => `<option value="${v}">${v}</option>`).join('');
-        };
-        setO('fFowj', 'fowj'); setO('fSNum', 'sariyaNum'); setO('fSName', 'sariyaName');
-    }
+  function searchNames(){
+    const input=document.getElementById("searchInput").value.toLowerCase();
+    const dropdown=document.getElementById("searchDropdown");
+    dropdown.innerHTML="";
+    if(input===""){ dropdown.style.display="none"; return; }
+    const rows=document.querySelectorAll("#mainTable tbody tr");
+    rows.forEach(r=>{
+      const name=r.children[1].textContent.toLowerCase();
+      if(name.includes(input)){
+        const item=document.createElement("div");
+        item.textContent=r.children[1].textContent;
+        item.style.padding="5px"; item.style.cursor="pointer";
+        item.onclick=()=>fillForm(r);
+        dropdown.appendChild(item);
+      }
+    });
+    dropdown.style.display=dropdown.innerHTML===""?"none":"block";
+  }
 
-    function applyFilters() {
-        let f = document.getElementById('fFowj').value, sn = document.getElementById('fSNum').value, sna = document.getElementById('fSName').value, c = document.getElementById('fColor').value;
-        document.querySelectorAll('#tableBody tr').forEach(tr => {
-            let mF = !f || tr.dataset.f === f, mSN = !sn || tr.dataset.sn === sn, mSNA = !sna || tr.dataset.sna === sna, mC = c === 'all' || (c === 'dup' && tr.classList.contains('duplicate-row'));
-            tr.style.display = (mF && mSN && mSNA && mC) ? '' : 'none';
-        });
-    }
+  function fillForm(row){
+    const fields=["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
+      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
+      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"];
+    fields.forEach((f,i)=>{ document.getElementById(f).value=row.children[i].textContent; });
+    document.getElementById("searchDropdown").style.display="none";
+  }
 
-    function changeTheme(c) { document.documentElement.style.setProperty('--main-color', c); localStorage.setItem('306_c', c); }
-    function updateBg(i) {
-        let r = new FileReader(); r.onload = e => {
-            document.body.style.backgroundImage = `url(${e.target.result})`;
-            document.getElementById('wmImage').src = e.target.result;
-            localStorage.setItem('306_bg', e.target.result);
-        }; r.readAsDataURL(i.files[0]);
+  function changeLogin(){
+    const oldU=document.getElementById("oldUser").value;
+    const oldP=document.getElementById("oldPass").value;
+    const newU=document.getElementById("newUser").value;
+    const newP=document.getElementById("newPass").value;
+    if(oldU===currentUser && oldP===currentPass){
+      currentUser=newU; currentPass=newP;
+      alert("تم تغيير بيانات الدخول ✅");
+    } else { alert("البيانات القديمة غير صحيحة ❌"); }
+  }
+
+  function changeColor(){
+    const color=document.getElementById("colorPicker").value;
+    document.documentElement.style.setProperty("--main-color",color);
+    alert("تم تغيير اللون الرئيسي 🎨");
+  }
+
+  function setBackground(event){
+    const file=event.target.files[0];
+    if(file){
+      const reader=new FileReader();
+      reader.onload=function(e){
+        document.body.style.backgroundImage=`url(${e.target.result})`;
+        document.body.style.backgroundSize="cover";
+      }
+      reader.readAsDataURL(file);
     }
-    function updateSecurity() {
-        let sU = localStorage.getItem('306_u') || 'admin', sP = localStorage.getItem('306_p') || '1234';
-        if(document.getElementById('oldU').value === sU && document.getElementById('oldP').value === sP) {
-            localStorage.setItem('306_u', document.getElementById('newU').value); localStorage.setItem('306_p', document.getElementById('newP').value);
-            alert("تم التحديث"); document.getElementById('settMod').style.display='none';
-        } else alert("بيانات قديمة خطأ");
-    }
-    function transferToPenalty() {
-        let data = {}; fields.forEach(f => data[f] = document.getElementById(f).value);
-        if(!data.fullName) return;
-        let pen = JSON.parse(localStorage.getItem('db_306_pen') || '[]'); pen.push(data);
-        localStorage.setItem('db_306_pen', JSON.stringify(pen)); alert("تم الترحيل");
-    }
-    function loadFromTable(i) { loadFromIdx(i); showView('form'); }
-    window.onload = () => {
-        let c = localStorage.getItem('306_c'); if(c) changeTheme(c);
-        let bg = localStorage.getItem('306_bg'); if(bg) { document.body.style.backgroundImage = `url(${bg})`; document.getElementById('wmImage').src = bg; }
-    };
-</script>
-</body>
-</html>
+  }
+
+  function setWatermark(event){
+    const file=event.target.files[0];
+    if(file){
+      const reader=new FileReader();
+      reader.onload=function(e){
+        const wm=document.createElement("img");
+        wm.src=e.target.result;
+        wm.className="print-watermark
