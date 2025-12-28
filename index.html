@@ -38,24 +38,27 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 <h2>نظام العديد المركزي - لواء 306</h2>
 
 <div class="tabs">
-<button class="tab-btn active" onclick="showTab('tabForm')">📝 إدخال البيانات</button>
-<button class="tab-btn" onclick="showTab('tabDB')">📋 القاعدة الأساسية</button>
-<button class="tab-btn" onclick="showTab('tabPen')">⚖️ العقوبات</button>
+<button class="tab-btn active" onclick="showTab('tabForm',this)">📝 إدخال البيانات</button>
+<button class="tab-btn" onclick="showTab('tabDB',this)">📋 القاعدة الأساسية</button>
+<button class="tab-btn" onclick="showTab('tabPen',this)">⚖️ العقوبات</button>
 </div>
 
 <!-- تبويب إدخال البيانات -->
 <div id="tabForm" class="tab-content active">
-<!-- أزرار البحث والطباعة والإعدادات -->
 <div style="margin-bottom:15px; display:flex; gap:10px; flex-wrap:wrap;">
     <button class="btn btn-main" onclick="document.getElementById('settingsModal').style.display='block'">⚙️ إعدادات</button>
     <input type="text" id="mainSearch" placeholder="🔍 بحث سريع بالاسم..." onkeyup="liveSearch(this.value)" style="flex:1; padding:8px; border-radius:5px; border:1px solid #ccc; text-align:center;">
     <button class="btn btn-main" onclick="window.print()">🖨️ طباعة</button>
+    <button class="btn btn-export" onclick="exportCSV('DB')">تصدير CSV</button>
+    <input type="file" id="importFile" style="display:none" accept=".csv" onchange="importCSV(this,'DB')">
+    <button class="btn btn-import" onclick="document.getElementById('importFile').click()">استيراد CSV</button>
 </div>
 
 <form id="mainForm" onsubmit="saveData(event); return false;">
 <div class="form-grid">
+  <!-- جميع الحقول 31 كما في النسخة السابقة -->
   <div><label>ID</label><input type="text" id="idNo"></div>
-  <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required onkeyup="liveSearch(this.value)"></div>
+  <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName" required></div>
   <div><label>المواليد</label><input type="text" id="birthDate"></div>
   <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
   <div><label>الجنس</label><input type="text" id="gender"></div>
@@ -93,7 +96,7 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 
 <!-- تبويب القاعدة الأساسية -->
 <div id="tabDB" class="tab-content">
-<div class="stats" id="statsDB">📊 الإحصائيات: إجمالي الأفراد: 0 | المكررات: 0</div>
+<div class="stats" id="statsDB">📊 الإحصائيات</div>
 <input type="text" id="searchDB" placeholder="بحث سريع" onkeyup="renderTable('DB')">
 <select id="filterFowjDB" onchange="renderTable('DB')"><option value="">كل الأفواج</option></select>
 <select id="filterSNumDB" onchange="renderTable('DB')"><option value="">كل السرايا</option></select>
@@ -108,7 +111,7 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 
 <!-- تبويب العقوبات -->
 <div id="tabPen" class="tab-content">
-<div class="stats" id="statsPEN">📊 الإحصائيات: إجمالي المعاقبين: 0 | المكررات: 0</div>
+<div class="stats" id="statsPEN">📊 الإحصائيات</div>
 <input type="text" id="searchPen" placeholder="بحث سريع" onkeyup="renderTable('PEN')">
 <select id="filterFowjPen" onchange="renderTable('PEN')"><option value="">كل الأفواج</option></select>
 <select id="filterSNumPen" onchange="renderTable('PEN')"><option value="">كل السرايا</option></select>
@@ -137,13 +140,12 @@ input,select{padding:10px;border:1px solid #ccc;border-radius:5px;text-align:cen
 const DB_KEY='db_306_data';
 const PEN_KEY='db_306_pen';
 const fields=["idNo","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids","edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
-const labels=["ID","الاسم الرباعي واللقب","المواليد","محل التولد","الجنس","اسم الأم","رقم الهوية","الحالة الاجتماعية","اسم الزوجة","عدد الاطفال","التحصيل الدراسي","التخصص الدراسي","العمل","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","أقرب نقطة دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرات","المعرف","هاتف المعرف","الملاحظات","اسم السرية"];
 
-function showTab(id){
+function showTab(id,btn){
   document.querySelectorAll('.tab-content').forEach(tc=>tc.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  event.currentTarget.classList.add('active');
+  btn.classList.add('active');
 }
 
 function saveData(e){
@@ -162,8 +164,8 @@ function liveSearch(val){
   const drop=document.getElementById('searchDropdown');
   if(!val){ drop.style.display='none'; return; }
   let matches=db.filter(x=>x.fullName.includes(val));
-  drop.innerHTML=matches.map((m,i)=>`<div onclick="fillForm(${i})">${m.fullName}</div>`).join('');
-  drop.style.display=matches.length?'block':'none';
+  drop.innerHTML = matches.map((m,i)=>`<div onclick="fillForm(${i})">${m.fullName}</div>`).join('');
+  drop.style.display = matches.length?'block':'none';
 }
 
 function fillForm(i){
@@ -186,35 +188,22 @@ function renderTable(type){
            (!sNum||r.sariyaNum===sNum) &&
            (!sName||r.sariyaName===sName);
   });
-  // الإحصائيات
   const names=db.map(r=>r.fullName);
   const dupNames=names.filter((v,i,a)=>a.indexOf(v)!==i);
   document.getElementById(type==='PEN'?'statsPEN':'statsDB').innerText=`📊 الإحصائيات: إجمالي ${type==='PEN'?'المعاقبين':'الأفراد'}: ${db.length} | المكررات: ${dupNames.length}`;
 
-  table.querySelector('thead').innerHTML='<tr>'+labels.map(l=>`<th>${l}</th>`).join('')+(type==='PEN'?'<th>رفع العقوبة</th>':'')+'</tr>';
+  table.querySelector('thead').innerHTML='<tr>'+fields.map(f=>`<th>${f}</th>`).join('')+(type==='PEN'?'<th>رفع العقوبة</th>':'')+'</tr>';
   table.querySelector('tbody').innerHTML=db.map((r,i)=>{
     let tds=fields.map(f=>`<td${dupNames.includes(r.fullName)?' class="duplicate"':''}>${r[f]||''}</td>`).join('');
     if(type==='PEN') tds+=`<td><button class="btn btn-undo" onclick="undoPen(${i})">رفع العقوبة</button></td>`;
     return `<tr>${tds}</tr>`;
   }).join('');
-  populateFilters(type);
-}
-
-function populateFilters(type){
-  const key=type==='PEN'?PEN_KEY:DB_KEY;
-  const db=JSON.parse(localStorage.getItem(key)||'[]');
-  const fSet=[...new Set(db.map(r=>r.fowj).filter(x=>x))];
-  const sSet=[...new Set(db.map(r=>r.sariyaNum).filter(x=>x))];
-  const nSet=[...new Set(db.map(r=>r.sariyaName).filter(x=>x))];
-  document.getElementById(type==='PEN'?'filterFowjPen':'filterFowjDB').innerHTML='<option value="">كل الأفواج</option>'+fSet.map(x=>`<option>${x}</option>`).join('');
-  document.getElementById(type==='PEN'?'filterSNumPen':'filterSNumDB').innerHTML='<option value="">كل السرايا</option>'+sSet.map(x=>`<option>${x}</option>`).join('');
-  document.getElementById(type==='PEN'?'filterSNamePen':'filterSNameDB').innerHTML='<option value="">كل أسماء السرايا</option>'+nSet.map(x=>`<option>${x}</option>`).join('');
 }
 
 function exportCSV(type){
   const key=type==='PEN'?PEN_KEY:DB_KEY;
   const db=JSON.parse(localStorage.getItem(key)||'[]');
-  let csv="\uFEFF"+labels.join(",")+"\n"+db.map(r=>fields.map(f=>`"${r[f]||''}"`).join(",")).join("\n");
+  let csv="\uFEFF"+fields.join(",")+"\n"+db.map(r=>fields.map(f=>`"${r[f]||''}"`).join(",")).join("\n");
   let a=document.createElement('a'); a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'})); a.download=(type==='PEN'?'العقوبات':'القاعدة_الكاملة')+".csv"; a.click();
 }
 
@@ -223,8 +212,30 @@ function importCSV(input,type){
   let reader=new FileReader();
   reader.onload=function(e){
     let lines=e.target.result.split("\n");
-    let key=type==='PEN'?PEN_KEY:DB_KEY;
-    let db=JSON.parse(localStorage.getItem(key)||'[]');
+    let key = type==='PEN'?PEN_KEY:DB_KEY;
+    let db = JSON.parse(localStorage.getItem(key)||'[]');
     lines.slice(1).forEach(line=>{
       let cols=line.split(",");
       if(cols.length>=fields.length){
+        let obj={};
+        fields.forEach((f,i)=>obj[f]=(cols[i]||'').replace(/"/g,'').trim());
+        db.push(obj);
+      }
+    });
+    localStorage.setItem(key, JSON.stringify(db));
+    alert("تم استيراد البيانات بنجاح إلى "+(type==='PEN'?'العقوبات':''+'القاعدة الأساسية'));
+    renderTable(type);
+  };
+  reader.readAsText(input.files[0]);
+}
+
+// الإعدادات
+function changeTheme(c){document.documentElement.style.setProperty('--main-color',c);localStorage.setItem('306_theme',c);}
+function updateBackground(input){if(!input.files[0])return;let reader=new FileReader();reader.onload=e=>{document.body.style.backgroundImage=`url(${e.target.result})`;localStorage.setItem('306_bg',e.target.result)};reader.readAsDataURL(input.files[0]);}
+
+window.onload=()=>{
+  let c=localStorage.getItem('306_theme'); if(c) changeTheme(c);
+  let bg=localStorage.getItem('306_bg'); if(bg)document.body.style.backgroundImage=`url(${bg})`;
+  renderTable('DB'); renderTable('PEN');
+};
+</
