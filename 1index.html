@@ -1,16 +1,123 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام العديد المركزي - لواء 306</title>
-    <style>
-        :root { --main-color: #1b5e20; }
-        body { font-family: 'Segoe UI', Tahoma, sans-serif; background-color: #f4f4f9; margin: 0; padding: 0; direction: rtl; }
-        .container { max-width: 1000px; margin: 20px auto; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 5px 25px rgba(0,0,0,0.1); }
-        .header-section { border-bottom: 3px solid var(--main-color); padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
-        .form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
-        .form-grid div { display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: bold; margin-bottom: 4px; color: #333; }
-        input { padding: 10px; border: 1px solid #ccc; border-radius: 5px; text-align: center; font-size: 14px; background: #fff; }
-        .btn-main { background: var(--main-color
+  <meta charset="UTF-8">
+  <title>العديد المركزي - لواء 306 ذي قار</title>
+  <style>
+    body { font-family: Tahoma, sans-serif; margin:0; padding:0; background:#f4f4f9; }
+    .login, .data-page { max-width:1100px; margin:30px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
+    h1 { text-align:center; color:#1b5e20; }
+    .form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
+    label { font-weight:bold; font-size:13px; }
+    input { padding:8px; border:1px solid #ccc; border-radius:5px; }
+    .btn { background:#1b5e20; color:#fff; border:none; padding:10px; border-radius:5px; cursor:pointer; margin:5px; }
+    .hidden { display:none; }
+    table { width:100%; border-collapse:collapse; margin-top:20px; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:center; font-size:12px; }
+    th { background:#0277bd; color:#fff; }
+    @media print {
+      .no-print { display:none !important; }
+      input { display:none !important; }
+      .print-only { display:block !important; border-bottom:1px dashed #666; font-size:14px; font-weight:bold; color:#000; padding:5px 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- صفحة تسجيل الدخول -->
+<div class="login" id="loginPage">
+  <h1>تسجيل الدخول</h1>
+  <label>اسم المستخدم</label>
+  <input type="text" id="username"><br>
+  <label>كلمة المرور</label>
+  <input type="password" id="password"><br><br>
+  <button class="btn" onclick="login()">دخول</button>
+</div>
+
+<!-- صفحة واجهة البيانات -->
+<div class="data-page hidden" id="dataPage">
+  <h1>العديد المركزي - عديد لواء 306 ذي قار</h1>
+  <form id="mainForm">
+    <div class="form-grid">
+      <div><label>ID</label><input type="text" id="id"></div>
+      <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName"></div>
+      <div><label>المواليد</label><input type="date" id="birthDate"></div>
+      <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
+      <div><label>الجنس</label><input type="text" id="gender"></div>
+      <div><label>اسم الأم</label><input type="text" id="motherName"></div>
+      <div><label>رقم الهوية</label><input type="text" id="natId"></div>
+      <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
+      <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
+      <div><label>عدد الأطفال</label><input type="number" id="kids"></div>
+      <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
+      <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
+      <div><label>العمل/الوظيفة</label><input type="text" id="job"></div>
+      <div><label>المحافظة</label><input type="text" id="prov"></div>
+      <div><label>القضاء</label><input type="text" id="dist"></div>
+      <div><label>الناحية</label><input type="text" id="subDist"></div>
+      <div><label>المنطقة</label><input type="text" id="region"></div>
+      <div><label>المحلة</label><input type="text" id="mahala"></div>
+      <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
+      <div><label>الدار</label><input type="text" id="dar"></div>
+      <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
+      <div><label>رقم الهاتف</label><input type="text" id="phone"></div>
+      <div><label>اللواء</label><input type="text" id="brigade"></div>
+      <div><label>الفوج</label><input type="text" id="regiment"></div>
+      <div><label>رقم السرية</label><input type="text" id="companyNo"></div>
+      <div><label>الصنف</label><input type="text" id="class"></div>
+      <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
+      <div><label>المعرف</label><input type="text" id="ref"></div>
+      <div><label>هاتف المعرف</label><input type="text" id="refPhone"></div>
+      <div><label>الملاحظات</label><input type="text" id="notes"></div>
+      <div><label>اسم السرية</label><input type="text" id="companyName"></div>
+    </div>
+    <button type="button" class="btn no-print" onclick="saveData()">حفظ البيانات</button>
+    <button type="button" class="btn no-print" onclick="window.print()">طباعة</button>
+    <button type="button" class="btn no-print">استيراد</button>
+    <button type="button" class="btn no-print">تصدير</button>
+    <button type="button" class="btn no-print">عقوبة</button>
+    <button type="button" class="btn no-print">إعدادات</button>
+  </form>
+
+  <!-- جدول قاعدة البيانات الرئيسية -->
+  <table id="mainTable">
+    <thead>
+      <tr>
+        <th>ID</th><th>الاسم</th><th>المواليد</th><th>محل التولد</th><th>الجنس</th>
+        <th>اسم الأم</th><th>رقم الهوية</th><th>الحالة الاجتماعية</th><th>اسم الزوجة</th><th>عدد الأطفال</th>
+        <th>التحصيل</th><th>التخصص</th><th>الوظيفة</th><th>المحافظة</th><th>القضاء</th>
+        <th>الناحية</th><th>المنطقة</th><th>المحلة</th><th>الزقاق</th><th>الدار</th>
+        <th>النقطة الدالة</th><th>الهاتف</th><th>اللواء</th><th>الفوج</th><th>رقم السرية</th>
+        <th>الصنف</th><th>الخبرات</th><th>المعرف</th><th>هاتف المعرف</th><th>الملاحظات</th><th>اسم السرية</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<script>
+  function login() {
+    const user = document.getElementById("username").value;
+    const pass = document.getElementById("password").value;
+    if(user==="admin" && pass==="1234"){ // مثال بسيط
+      document.getElementById("loginPage").classList.add("hidden");
+      document.getElementById("dataPage").classList.remove("hidden");
+    } else {
+      alert("بيانات الدخول غير صحيحة");
+    }
+  }
+
+  function saveData() {
+    const fields = [
+      "id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
+      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
+      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"
+    ];
+    const row = document.createElement("tr");
+    fields.forEach(f=>{
+      const td = document.createElement("td");
+      td.textContent = document.getElementById(f).value;
+      row.appendChild(td);
+    });
+    document.querySelector("#mainTable tbody").appendChild(row);
+    alert("
