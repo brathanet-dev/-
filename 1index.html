@@ -1,95 +1,444 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>العديد المركزي - لواء 306 ذي قار</title>
-  <style>
-    :root { --main-color:#1b5e20; }
-    body { font-family: Tahoma, sans-serif; margin:0; padding:0; background:#f4f4f9; }
-    .page { max-width:1100px; margin:30px auto; background:#fff; padding:20px; border-radius:10px; box-shadow:0 5px 15px rgba(0,0,0,0.1); }
-    h1 { text-align:center; color:var(--main-color); }
-    .form-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:20px; }
-    label { font-weight:bold; font-size:13px; }
-    input { padding:6px; border:1px solid #ccc; border-radius:5px; }
-    .btn { background:var(--main-color); color:#fff; border:none; padding:8px 12px; border-radius:5px; cursor:pointer; margin:5px; font-size:12px; }
-    table { width:100%; border-collapse:collapse; margin-top:20px; }
-    th, td { border:1px solid #ccc; padding:6px; text-align:center; font-size:12px; }
-    th { background:#0277bd; color:#fff; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام العديد المركزي - لواء 306</title>
+    <style>
+        :root { --main-color: #1b5e20; --accent-color: #c62828; --form-bg: rgba(255, 255, 255, 0.95); }
+        body { font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 0; background-color: #f0f2f5; direction: rtl; background-size: cover; background-attachment: fixed; background-position: center; }
+        
+        #loginOverlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--main-color); display: flex; align-items: center; justify-content: center; z-index: 10000; }
+        .login-box { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; width: 350px; }
+        .login-box input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 5px; text-align: center; }
+        
+        .container { max-width: 1350px; margin: 15px auto; background: var(--form-bg); padding: 25px; border-radius: 12px; display: none; }
+        .header-title { text-align: center; color: var(--main-color); border-bottom: 4px double var(--main-color); margin-bottom: 25px; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+        .field-group { display: flex; flex-direction: column; }
+        label { font-weight: bold; margin-bottom: 5px; font-size: 13px; color: #333; }
+        input { padding: 10px; border: 1px solid #bbb; border-radius: 5px; text-align: center; font-size: 14px; background: white; }
+        .button-bar { margin-top: 20px; display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .btn { padding: 10px 18px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; color: white; transition: 0.3s; font-size: 14px; }
+        .btn-save { background: var(--main-color); flex: 1; font-size: 16px; margin-top: 15px; }
+        .btn-update { background: #f57c00; flex: 1; font-size: 16px; margin-top: 15px; }
+        .btn-penalty { background: var(--accent-color); }
+        
+        .search-box { position: relative; margin: 0 auto 20px auto; width: 100%; max-width: 1000px; display: block; }
+        #searchDropdown { position: absolute; width: 100%; background: white; border: 2px solid var(--main-color); z-index: 9999; display: none; max-height: 250px; overflow-y: auto; }
+        .search-item { padding: 12px; cursor: pointer; border-bottom: 1px solid #eee; text-align: right; }
+        
+        .view-section { display: none; margin-top: 30px; border-top: 2px solid #ddd; padding-top: 20px; }
+        .table-wrapper { overflow-x: auto; border: 1px solid #ddd; border-radius: 8px; background: white; }
+        table { width: 100%; border-collapse: collapse; min-width: 3500px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; font-size: 13px; }
+        th { background: var(--main-color); color: white; }
+        
+        .admin-only { display: none; }
+        .control-group { background: #eee; padding: 15px; border-radius: 8px; margin-bottom: 15px; }
+
+        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 20px; }
+        .stat-card { background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; border-right: 5px solid var(--main-color); }
+        .stat-card h4 { margin: 0; color: #666; font-size: 14px; }
+        .stat-card p { margin: 10px 0 0; font-size: 22px; font-weight: bold; color: var(--main-color); }
+
+        @media print {
+            .no-print { display: none !important; }
+            #printPage { display: block !important; width: 210mm; padding: 10mm; margin: 0 auto; position: relative; }
+            #printPage::before { 
+                content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; 
+                background-image: var(--bg-img); background-size: 50%; background-repeat: no-repeat; 
+                background-position: center; opacity: 0.1; z-index: -1; 
+            }
+            .print-grid { display: grid !important; grid-template-columns: repeat(3, 1fr) !important; gap: 5px !important; border: 1px solid #000; }
+            .print-box { border: 1px solid #000; padding: 5px; display: flex; flex-direction: column; font-size: 11px; }
+            .print-box b { border-bottom: 1px solid #000; margin-bottom: 3px; }
+        }
+        #printPage { display: none; }
+    </style>
 </head>
 <body>
 
-<!-- واجهة البيانات مباشرة -->
-<div class="page" id="dataPage">
-  <h1>العديد المركزي - عديد لواء 306 ذي قار</h1>
-
-  <form id="mainForm">
-    <div class="form-grid">
-      <div><label>ID</label><input type="text" id="id"></div>
-      <div><label>الاسم الرباعي واللقب</label><input type="text" id="fullName"></div>
-      <div><label>المواليد</label><input type="date" id="birthDate"></div>
-      <div><label>محل التولد</label><input type="text" id="birthPlace"></div>
-      <div><label>الجنس</label><input type="text" id="gender"></div>
-      <div><label>اسم الأم</label><input type="text" id="motherName"></div>
-      <div><label>رقم الهوية</label><input type="text" id="natId"></div>
-      <div><label>الحالة الاجتماعية</label><input type="text" id="marital"></div>
-      <div><label>اسم الزوجة</label><input type="text" id="spouse"></div>
-      <div><label>عدد الأطفال</label><input type="number" id="kids"></div>
-      <div><label>التحصيل الدراسي</label><input type="text" id="edu"></div>
-      <div><label>التخصص الدراسي</label><input type="text" id="spec"></div>
-      <div><label>العمل/الوظيفة</label><input type="text" id="job"></div>
-      <div><label>المحافظة</label><input type="text" id="prov"></div>
-      <div><label>القضاء</label><input type="text" id="dist"></div>
-      <div><label>الناحية</label><input type="text" id="subDist"></div>
-      <div><label>المنطقة</label><input type="text" id="region"></div>
-      <div><label>المحلة</label><input type="text" id="mahala"></div>
-      <div><label>الزقاق</label><input type="text" id="zuqaq"></div>
-      <div><label>الدار</label><input type="text" id="dar"></div>
-      <div><label>أقرب نقطة دالة</label><input type="text" id="point"></div>
-      <div><label>رقم الهاتف</label><input type="text" id="phone"></div>
-      <div><label>اللواء</label><input type="text" id="brigade"></div>
-      <div><label>الفوج</label><input type="text" id="regiment"></div>
-      <div><label>رقم السرية</label><input type="text" id="companyNo"></div>
-      <div><label>الصنف</label><input type="text" id="class"></div>
-      <div><label>الخبرات العسكرية</label><input type="text" id="exp"></div>
-      <div><label>المعرف</label><input type="text" id="ref"></div>
-      <div><label>هاتف المعرف</label><input type="text" id="refPhone"></div>
-      <div><label>الملاحظات</label><input type="text" id="notes"></div>
-      <div><label>اسم السرية</label><input type="text" id="companyName"></div>
+<div id="loginOverlay">
+    <div class="login-box">
+        <h2 style="color: var(--main-color);">نظام لواء 306</h2>
+        <input type="text" id="userInput" placeholder="اسم المستخدم">
+        <input type="password" id="passInput" placeholder="كلمة المرور">
+        <button class="btn" style="background: var(--main-color); width: 100%;" onclick="checkLogin()">دخول</button>
+        <p id="loginError" style="color: red; font-size: 12px; display: none; margin-top: 10px;">خطأ في البيانات!</p>
     </div>
-    <button type="button" class="btn" onclick="saveData()">حفظ البيانات</button>
-  </form>
-
-  <table id="mainTable">
-    <thead>
-      <tr>
-        <th>ID</th><th>الاسم</th><th>المواليد</th><th>محل التولد</th><th>الجنس</th>
-        <th>اسم الأم</th><th>رقم الهوية</th><th>الحالة الاجتماعية</th><th>اسم الزوجة</th><th>عدد الأطفال</th>
-        <th>التحصيل</th><th>التخصص</th><th>الوظيفة</th><th>المحافظة</th><th>القضاء</th>
-        <th>الناحية</th><th>المنطقة</th><th>المحلة</th><th>الزقاق</th><th>الدار</th>
-        <th>النقطة الدالة</th><th>الهاتف</th><th>اللواء</th><th>الفوج</th><th>رقم السرية</th>
-        <th>الصنف</th><th>الخبرات</th><th>المعرف</th><th>هاتف المعرف</th><th>الملاحظات</th><th>اسم السرية</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
 </div>
 
-<script>
-  function saveData(){
-    const fields=["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","spouse","kids",
-      "edu","spec","job","prov","dist","subDist","region","mahala","zuqaq","dar","point","phone",
-      "brigade","regiment","companyNo","class","exp","ref","refPhone","notes","companyName"];
-    const row=document.createElement("tr");
-    fields.forEach(f=>{
-      const td=document.createElement("td");
-      td.textContent=document.getElementById(f).value;
-      row.appendChild(td);
-    });
-    document.querySelector("#mainTable tbody").appendChild(row);
-    alert("تم حفظ البيانات ✅");
-  }
-</script>
+<div class="container no-print" id="appContent">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h1 class="header-title" style="flex-grow: 1;">نظام العديد المركزي - لواء 306</h1>
+        <button class="btn" style="background: #444;" onclick="location.reload()">تسجيل خروج</button>
+    </div>
 
+    <div class="search-box">
+        <input type="text" id="mainSearch" autocomplete="off" placeholder="🔍 ابحث عن اسم..." oninput="searchNames(this.value)" style="width:100%; padding:14px; border-radius:8px; border:2px solid var(--main-color);">
+        <div id="searchDropdown"></div>
+    </div>
+
+    <div class="button-bar">
+        <button class="btn admin-only" style="background:#0277bd" onclick="toggleSection('mainBase')">📋 القاعدة الرئيسية</button>
+        <button class="btn admin-only" style="background:var(--accent-color)" onclick="toggleSection('penaltyBase')">⚖️ قاعدة العقوبات</button>
+        <button class="btn" style="background:#6a1b9a" onclick="updateStats(); toggleSection('statsPanel')">📊 الإحصائيات</button>
+        <button class="btn" style="background:#444" onclick="preparePrint()">🖨️ طباعة A4</button>
+        <button class="btn admin-only" style="background:#8d6e63" onclick="toggleSection('historyPanel')">📜 سجل الحركات</button>
+        <button class="btn admin-only" style="background:#2e7d32" onclick="exportToCSV('all')">📤 تصدير الكل</button>
+        <button class="btn admin-only" style="background:#607d8b" onclick="downloadTemplate()">📄 زر النموذج</button>
+        <button class="btn admin-only" style="background:#1565c0" onclick="document.getElementById('fileIn').click()">📥 استيراد</button>
+        <input type="file" id="fileIn" hidden onchange="importFromCSV(this)">
+        <button class="btn admin-only" style="background:#546e7a" onclick="toggleSection('settingsPanel')">⚙️ لوحة التحكم</button>
+    </div>
+
+    <div id="historyPanel" class="view-section">
+        <h3>📜 سجل نشاطات اليوزر</h3>
+        <div class="table-wrapper"><table style="min-width: 800px;"><thead><tr><th>الوقت</th><th>المستخدم</th><th>العملية</th><th>التفاصيل</th></tr></thead><tbody id="historyTb"></tbody></table></div>
+        <button class="btn" style="background:red; margin-top:10px;" onclick="clearHistory()">مسح السجل</button>
+    </div>
+
+    <div id="statsPanel" class="view-section">
+        <h3>📊 إحصائيات لواء 306</h3>
+        <div id="statsContent" class="stats-container"></div>
+    </div>
+
+    <form id="dataForm" class="form-grid" style="margin-top:25px;"></form>
+
+    <div class="admin-only" id="adminActions" style="gap:10px; width: 100%;">
+        <button class="btn btn-save" onclick="saveData('main')">💾 إضافة كجديد</button>
+        <button class="btn btn-update" onclick="updateData()">💾 حفظ التعديلات</button>
+    </div>
+    <button class="btn btn-penalty admin-only" style="width:100%; margin-top:10px;" id="penaltyBtn" onclick="saveData('pen')">⚖️ ترحيل مباشر للعقوبات</button>
+
+    <div id="settingsPanel" class="view-section">
+        <h3>⚙️ الإعدادات والتحكم</h3>
+        <div class="control-group admin-only">
+            <h4>👥 إدارة مستخدمين النظام</h4>
+            <div style="display:flex; gap:5px; margin-bottom:10px;">
+                <input type="text" id="newU" placeholder="اسم المستخدم">
+                <input type="password" id="newP" placeholder="كلمة المرور">
+                <button class="btn" style="background:var(--main-color)" onclick="addNewUser()">إضافة يوزر</button>
+            </div>
+            <div id="usersList"></div>
+        </div>
+        <div class="control-group">
+            <label>لون البرنامج:</label> <input type="color" id="colorPicker" onchange="updateThemeColor(this.value)" style="width:100%;">
+            <label>شفافية الواجهة:</label> <input type="range" min="10" max="100" value="95" oninput="updateOpacity(this.value)" style="width:100%;">
+            <label>صورة الخلفية (العلامة المائية):</label> <input type="file" accept="image/*" onchange="updateBgImage(this)">
+        </div>
+        <div class="control-group admin-only">
+            <h4>تغيير بيانات دخول الآدمن</h4>
+            <input type="password" id="oldPass" placeholder="الرمز القديم للآدمن">
+            <input type="text" id="newName" placeholder="اسم الآدمن الجديد">
+            <input type="password" id="newPass" placeholder="الرمز الجديد للآدمن">
+            <button class="btn btn-update" style="width:100%;" onclick="changeAdminCredentials()">تحديث حساب الآدمن</button>
+        </div>
+        <div id="labelSettings" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;"></div>
+        <button class="btn btn-save" style="width:100%; margin-top:10px;" onclick="saveLabels()">💾 حفظ المسميات</button>
+    </div>
+
+    <div id="mainBase" class="view-section">
+        <h3>📋 القاعدة الرئيسية</h3>
+        <div style="background:#f4f4f4; padding:12px; margin-bottom:10px; border-radius:8px; display:flex; gap:10px; flex-wrap: wrap;">
+            <button class="btn" style="background:#333" onclick="toggleAll('m')">🔘 تحديد الكل</button>
+            <input type="text" id="f1" placeholder="فرز بالفوج..." onkeyup="applyFixFilter('tb1')">
+            <input type="text" id="f2" placeholder="فرز بالسرية..." onkeyup="applyFixFilter('tb1')">
+            <button class="btn admin-only" style="background:#1b5e20" onclick="exportToCSV('selected')">📥 تصدير المحدد</button>
+            <button class="btn admin-only" style="background:red" onclick="deleteItems('main')">🗑️ حذف المحدد</button>
+        </div>
+        <div class="table-wrapper"><table><thead><tr id="th1"></tr></thead><tbody id="tb1"></tbody></table></div>
+    </div>
+
+    <div id="penaltyBase" class="view-section">
+        <h3>⚖️ قاعدة العقوبات</h3>
+        <div style="background:#f4f4f4; padding:12px; margin-bottom:10px; border-radius:8px; display:flex; gap:10px;">
+            <button class="btn" style="background:#333" onclick="toggleAll('p')">🔘 تحديد الكل</button>
+            <button class="btn admin-only" style="background:orange" onclick="moveItems('pen', 'main')">🔓 رفع العقوبة</button>
+            <button class="btn admin-only" style="background:red" onclick="deleteItems('pen')">🗑️ حذف نهائي</button>
+        </div>
+        <div class="table-wrapper"><table><thead><tr id="th2"></tr></thead><tbody id="tb2"></tbody></table></div>
+    </div>
+</div>
+
+<div id="printPage"><div class="print-header" style="text-align:center;"><h1>لواء 306</h1><h2>استمارة معلومات</h2><hr></div><div id="printGrid" class="print-grid"></div></div>
+
+<script>
+    const keys = ["id","fullName","birthDate","birthPlace","gender","motherName","natId","marital","wife","kids","edu","spec","job","prov","dist","subDist","area","mahala","zuqaq","dar","landmark","phone","brigade","fowj","sariyaNum","sanaf","exp","refN","refP","notes","sariyaName"];
+    let labels = JSON.parse(localStorage.getItem('LWA306_LABELS')) || ["ID","الاسم","المواليد","محل التولد","الجنس","الأم","رقم الهوية","الحالة","الزوجة","الأطفال","الدراسة","التخصص","الوظيفة","المحافظة","القضاء","الناحية","المنطقة","المحلة","الزقاق","الدار","دالة","الهاتف","اللواء","الفوج","السرية","الصنف","الخبرة","المعرف","هاتف المعرف","ملاحظات","اسم السرية"];
+    let auth = JSON.parse(localStorage.getItem('LWA306_AUTH')) || { admin: {u:'admin', p:'100'}, users: [{u:'user', p:'200'}] };
+    let currentUid = null;
+    let currentUser = "";
+    let db;
+
+    // --- نظام IndexedDB الجديد ---
+    function openDatabase() {
+        return new Promise((resolve, reject) => {
+            const request = indexedDB.open("LWA306_Database", 2);
+            request.onupgradeneeded = e => {
+                const dbRes = e.target.result;
+                if(!dbRes.objectStoreNames.contains("main")) dbRes.createObjectStore("main", {keyPath: "uid"});
+                if(!dbRes.objectStoreNames.contains("pen")) dbRes.createObjectStore("pen", {keyPath: "uid"});
+            };
+            request.onsuccess = e => { db = e.target.result; resolve(); };
+            request.onerror = e => reject();
+        });
+    }
+
+    async function getAllData(storeName) {
+        return new Promise(resolve => {
+            const tx = db.transaction(storeName, "readonly");
+            const store = tx.objectStore(storeName);
+            const request = store.getAll();
+            request.onsuccess = () => resolve(request.result);
+        });
+    }
+
+    async function saveToDB(storeName, item) {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).put(item);
+        return new Promise(resolve => tx.oncomplete = resolve);
+    }
+
+    async function deleteFromDB(storeName, uid) {
+        const tx = db.transaction(storeName, "readwrite");
+        tx.objectStore(storeName).delete(uid);
+        return new Promise(resolve => tx.oncomplete = resolve);
+    }
+
+    // --- بقية الوظائف المعدلة للتعامل مع DB ---
+
+    async function checkLogin() {
+        await openDatabase();
+        const u = document.getElementById('userInput').value; const p = document.getElementById('passInput').value;
+        if(u === auth.admin.u && p === auth.admin.p) { currentUser = "admin"; setupRole('admin'); }
+        else {
+            const foundUser = auth.users.find(x => x.u === u && x.p === p);
+            if(foundUser) { currentUser = u; setupRole('user'); }
+            else document.getElementById('loginError').style.display = 'block';
+        }
+    }
+
+    async function setupRole(role) {
+        document.getElementById('loginOverlay').style.display = 'none';
+        document.getElementById('appContent').style.display = 'block';
+        initUI();
+        renderUsersList();
+        renderHistory();
+        await renderTables();
+        if(role === 'admin') {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'flex');
+        } else {
+            document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+            document.querySelectorAll('input:not(#mainSearch):not(#userInput):not(#passInput):not(#f1):not(#f2)').forEach(i => i.readOnly = true);
+        }
+    }
+
+    function logAction(type, detail) {
+        if(currentUser === "admin") return;
+        let history = JSON.parse(localStorage.getItem('306_history') || '[]');
+        history.push({ time: new Date().toLocaleString(), user: currentUser, type: type, detail: detail });
+        localStorage.setItem('306_history', JSON.stringify(history.slice(-500))); // حفظ آخر 500 حركة فقط
+    }
+
+    function renderHistory() {
+        const history = JSON.parse(localStorage.getItem('306_history') || '[]');
+        document.getElementById('historyTb').innerHTML = history.reverse().map(h => `<tr><td>${h.time}</td><td>${h.user}</td><td>${h.type}</td><td>${h.detail}</td></tr>`).join('');
+    }
+
+    function clearHistory() { if(confirm("مسح السجل؟")) { localStorage.removeItem('306_history'); renderHistory(); } }
+
+    function addNewUser() {
+        const u = document.getElementById('newU').value; const p = document.getElementById('newP').value;
+        if(u && p) {
+            auth.users.push({u, p});
+            localStorage.setItem('LWA306_AUTH', JSON.stringify(auth));
+            renderUsersList();
+            alert("تم إضافة المستخدم");
+        }
+    }
+
+    function deleteUser(idx) {
+        if(confirm("حذف المستخدم؟")) {
+            auth.users.splice(idx, 1);
+            localStorage.setItem('LWA306_AUTH', JSON.stringify(auth));
+            renderUsersList();
+        }
+    }
+
+    function renderUsersList() {
+        const list = document.getElementById('usersList');
+        if(!list) return;
+        list.innerHTML = auth.users.map((u, i) => `<div style="display:flex; justify-content:space-between; padding:5px; border-bottom:1px solid #ccc; margin-top:5px; background:white; border-radius:4px;"><span>👤 ${u.u}</span><button onclick="deleteUser(${i})" style="color:red; border:none; background:none; cursor:pointer;">حذف</button></div>`).join('');
+    }
+
+    function changeAdminCredentials() {
+        const old = document.getElementById('oldPass').value;
+        if(old !== auth.admin.p) return alert("الرمز القديم للآدمن خطأ");
+        auth.admin.u = document.getElementById('newName').value || auth.admin.u;
+        auth.admin.p = document.getElementById('newPass').value || auth.admin.p;
+        localStorage.setItem('LWA306_AUTH', JSON.stringify(auth));
+        alert("تم تحديث بيانات الآدمن");
+    }
+
+    function initUI() {
+        const form = document.getElementById('dataForm'); const settings = document.getElementById('labelSettings');
+        form.innerHTML = ""; settings.innerHTML = "";
+        keys.forEach((k, i) => {
+            form.innerHTML += `<div class="field-group"><label>${labels[i]}</label><input type="text" id="${k}"></div>`;
+            settings.innerHTML += `<div class="field-group"><label>${k}</label><input type="text" id="set_${i}" value="${labels[i]}"></div>`;
+        });
+        loadStyles();
+    }
+
+    function loadStyles() {
+        const c = localStorage.getItem('306_col'); if(c) updateThemeColor(c);
+        const o = localStorage.getItem('306_op'); if(o) updateOpacity(o);
+        const b = localStorage.getItem('306_bg'); if(b) { document.body.style.backgroundImage = `url(${b})`; document.documentElement.style.setProperty('--bg-img', `url(${b})`); }
+    }
+
+    function updateThemeColor(v) { document.documentElement.style.setProperty('--main-color', v); localStorage.setItem('306_col', v); }
+    function updateOpacity(v) { document.documentElement.style.setProperty('--form-bg', `rgba(255, 255, 255, ${v/100})`); localStorage.setItem('306_op', v); }
+    function updateBgImage(i) { if(i.files[0]) { const r = new FileReader(); r.onload = e => { document.body.style.backgroundImage = `url(${e.target.result})`; document.documentElement.style.setProperty('--bg-img', `url(${e.target.result})`); localStorage.setItem('306_bg', e.target.result); }; r.readAsDataURL(i.files[0]); } }
+
+    async function renderTables() {
+        const m = await getAllData('main'); const p = await getAllData('pen');
+        const h = "<th>تحديد</th>" + labels.map(l => `<th>${l}</th>`).join('');
+        document.getElementById('th1').innerHTML = h; document.getElementById('th2').innerHTML = h;
+        const row = (r, t) => `<tr data-uid="${r.uid}"><td><input type="checkbox" class="c-${t}" value="${r.uid}"></td>${keys.map(k => `<td>${r[k]||''}</td>`).join('')}</tr>`;
+        document.getElementById('tb1').innerHTML = m.map(r => row(r, 'm')).join('');
+        document.getElementById('tb2').innerHTML = p.map(r => row(r, 'p')).join('');
+    }
+
+    function applyFixFilter(tableId) {
+        const f1 = document.getElementById('f1').value.trim().toUpperCase();
+        const f2 = document.getElementById('f2').value.trim().toUpperCase();
+        const rows = document.getElementById(tableId).getElementsByTagName('tr');
+        const idxFowj = keys.indexOf("fowj") + 1;
+        const idxSariya = keys.indexOf("sariyaNum") + 1;
+        for (let r of rows) {
+            const v1 = r.cells[idxFowj] ? r.cells[idxFowj].textContent.toUpperCase() : "";
+            const v2 = r.cells[idxSariya] ? r.cells[idxSariya].textContent.toUpperCase() : "";
+            r.style.display = (v1.includes(f1) && v2.includes(f2)) ? "" : "none";
+        }
+    }
+
+    async function updateStats() {
+        const m = await getAllData('main'); const p = await getAllData('pen');
+        const fowjData = {};
+        m.forEach(i => { if(i.fowj) fowjData[i.fowj] = (fowjData[i.fowj] || 0) + 1; });
+        let html = `<div class="stat-card"><h4>القوة الكلية (اللواء)</h4><p>${m.length}</p></div>`;
+        html += `<div class="stat-card" style="border-right-color:var(--accent-color)"><h4>قاعدة العقوبات</h4><p>${p.length}</p></div>`;
+        for (let f in fowjData) { html += `<div class="stat-card" style="border-right-color:#0277bd"><h4>${f}</h4><p>${fowjData[f]}</p></div>`; }
+        document.getElementById('statsContent').innerHTML = html;
+    }
+
+    async function deleteItems(type) {
+        if(!confirm("حذف المحدد؟")) return;
+        const selectedUids = Array.from(document.querySelectorAll(`.c-${type==='main'?'m':'p'}:checked`)).map(c => c.value);
+        for(let uid of selectedUids) { await deleteFromDB(type, uid); }
+        await renderTables();
+    }
+
+    async function moveItems(f, t) {
+        const selectedUids = Array.from(document.querySelectorAll('.c-p:checked')).map(c => c.value);
+        const dbF = await getAllData(f);
+        for(let id of selectedUids) {
+            let item = dbF.find(x => String(x.uid) === String(id));
+            if(item) {
+                await saveToDB(t, item);
+                await deleteFromDB(f, item.uid);
+            }
+        }
+        await renderTables();
+    }
+
+    async function exportToCSV(mode) {
+        let dbData = await getAllData('main');
+        if(mode === 'selected') {
+            const ids = Array.from(document.querySelectorAll('.c-m:checked')).map(c => c.value);
+            if(ids.length === 0) return alert("حدد أسماء أولاً");
+            dbData = dbData.filter(item => ids.includes(String(item.uid)));
+        }
+        const csv = "\uFEFF" + labels.join(",") + "\n" + dbData.map(r => keys.map(k => `"${r[k]||''}"`).join(",")).join("\n");
+        const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); l.download = "data_306.csv"; l.click();
+    }
+
+    async function saveData(type) {
+        let d = { uid: "UID_" + Date.now() + "_" + Math.floor(Math.random()*1000) };
+        keys.forEach(k => d[k] = document.getElementById(k).value);
+        if(!d.fullName) return alert("الاسم مطلوب");
+        await saveToDB(type, d);
+        await renderTables();
+        alert("تم الحفظ");
+    }
+
+    async function updateData() {
+        if(!currentUid) return alert("ابحث عن اسم");
+        const dbM = await getAllData('main');
+        let item = dbM.find(x => String(x.uid) === String(currentUid));
+        if(item) { 
+            keys.forEach(k => item[k] = document.getElementById(k).value); 
+            await saveToDB('main', item);
+            await renderTables();
+            alert("تم التحديث"); 
+        }
+    }
+
+    async function searchNames(v) {
+        if(v.length < 2) { document.getElementById('searchDropdown').style.display = 'none'; return; }
+        const dbM = await getAllData('main');
+        const matches = dbM.filter(i => i.fullName && i.fullName.includes(v));
+        const drop = document.getElementById('searchDropdown');
+        drop.innerHTML = matches.map(m => `<div class="search-item" onclick="loadItem('${m.uid}')">${m.fullName}</div>`).join('');
+        drop.style.display = 'block';
+        if(v.length > 3) logAction("بحث", v);
+    }
+
+    async function loadItem(uid) {
+        const dbM = await getAllData('main');
+        const item = dbM.find(i => String(i.uid) === String(uid));
+        if(item) { keys.forEach(k => document.getElementById(k).value = item[k] || ''); currentUid = uid; }
+        document.getElementById('searchDropdown').style.display = 'none';
+    }
+
+    async function importFromCSV(inp) {
+        const r = new FileReader(); r.onload = async e => {
+            const lines = e.target.result.split(/\r?\n/);
+            for(let i=1; i<lines.length; i++) {
+                const cols = lines[i].split(",");
+                if(cols.length > 5) {
+                    let o = { uid: "IMP_" + Date.now() + "_" + i };
+                    keys.forEach((k, idx) => o[k] = cols[idx] ? cols[idx].replace(/"/g,'').trim() : "");
+                    await saveToDB('main', o);
+                }
+            }
+            await renderTables(); alert("تم الاستيراد");
+        }; r.readAsText(inp.files[0], 'UTF-8');
+    }
+
+    function saveLabels() {
+        const nl = []; keys.forEach((_, i) => nl.push(document.getElementById(`set_${i}`).value));
+        localStorage.setItem('LWA306_LABELS', JSON.stringify(nl)); location.reload();
+    }
+
+    function toggleSection(id) { const s = document.getElementById(id); s.style.display = (s.style.display === 'block') ? 'none' : 'block'; }
+    function toggleAll(t) { 
+        const tableId = (t === 'm') ? 'tb1' : 'tb2';
+        const visibleChecks = Array.from(document.querySelectorAll(`#${tableId} tr`)).filter(tr => tr.style.display !== 'none').map(tr => tr.querySelector('input[type="checkbox"]'));
+        const allChecked = visibleChecks.every(c => c.checked);
+        visibleChecks.forEach(c => c.checked = !allChecked);
+    }
+    function downloadTemplate() { const csv = "\uFEFF" + labels.join(",") + "\n"; const l = document.createElement("a"); l.href = URL.createObjectURL(new Blob([csv], {type:'text/csv'})); l.download = "Template.csv"; l.click(); }
+    
+    function preparePrint() { 
+        let h = ""; 
+        keys.forEach((k, i) => { h += `<div class="print-box"><b>${labels[i]}</b><span>${document.getElementById(k).value || '...'}</span></div>`; }); 
+        document.getElementById('printGrid').innerHTML = h;
+        logAction("طباعة", document.getElementById('fullName').value);
+        window.print(); 
+    }
+</script>
 </body>
 </html>
